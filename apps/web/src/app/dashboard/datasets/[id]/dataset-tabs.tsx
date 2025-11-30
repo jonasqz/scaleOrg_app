@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, BarChart3, TrendingUp, GitCompare, Upload } from 'lucide-react';
+import { Users, BarChart3, TrendingUp, GitCompare, Upload, Download, Plus } from 'lucide-react';
+import { exportAnalyticsToPDF } from './export-analytics-pdf';
+import Link from 'next/link';
 import AddEmployeeForm from './add-employee-form';
 import CSVUpload from './csv-upload';
 import EmployeeListClient from './employee-list-client';
@@ -11,6 +13,7 @@ import OutliersDisplay from './outliers-display';
 import TenureDisplay from './tenure-display';
 import InsightsDisplay from './insights-display';
 import ScenarioBuilder from './scenario-builder';
+import SavedScenariosList from './saved-scenarios-list';
 
 interface Employee {
   id: string;
@@ -36,6 +39,7 @@ interface DatasetTabsProps {
   currency: string;
   employees: Employee[];
   metrics: any;
+  datasetName?: string;
 }
 
 type TabId = 'overview' | 'employees' | 'analytics' | 'scenarios';
@@ -45,8 +49,110 @@ export default function DatasetTabs({
   currency,
   employees,
   metrics,
+  datasetName = 'Workforce Dataset',
 }: DatasetTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [benchmarkData, setBenchmarkData] = useState<any>(null);
+  const [insightsData, setInsightsData] = useState<any[]>([]);
+  const [isLoadingExportData, setIsLoadingExportData] = useState(false);
+
+  const handleExportAnalytics = async () => {
+    setIsLoadingExportData(true);
+    try {
+      // Fetch benchmarks if not already loaded
+      let benchmarks = benchmarkData;
+      if (!benchmarks) {
+        try {
+          const benchmarkRes = await fetch(`/api/datasets/${datasetId}/benchmarks`);
+          if (benchmarkRes.ok) {
+            benchmarks = await benchmarkRes.json();
+          }
+        } catch (error) {
+          console.error('Error fetching benchmarks:', error);
+        }
+      }
+
+      // Fetch insights if not already loaded
+      let insights = insightsData;
+      if (insights.length === 0) {
+        try {
+          const insightsRes = await fetch(`/api/datasets/${datasetId}/insights`);
+          if (insightsRes.ok) {
+            const data = await insightsRes.json();
+            insights = data.insights || [];
+          }
+        } catch (error) {
+          console.error('Error fetching insights:', error);
+        }
+      }
+
+      // Calculate outliers from employees
+      const outliers = calculateOutliers(employees);
+
+      exportAnalyticsToPDF({
+        datasetName,
+        currency,
+        metrics,
+        employees,
+        benchmarks,
+        outliers,
+        insights,
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export PDF');
+    } finally {
+      setIsLoadingExportData(false);
+    }
+  };
+
+  // Helper function to calculate outliers
+  const calculateOutliers = (employees: Employee[]) => {
+    // Calculate high cost outliers (z-score > 2)
+    const compensations = employees.map(e => e.totalCompensation);
+    const mean = compensations.reduce((sum, val) => sum + val, 0) / compensations.length;
+    const stdDev = Math.sqrt(
+      compensations.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / compensations.length
+    );
+
+    const highCostEmployees = employees
+      .map(emp => {
+        const zScore = (emp.totalCompensation - mean) / stdDev;
+        return {
+          employeeId: emp.id,
+          department: emp.department,
+          role: emp.role,
+          totalCompensation: emp.totalCompensation,
+          zScore,
+          deltaFromMean: emp.totalCompensation - mean,
+        };
+      })
+      .filter(emp => emp.zScore > 2)
+      .sort((a, b) => b.zScore - a.zScore);
+
+    // Calculate managers with low span of control
+    const managers = employees.filter(emp => emp.managerId === null ||
+      employees.some(e => e.managerId === emp.id));
+
+    const lowSpanManagers = managers
+      .map(mgr => {
+        const directReports = employees.filter(e => e.managerId === mgr.id);
+        return {
+          managerId: mgr.id,
+          managerName: mgr.employeeName,
+          department: mgr.department,
+          directReportsCount: directReports.length,
+          expectedMin: 5,
+        };
+      })
+      .filter(mgr => mgr.directReportsCount > 0 && mgr.directReportsCount < 5);
+
+    return {
+      highCostEmployees,
+      lowSpanManagers,
+      departmentImbalances: [],
+    };
+  };
 
   const tabs = [
     { id: 'overview' as TabId, label: 'Overview', icon: BarChart3 },
@@ -233,6 +339,20 @@ export default function DatasetTabs({
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
           <div className="space-y-8">
+            {/* Export Button */}
+            {metrics && employees.length >= 3 && (
+              <div className="flex justify-end">
+                <button
+                  onClick={handleExportAnalytics}
+                  disabled={isLoadingExportData}
+                  className="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-white px-4 py-2 font-medium text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Download className="h-4 w-4" />
+                  {isLoadingExportData ? 'Generating PDF...' : 'Export to PDF'}
+                </button>
+              </div>
+            )}
+
             {/* Visualizations */}
             {metrics && employees.length >= 3 && (
               <MetricsCharts
@@ -295,14 +415,23 @@ export default function DatasetTabs({
           <div className="space-y-6">
             {metrics ? (
               <>
-                <div className="rounded-lg border bg-purple-50 p-6">
-                  <h2 className="mb-2 text-lg font-semibold text-purple-900">
-                    Scenario Modeling
-                  </h2>
-                  <p className="text-sm text-purple-700">
-                    Run what-if analyses to understand the impact of workforce changes on your
-                    metrics. Model hiring freezes, cost reductions, growth plans, and more.
-                  </p>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="rounded-lg border bg-purple-50 p-6 flex-1">
+                    <h2 className="mb-2 text-lg font-semibold text-purple-900">
+                      Scenario Modeling
+                    </h2>
+                    <p className="text-sm text-purple-700">
+                      Run what-if analyses to understand the impact of workforce changes on your
+                      metrics. Model hiring freezes, cost reductions, growth plans, and more.
+                    </p>
+                  </div>
+                  <Link
+                    href={`/dashboard/datasets/${datasetId}/scenarios/new`}
+                    className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700 whitespace-nowrap"
+                  >
+                    <Plus className="h-5 w-5" />
+                    New Detailed Scenario
+                  </Link>
                 </div>
 
                 <ScenarioBuilder
@@ -315,6 +444,14 @@ export default function DatasetTabs({
                     rdToGTM: metrics.ratios.rdToGTM,
                   }}
                   departments={metrics.departments}
+                  employees={employees}
+                  onViewEmployees={() => setActiveTab('employees')}
+                />
+
+                {/* Saved Scenarios */}
+                <SavedScenariosList
+                  datasetId={datasetId}
+                  currency={currency}
                 />
               </>
             ) : (

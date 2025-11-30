@@ -3,13 +3,12 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { prisma } from '@scleorg/database';
-import { calculateAllMetrics } from '@scleorg/calculations';
-import DatasetTabs from './dataset-tabs';
+import ScenarioEditorClient from './scenario-editor-client';
 
-export default async function DatasetDetailPage({
+export default async function ScenarioDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: { id: string; scenarioId: string };
 }) {
   const { userId } = await auth();
 
@@ -17,7 +16,6 @@ export default async function DatasetDetailPage({
     redirect('/sign-in');
   }
 
-  // Get user
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
   });
@@ -34,7 +32,7 @@ export default async function DatasetDetailPage({
     },
     include: {
       employees: {
-        orderBy: { createdAt: 'desc' },
+        orderBy: { department: 'asc' },
       },
     },
   });
@@ -43,11 +41,23 @@ export default async function DatasetDetailPage({
     notFound();
   }
 
-  // Calculate metrics if we have employees
-  const metrics =
-    dataset.employees.length > 0
-      ? calculateAllMetrics(dataset.employees, dataset)
-      : null;
+  // Get scenario
+  const scenario = await prisma.scenario.findFirst({
+    where: {
+      id: params.scenarioId,
+      datasetId: dataset.id,
+    },
+    include: {
+      results: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+      },
+    },
+  });
+
+  if (!scenario) {
+    notFound();
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,37 +65,33 @@ export default async function DatasetDetailPage({
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4">
           <Link
-            href="/dashboard"
+            href={`/dashboard/datasets/${params.id}`}
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Datasets
+            Back to Dataset
           </Link>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Dataset Header */}
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
-            {dataset.name}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">
+            {scenario.name}
           </h1>
-          {dataset.description && (
-            <p className="text-gray-600">{dataset.description}</p>
-          )}
-          {dataset.companyName && (
-            <p className="mt-1 text-sm text-gray-500">{dataset.companyName}</p>
+          {scenario.description && (
+            <p className="mt-2 text-gray-600">{scenario.description}</p>
           )}
         </div>
 
-        {/* Tabbed Content */}
-        <DatasetTabs
+        <ScenarioEditorClient
+          scenarioId={scenario.id}
           datasetId={dataset.id}
+          datasetName={dataset.name}
           currency={dataset.currency}
           employees={dataset.employees}
-          metrics={metrics}
-          datasetName={dataset.name}
+          initialScenario={scenario}
         />
       </main>
     </div>

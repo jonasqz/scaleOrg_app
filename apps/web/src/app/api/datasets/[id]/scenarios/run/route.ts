@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@scleorg/database';
+import type { AffectedEmployee } from '@scleorg/types';
 import {
   applyHiringFreeze,
   applyCostReduction,
@@ -44,10 +45,11 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { type, adjustments, reductionPct, targetDepartments, additionalFTE, distribution, targetRatio } = body;
+    const { type, adjustments, reductionPct, targetDepartments, additionalFTE, distribution, targetRatio, currentCash, includeTimeline } = body;
 
     const baselineEmployees = dataset.employees.filter(emp => !emp.endDate);
     let scenarioEmployees = [...baselineEmployees];
+    const affectedEmployees: AffectedEmployee[] = [];
 
     // Apply transformation based on scenario type
     switch (type) {
@@ -62,6 +64,23 @@ export async function POST(
           reductionPct || 10,
           targetDepartments
         );
+
+        // Track removed employees
+        const removedIds = new Set(scenarioEmployees.map(e => e.id));
+        baselineEmployees.forEach(emp => {
+          if (!removedIds.has(emp.id)) {
+            affectedEmployees.push({
+              id: emp.id,
+              employeeId: emp.employeeId,
+              employeeName: emp.employeeName,
+              department: emp.department,
+              role: emp.role,
+              totalCompensation: Number(emp.totalCompensation),
+              action: 'remove',
+              effectiveDate: null, // Will be set by frontend or default
+            });
+          }
+        });
         break;
 
       case 'growth':
@@ -71,6 +90,24 @@ export async function POST(
             additionalFTE,
             distribution
           );
+
+          // Track new hires
+          const baselineIds = new Set(baselineEmployees.map(e => e.id));
+          scenarioEmployees.forEach(emp => {
+            if (!baselineIds.has(emp.id)) {
+              affectedEmployees.push({
+                id: emp.id,
+                employeeId: emp.employeeId,
+                employeeName: emp.employeeName,
+                department: emp.department,
+                role: emp.role,
+                totalCompensation: Number(emp.totalCompensation),
+                action: 'add',
+                effectiveDate: null, // Will be set by frontend or default
+                isNew: true,
+              });
+            }
+          });
         }
         break;
 
@@ -104,6 +141,21 @@ export async function POST(
                 Number(b.totalCompensation) - Number(a.totalCompensation)
               );
               const numToRemove = Math.abs(changeNum);
+
+              // Track removed employees
+              sorted.slice(0, numToRemove).forEach(emp => {
+                affectedEmployees.push({
+                  id: emp.id,
+                  employeeId: emp.employeeId,
+                  employeeName: emp.employeeName,
+                  department: emp.department,
+                  role: emp.role,
+                  totalCompensation: Number(emp.totalCompensation),
+                  action: 'remove',
+                  effectiveDate: null,
+                });
+              });
+
               // Skip the first numToRemove (highest paid) and keep the rest
               scenarioEmployees.push(...sorted.slice(numToRemove));
             } else if (changeNum > 0) {
@@ -115,7 +167,7 @@ export async function POST(
                 : 100000;
 
               for (let i = 0; i < changeNum; i++) {
-                scenarioEmployees.push({
+                const newHire = {
                   id: `new_${dept}_${i}`,
                   datasetId: dataset.id,
                   employeeId: `NEW_${dept}_${i}`,
@@ -137,7 +189,22 @@ export async function POST(
                   equityValue: null,
                   startDate: null,
                   endDate: null,
-                } as any);
+                } as any;
+
+                scenarioEmployees.push(newHire);
+
+                // Track new hire
+                affectedEmployees.push({
+                  id: newHire.id,
+                  employeeId: newHire.employeeId,
+                  employeeName: newHire.employeeName,
+                  department: newHire.department,
+                  role: newHire.role,
+                  totalCompensation: avgComp,
+                  action: 'add',
+                  effectiveDate: null,
+                  isNew: true,
+                });
               }
             } else {
               // No change
@@ -165,7 +232,12 @@ export async function POST(
     const result = calculateScenarioMetrics(
       baselineEmployees,
       scenarioEmployees,
-      dataset.totalRevenue ? Number(dataset.totalRevenue) : null
+      dataset.totalRevenue ? Number(dataset.totalRevenue) : null,
+      {
+        includeTimeline: includeTimeline !== false, // Default to true
+        currentCash: currentCash ? Number(currentCash) : undefined,
+        affectedEmployees: affectedEmployees.length > 0 ? affectedEmployees : undefined,
+      }
     );
 
     return NextResponse.json(result);

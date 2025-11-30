@@ -124,6 +124,43 @@ export interface ScenarioParams {
   parameters: Record<string, any>;
 }
 
+export interface AffectedEmployee {
+  id: string;
+  employeeId: string;
+  employeeName: string | null;
+  department: string;
+  role: string | null;
+  totalCompensation: number;
+  action: 'remove' | 'add';
+  effectiveDate: Date | null;
+  isNew?: boolean;
+}
+
+export interface MonthlyBurnRate {
+  month: string; // e.g., "2025-01", "2025-02"
+  baselineCost: number;
+  scenarioCost: number;
+  savings: number;
+  effectiveEmployeeCount: number;
+}
+
+export interface RunwayAnalysis {
+  currentCash: number | null;
+  baselineRunwayMonths: number | null;
+  scenarioRunwayMonths: number | null;
+  runwayExtensionMonths: number | null;
+  baselineRunoutDate: Date | null;
+  scenarioRunoutDate: Date | null;
+}
+
+export interface YearEndProjection {
+  year: number;
+  baselineTotal: number;
+  scenarioTotal: number;
+  totalSavings: number;
+  avgMonthlyBurn: number;
+}
+
 export interface ScenarioResult {
   baseline: SummaryMetrics;
   scenario: SummaryMetrics;
@@ -133,4 +170,8 @@ export interface ScenarioResult {
     costSavingsPct: number;
     ratioChange: number;
   };
+  affectedEmployees?: AffectedEmployee[];
+  monthlyBurnRate?: MonthlyBurnRate[];
+  runway?: RunwayAnalysis;
+  yearEndProjection?: YearEndProjection;
 }

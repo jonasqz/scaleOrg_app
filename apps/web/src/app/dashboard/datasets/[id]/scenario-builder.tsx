@@ -2,6 +2,19 @@
 
 import { useState } from 'react';
 import { X, Play, TrendingUp, TrendingDown, Users, DollarSign, AlertCircle } from 'lucide-react';
+import ScenarioResultsEnhanced from './scenario-results-enhanced';
+
+interface Employee {
+  id: string;
+  employeeName: string | null;
+  email: string | null;
+  department: string;
+  role: string | null;
+  level: string | null;
+  totalCompensation: number;
+  baseSalary: number | null;
+  startDate: Date | null;
+}
 
 interface ScenarioBuilderProps {
   datasetId: string;
@@ -13,6 +26,45 @@ interface ScenarioBuilderProps {
     rdToGTM: number;
   };
   departments: { [key: string]: { fte: number; cost: number; employeeCount: number } };
+  employees: Employee[];
+  onViewEmployees?: () => void;
+}
+
+interface AffectedEmployee {
+  id: string;
+  employeeId: string;
+  employeeName: string | null;
+  department: string;
+  role: string | null;
+  totalCompensation: number;
+  action: 'remove' | 'add';
+  effectiveDate: Date | null;
+  isNew?: boolean;
+}
+
+interface MonthlyBurnRate {
+  month: string;
+  baselineCost: number;
+  scenarioCost: number;
+  savings: number;
+  effectiveEmployeeCount: number;
+}
+
+interface RunwayAnalysis {
+  currentCash: number | null;
+  baselineRunwayMonths: number | null;
+  scenarioRunwayMonths: number | null;
+  runwayExtensionMonths: number | null;
+  baselineRunoutDate: Date | null;
+  scenarioRunoutDate: Date | null;
+}
+
+interface YearEndProjection {
+  year: number;
+  baselineTotal: number;
+  scenarioTotal: number;
+  totalSavings: number;
+  avgMonthlyBurn: number;
 }
 
 interface ScenarioResult {
@@ -33,6 +85,10 @@ interface ScenarioResult {
     costSavings: number;
     costSavingsPct: number;
   };
+  affectedEmployees?: AffectedEmployee[];
+  monthlyBurnRate?: MonthlyBurnRate[];
+  runway?: RunwayAnalysis;
+  yearEndProjection?: YearEndProjection;
 }
 
 type ScenarioType = 'custom' | 'hiring_freeze' | 'cost_reduction' | 'growth' | 'target_ratio';
@@ -41,12 +97,15 @@ export default function ScenarioBuilder({
   datasetId,
   currency,
   currentMetrics,
-  departments
+  departments,
+  employees,
+  onViewEmployees
 }: ScenarioBuilderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scenarioType, setScenarioType] = useState<ScenarioType>('custom');
   const [scenarioName, setScenarioName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<ScenarioResult | null>(null);
 
   // Custom scenario: department adjustments
@@ -63,12 +122,17 @@ export default function ScenarioBuilder({
   // Target ratio scenario
   const [targetRatio, setTargetRatio] = useState(1.0);
 
+  // Financial planning
+  const [currentCash, setCurrentCash] = useState<string>('');
+
   const handleRunScenario = async () => {
     setLoading(true);
     try {
       const payload: any = {
         type: scenarioType,
         name: scenarioName || getDefaultScenarioName(),
+        currentCash: currentCash ? parseFloat(currentCash) : undefined,
+        includeTimeline: true,
       };
 
       if (scenarioType === 'custom') {
@@ -116,6 +180,55 @@ export default function ScenarioBuilder({
       ...deptAdjustments,
       [dept]: (deptAdjustments[dept] || 0) + change,
     });
+  };
+
+  const handleSaveScenario = async () => {
+    if (!result) return;
+
+    setSaving(true);
+    try {
+      const payload = {
+        name: scenarioName || getDefaultScenarioName(),
+        description: null,
+        type: scenarioType,
+        parameters: {
+          adjustments: deptAdjustments,
+          reductionPct,
+          targetDepartments,
+          additionalFTE,
+          distribution: growthDist,
+          targetRatio,
+        },
+        operations: {},
+        affectedEmployees: result.affectedEmployees,
+        monthlyBurnRate: result.monthlyBurnRate,
+        runway: result.runway,
+        yearEndProjection: result.yearEndProjection,
+        currentCash: currentCash ? parseFloat(currentCash) : null,
+        baseline: result.baseline,
+        scenario: result.scenario,
+        delta: result.delta,
+      };
+
+      const response = await fetch(`/api/datasets/${datasetId}/scenarios/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error('Failed to save scenario');
+
+      const data = await response.json();
+      alert('Scenario saved successfully!');
+
+      // Optionally close or reset
+      handleClose();
+    } catch (error) {
+      console.error('Save scenario error:', error);
+      alert('Failed to save scenario');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleClose = () => {
@@ -179,6 +292,26 @@ export default function ScenarioBuilder({
               placeholder={getDefaultScenarioName()}
               className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
+          </div>
+
+          {/* Current Cash Balance */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Current Cash Balance (optional - for runway analysis)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-500">{currency}</span>
+              <input
+                type="number"
+                value={currentCash}
+                onChange={(e) => setCurrentCash(e.target.value)}
+                placeholder="e.g., 2500000"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 pl-12 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Enter your current cash balance to see runway projections
+            </p>
           </div>
 
           {/* Custom Adjustments */}
@@ -471,6 +604,16 @@ export default function ScenarioBuilder({
             </div>
           </div>
 
+          {/* Enhanced Results */}
+          <ScenarioResultsEnhanced
+            affectedEmployees={result.affectedEmployees}
+            monthlyBurnRate={result.monthlyBurnRate}
+            runway={result.runway}
+            yearEndProjection={result.yearEndProjection}
+            currency={currency}
+            onViewEmployees={onViewEmployees}
+          />
+
           {/* Actions */}
           <div className="flex items-center gap-3">
             <button
@@ -478,6 +621,13 @@ export default function ScenarioBuilder({
               className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 hover:bg-gray-50"
             >
               Run Another Scenario
+            </button>
+            <button
+              onClick={handleSaveScenario}
+              disabled={saving}
+              className="flex-1 rounded-lg border border-purple-600 bg-white px-4 py-2 font-medium text-purple-600 hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : 'Save Scenario'}
             </button>
             <button
               onClick={handleClose}

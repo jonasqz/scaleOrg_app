@@ -1,7 +1,7 @@
 // Scenario transformation functions
 
 import type { Employee, OpenRole } from '@scleorg/database';
-import type { ScenarioResult, SummaryMetrics } from '@scleorg/types';
+import type { ScenarioResult, SummaryMetrics, AffectedEmployee } from '@scleorg/types';
 import {
   calculateTotalCost,
   calculateTotalFTE,
@@ -10,6 +10,12 @@ import {
 import { calculateDepartmentBreakdown, calculateRDtoGTMRatio } from '../core/structure';
 import { normalizeDepartment } from '../utils/normalizations';
 import { filterActiveEmployees } from '../utils/aggregations';
+import {
+  calculateMonthlyBurnRate,
+  calculateRunwayAnalysis,
+  calculateYearEndProjection,
+  generateDefaultEffectiveDates,
+} from './timeline';
 
 export function applyHiringFreeze(
   employees: Employee[],
@@ -131,7 +137,12 @@ export function applyTargetRatio(
 export function calculateScenarioMetrics(
   baselineEmployees: Employee[],
   scenarioEmployees: Employee[],
-  totalRevenue: number | null
+  totalRevenue: number | null,
+  options?: {
+    includeTimeline?: boolean;
+    currentCash?: number;
+    affectedEmployees?: AffectedEmployee[];
+  }
 ): ScenarioResult {
   const baselineCost = calculateTotalCost(baselineEmployees);
   const baselineFTE = calculateTotalFTE(baselineEmployees);
@@ -169,9 +180,40 @@ export function calculateScenarioMetrics(
       calculateRDtoGTMRatio(baselineBreakdown),
   };
 
-  return {
+  const result: ScenarioResult = {
     baseline,
     scenario,
     delta,
   };
+
+  // Add timeline calculations if requested
+  if (options?.includeTimeline && options?.affectedEmployees) {
+    // Generate default dates if not provided
+    const affectedWithDates = generateDefaultEffectiveDates(options.affectedEmployees);
+
+    // Calculate 12 months forward
+    const today = new Date();
+    const endDate = new Date(today.getFullYear(), today.getMonth() + 12, 0);
+
+    const monthlyBurnRate = calculateMonthlyBurnRate(
+      baselineEmployees,
+      affectedWithDates,
+      today,
+      endDate
+    );
+
+    const runway = calculateRunwayAnalysis(
+      options.currentCash || null,
+      monthlyBurnRate
+    );
+
+    const yearEndProjection = calculateYearEndProjection(monthlyBurnRate);
+
+    result.affectedEmployees = affectedWithDates;
+    result.monthlyBurnRate = monthlyBurnRate;
+    result.runway = runway;
+    result.yearEndProjection = yearEndProjection;
+  }
+
+  return result;
 }

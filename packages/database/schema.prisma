@@ -189,6 +189,13 @@ model Scenario {
   parameters    Json
   operations    Json
 
+  // Enhanced timeline data (JSON)
+  affectedEmployees Json?  @map("affected_employees")
+  monthlyBurnRate   Json?  @map("monthly_burn_rate")
+  runway            Json?  @map("runway")
+  yearEndProjection Json?  @map("year_end_projection")
+  currentCash       Decimal? @map("current_cash") @db.Decimal(15, 2)
+
   status        ScenarioStatus @default(DRAFT)
   calculatedAt  DateTime?      @map("calculated_at")
 
@@ -207,7 +214,7 @@ model Scenario {
 }
 
 enum ScenarioType {
-  FREEZE_HIRING
+  HIRING_FREEZE
   COST_REDUCTION
   GROWTH
   TARGET_RATIO

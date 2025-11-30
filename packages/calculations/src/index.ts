@@ -11,4 +11,5 @@ export * from './utils/aggregations';
 export * from './benchmarks/compare';
 export * from './benchmarks/data';
 export * from './scenarios/transform';
+export * from './scenarios/timeline';
 export * from './calculator';
