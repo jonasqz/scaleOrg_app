@@ -1,0 +1,330 @@
+// Prisma schema for scleorg
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model (minimal - most data managed by Clerk)
+model User {
+  id           String    @id @default(uuid())
+  clerkId      String    @unique @map("clerk_id")
+  email        String
+  companyName  String?   @map("company_name")
+  industry     String?
+  companySize  String?   @map("company_size")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  datasets     Dataset[]
+
+  @@index([clerkId])
+  @@map("users")
+}
+
+// Dataset model
+model Dataset {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+
+  // Metadata
+  name            String
+  description     String?
+  status          DatasetStatus @default(PROCESSING)
+
+  // Upload info
+  fileName        String    @map("file_name")
+  fileUrl         String    @map("file_url")
+  fileSizeBytes   Int?      @map("file_size_bytes")
+  fileType        String    @map("file_type")
+
+  // Column mapping (JSON)
+  columnMapping   Json?     @map("column_mapping")
+
+  // Organization metadata
+  companyName     String?   @map("company_name")
+  totalRevenue    Decimal?  @map("total_revenue") @db.Decimal(15, 2)
+  fiscalYearStart DateTime? @map("fiscal_year_start")
+  currency        String    @default("EUR")
+
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  processedAt     DateTime? @map("processed_at")
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employees       Employee[]
+  openRoles       OpenRole[]
+  scenarios       Scenario[]
+  insights        Insight[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("datasets")
+}
+
+enum DatasetStatus {
+  PROCESSING
+  MAPPING_REQUIRED
+  CALCULATING
+  READY
+  FAILED
+}
+
+// Employee model
+model Employee {
+  id                 String    @id @default(uuid())
+  datasetId          String    @map("dataset_id")
+
+  // Identity (optional/anonymizable)
+  employeeId         String?   @map("employee_id")
+  employeeName       String?   @map("employee_name")
+  email              String?
+
+  // Organization structure
+  department         String
+  role               String?
+  level              EmployeeLevel?
+  managerId          String?   @map("manager_id")
+  costCenter         String?   @map("cost_center")
+
+  // Employment details
+  employmentType     EmploymentType @default(FTE) @map("employment_type")
+  fteFactor          Decimal   @default(1.0) @map("fte_factor") @db.Decimal(3, 2)
+  location           String?
+
+  // Compensation
+  annualSalary       Decimal?  @map("annual_salary") @db.Decimal(12, 2)
+  bonus              Decimal?  @db.Decimal(12, 2)
+  equityValue        Decimal?  @map("equity_value") @db.Decimal(12, 2)
+  totalCompensation  Decimal   @map("total_compensation") @db.Decimal(12, 2)
+
+  // Dates
+  startDate          DateTime? @map("start_date")
+  endDate            DateTime? @map("end_date")
+
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  dataset            Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  manager            Employee? @relation("EmployeeManager", fields: [managerId], references: [id])
+  directReports      Employee[] @relation("EmployeeManager")
+
+  @@index([datasetId])
+  @@index([datasetId, department])
+  @@index([managerId])
+  @@index([employmentType])
+  @@map("employees")
+}
+
+enum EmployeeLevel {
+  IC
+  MANAGER
+  DIRECTOR
+  VP
+  C_LEVEL
+}
+
+enum EmploymentType {
+  FTE
+  CONTRACTOR
+  PART_TIME
+  INTERN
+}
+
+// Open roles model
+model OpenRole {
+  id                  String    @id @default(uuid())
+  datasetId           String    @map("dataset_id")
+
+  roleName            String    @map("role_name")
+  department          String
+  level               EmployeeLevel?
+
+  plannedSalaryMin    Decimal?  @map("planned_salary_min") @db.Decimal(12, 2)
+  plannedSalaryMax    Decimal?  @map("planned_salary_max") @db.Decimal(12, 2)
+  plannedTotalComp    Decimal?  @map("planned_total_comp") @db.Decimal(12, 2)
+
+  plannedStartDate    DateTime? @map("planned_start_date")
+  plannedEndDate      DateTime? @map("planned_end_date")
+
+  status              RoleStatus @default(OPEN)
+
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  dataset             Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@index([datasetId])
+  @@index([datasetId, department])
+  @@index([status])
+  @@map("open_roles")
+}
+
+enum RoleStatus {
+  OPEN
+  OFFER_EXTENDED
+  FILLED
+  CANCELLED
+}
+
+// Scenario model
+model Scenario {
+  id            String    @id @default(uuid())
+  datasetId     String    @map("dataset_id")
+
+  name          String
+  description   String?
+  type          ScenarioType
+
+  // Parameters and operations (JSON)
+  parameters    Json
+  operations    Json
+
+  status        ScenarioStatus @default(DRAFT)
+  calculatedAt  DateTime?      @map("calculated_at")
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  dataset       Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  results       ScenarioResult[]
+  insights      Insight[]
+
+  @@index([datasetId])
+  @@index([type])
+  @@index([createdAt(sort: Desc)])
+  @@map("scenarios")
+}
+
+enum ScenarioType {
+  FREEZE_HIRING
+  COST_REDUCTION
+  GROWTH
+  TARGET_RATIO
+  CUSTOM
+}
+
+enum ScenarioStatus {
+  DRAFT
+  CALCULATED
+  ARCHIVED
+}
+
+// Scenario results (cached calculations)
+model ScenarioResult {
+  id          String    @id @default(uuid())
+  scenarioId  String    @map("scenario_id")
+
+  metrics     Json
+  delta       Json
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  scenario    Scenario  @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@index([scenarioId])
+  @@map("scenario_results")
+}
+
+// Insights model
+model Insight {
+  id                String    @id @default(uuid())
+  datasetId         String    @map("dataset_id")
+  scenarioId        String?   @map("scenario_id")
+
+  ruleId            String?   @map("rule_id")
+  category          InsightCategory
+  severity          InsightSeverity
+
+  title             String
+  description       String
+
+  metrics           Json?
+  suggestedActions  Json?     @map("suggested_actions")
+
+  generatedBy       String    @default("rule") @map("generated_by")
+  confidenceScore   Decimal?  @map("confidence_score") @db.Decimal(3, 2)
+
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  dataset           Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  scenario          Scenario? @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@index([datasetId])
+  @@index([scenarioId])
+  @@index([severity])
+  @@index([category])
+  @@map("insights")
+}
+
+enum InsightCategory {
+  COST
+  STRUCTURE
+  EFFICIENCY
+  RISK
+}
+
+enum InsightSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// Benchmarks model
+model Benchmark {
+  id           String    @id @default(uuid())
+
+  industry     String
+  companySize  String    @map("company_size")
+  growthStage  String?   @map("growth_stage")
+  region       String?
+
+  metrics      Json
+
+  source       String
+  sampleSize   Int?      @map("sample_size")
+
+  version      Int       @default(1)
+  active       Boolean   @default(true)
+
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@index([industry, companySize])
+  @@index([active])
+  @@map("benchmarks")
+}
+
+// Audit logs
+model AuditLog {
+  id           String    @id @default(uuid())
+  userId       String?   @map("user_id")
+
+  action       String
+  resourceType String?   @map("resource_type")
+  resourceId   String?   @map("resource_id")
+
+  metadata     Json?
+  ipAddress    String?   @map("ip_address")
+  userAgent    String?   @map("user_agent")
+
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}

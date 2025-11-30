@@ -1,0 +1,21 @@
+Employee Name,Email,Department,Role,Level,Employment Type,Total Compensation,Base Salary,Bonus,Equity Value,Start Date,Location,FTE Factor
+Alice Cooper,alice@techcorp.com,Engineering,Senior Engineer,IC,FTE,155000,125000,20000,10000,2023-01-15,NYC,1.0
+,bob@techcorp.com,Sales,Account Exec,IC,FTE,125000,95000,25000,5000,2023-03-01,Boston,1.0
+Charlie Davis,charlie@techcorp.com,,Product Manager,IC,FTE,145000,115000,20000,10000,2023-02-10,Remote,1.0
+Diana Evans,diana.e@techcorp.com,Marketing,Marketing Lead,SENIOR,FTE,135000,110000,20000,5000,2023-04-01,Chicago,1.0
+Ethan Foster,ethan@techcorp.com,Engineering,Staff Engineer,IC,FULL_TIME,175000,145000,20000,10000,2022-12-15,SF,1.0
+Fiona Grant,fiona@techcorp.com,Sales,Sales Manager,MANAGER,FTE,invalid,130000,30000,5000,2023-05-20,Austin,1.0
+George Hill,george@techcorp.com,Product,Product Designer,IC,FTE,115000,95000,15000,5000,not-a-date,Remote,1.0
+Hannah Irving,hannah@techcorp.com,Engineering,Junior Engineer,IC,FTE,95000,85000,8000,2000,2023-08-01,Seattle,2.5
+Ivan Jones,ivan@techcorp.com,Customer Success,CS Manager,MANAGER,FTE,105000,90000,12000,3000,2023-06-15,Denver,1.0
+Julia King,julia@techcorp.com,Finance,Controller,DIRECTOR,FTE,165000,140000,20000,5000,2022-10-01,NY,1.0
+Kevin Lane,kevin.l@techcorp.com,Engineering,Engineering Manager,MANAGER,CONTRACTOR,180000,150000,20000,10000,2023-01-05,Boston,0.8
+Laura Moore,,Sales,Account Executive,IC,FTE,125000,95000,25000,5000,2023-07-10,LA,1.0
+Mark Nelson,mark@techcorp.com,Marketing,VP Marketing,VP,FTE,245000,190000,40000,15000,2021-11-15,Chicago,1.0
+Nina Owens,nina@techcorp.com,Engineering,Senior Engineer,IC,PART_TIME,85000,70000,10000,5000,2023-09-01,Remote,0.5
+Oscar Palmer,oscar@techcorp.com,Sales,Sales Director,DIRECTOR,FTE,205000,155000,40000,10000,2022-03-20,NYC,1.0
+Paula Quinn,paula@techcorp.com,Product,Senior PM,IC,FTE,150000,125000,20000,5000,2023-02-28,SF,1.0
+Quinn Reed,quinn@techcorp.com,Engineering,Software Engineer,IC,FTE,120000,105000,12000,3000,2023-10-15,Seattle,1.0
+Rachel Stone,,HR,HR Business Partner,IC,FTE,105000,90000,12000,3000,2023-04-05,Austin,1.0
+Sam Turner,sam@techcorp.com,Engineering,Principal Engineer,IC,FTE,210000,170000,25000,15000,2020-06-01,San Francisco,1.0
+Tina Upton,tina@techcorp.com,Customer Success,CS Team Lead,MANAGER,FTE,110000,92000,15000,3000,2023-05-12,Denver,1.0

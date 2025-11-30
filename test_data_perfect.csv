@@ -1,0 +1,21 @@
+Employee Name,Email,Department,Role,Level,Employment Type,Total Compensation,Base Salary,Bonus,Equity Value,Start Date,Location,FTE Factor
+Sarah Chen,sarah.chen@techcorp.com,Engineering,Senior Software Engineer,IC,FTE,165000,130000,20000,15000,2022-03-15,San Francisco,1.0
+Michael Rodriguez,michael.r@techcorp.com,Engineering,Engineering Manager,MANAGER,FTE,185000,145000,25000,15000,2021-06-01,New York,1.0
+Emma Thompson,emma.t@techcorp.com,Product,Senior Product Manager,IC,FTE,155000,125000,20000,10000,2022-08-20,Remote,1.0
+James Wilson,james.w@techcorp.com,Sales,Account Executive,IC,FTE,145000,95000,40000,10000,2023-01-10,Austin,1.0
+Lisa Kumar,lisa.kumar@techcorp.com,Engineering,Staff Engineer,IC,FTE,195000,155000,25000,15000,2020-11-05,Seattle,1.0
+David Park,david.p@techcorp.com,Marketing,Marketing Manager,MANAGER,FTE,135000,110000,20000,5000,2022-05-15,Chicago,1.0
+Jennifer Lee,jennifer.lee@techcorp.com,Sales,Sales Director,DIRECTOR,FTE,215000,165000,40000,10000,2021-02-01,Boston,1.0
+Robert Martinez,robert.m@techcorp.com,Engineering,Software Engineer,IC,FTE,125000,105000,15000,5000,2023-07-01,San Francisco,1.0
+Amanda White,amanda.w@techcorp.com,Product,Product Designer,IC,FTE,115000,100000,10000,5000,2023-04-12,Remote,1.0
+Chris Anderson,chris.a@techcorp.com,Customer Success,Customer Success Manager,IC,FTE,95000,80000,12000,3000,2023-09-01,Denver,1.0
+Patricia Garcia,patricia.g@techcorp.com,Finance,Finance Manager,MANAGER,FTE,145000,125000,15000,5000,2021-10-15,New York,1.0
+Kevin Brown,kevin.b@techcorp.com,Engineering,Principal Engineer,IC,FTE,220000,175000,30000,15000,2019-08-01,San Francisco,1.0
+Michelle Taylor,michelle.t@techcorp.com,HR,HR Manager,MANAGER,FTE,125000,105000,15000,5000,2022-01-20,Chicago,1.0
+Daniel Kim,daniel.kim@techcorp.com,Sales,Account Executive,IC,FTE,135000,90000,35000,10000,2023-02-15,Los Angeles,1.0
+Rachel Cohen,rachel.c@techcorp.com,Engineering,Engineering Manager,MANAGER,FTE,190000,150000,25000,15000,2020-12-01,Boston,1.0
+Thomas Johnson,thomas.j@techcorp.com,Marketing,Content Marketing Manager,IC,FTE,105000,90000,12000,3000,2023-05-10,Remote,1.0
+Jessica Nguyen,jessica.n@techcorp.com,Product,VP of Product,VP,FTE,275000,210000,45000,20000,2019-03-01,San Francisco,1.0
+Andrew Miller,andrew.m@techcorp.com,Engineering,Software Engineer,IC,FTE,130000,110000,15000,5000,2023-06-20,Seattle,1.0
+Maria Lopez,maria.lopez@techcorp.com,Customer Success,CS Team Lead,MANAGER,FTE,115000,95000,15000,5000,2022-09-05,Austin,1.0
+Brian Davis,brian.d@techcorp.com,Sales,VP of Sales,VP,FTE,295000,220000,60000,15000,2020-01-15,New York,1.0
