@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, BarChart3, TrendingUp, GitCompare, Upload, Download, Plus } from 'lucide-react';
+import { Users, BarChart3, TrendingUp, GitCompare, Upload, Download, Plus, Scale } from 'lucide-react';
 import { exportAnalyticsToPDF } from './export-analytics-pdf';
 import Link from 'next/link';
 import AddEmployeeForm from './add-employee-form';
@@ -425,13 +425,22 @@ export default function DatasetTabs({
                       metrics. Model hiring freezes, cost reductions, growth plans, and more.
                     </p>
                   </div>
-                  <Link
-                    href={`/dashboard/datasets/${datasetId}/scenarios/new`}
-                    className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700 whitespace-nowrap"
-                  >
-                    <Plus className="h-5 w-5" />
-                    New Detailed Scenario
-                  </Link>
+                  <div className="flex gap-3">
+                    <Link
+                      href={`/dashboard/datasets/${datasetId}/scenarios/compare`}
+                      className="inline-flex items-center gap-2 rounded-lg border border-purple-600 bg-white px-6 py-3 font-semibold text-purple-600 hover:bg-purple-50 whitespace-nowrap"
+                    >
+                      <Scale className="h-5 w-5" />
+                      Compare Scenarios
+                    </Link>
+                    <Link
+                      href={`/dashboard/datasets/${datasetId}/scenarios/new`}
+                      className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700 whitespace-nowrap"
+                    >
+                      <Plus className="h-5 w-5" />
+                      New Detailed Scenario
+                    </Link>
+                  </div>
                 </div>
 
                 <ScenarioBuilder
