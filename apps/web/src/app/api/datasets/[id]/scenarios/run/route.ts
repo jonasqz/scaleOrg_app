@@ -47,7 +47,7 @@ export async function POST(
     const body = await request.json();
     const { type, adjustments, reductionPct, targetDepartments, additionalFTE, distribution, targetRatio, currentCash, includeTimeline } = body;
 
-    const baselineEmployees = dataset.employees.filter(emp => !emp.endDate);
+    const baselineEmployees = dataset.employees.filter((emp: any) => !emp.endDate);
     let scenarioEmployees = [...baselineEmployees];
     const affectedEmployees: AffectedEmployee[] = [];
 
