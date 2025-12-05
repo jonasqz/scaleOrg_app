@@ -66,8 +66,8 @@ export async function POST(
         );
 
         // Track removed employees
-        const removedIds = new Set(scenarioEmployees.map(e => e.id));
-        baselineEmployees.forEach(emp => {
+        const removedIds = new Set(scenarioEmployees.map((e: any) => e.id));
+        baselineEmployees.forEach((emp: any) => {
           if (!removedIds.has(emp.id)) {
             affectedEmployees.push({
               id: emp.id,
@@ -92,8 +92,8 @@ export async function POST(
           );
 
           // Track new hires
-          const baselineIds = new Set(baselineEmployees.map(e => e.id));
-          scenarioEmployees.forEach(emp => {
+          const baselineIds = new Set(baselineEmployees.map((e: any) => e.id));
+          scenarioEmployees.forEach((emp: any) => {
             if (!baselineIds.has(emp.id)) {
               affectedEmployees.push({
                 id: emp.id,
@@ -123,7 +123,7 @@ export async function POST(
       case 'custom':
         // Custom adjustments: add/remove employees by department
         if (adjustments && Object.keys(adjustments).length > 0) {
-          const employeesByDept = baselineEmployees.reduce((acc, emp) => {
+          const employeesByDept = baselineEmployees.reduce((acc: any, emp: any) => {
             if (!acc[emp.department]) acc[emp.department] = [];
             acc[emp.department].push(emp);
             return acc;
@@ -137,13 +137,13 @@ export async function POST(
 
             if (changeNum < 0) {
               // Remove employees (highest paid first)
-              const sorted = [...deptEmps].sort((a, b) =>
+              const sorted = [...deptEmps].sort((a: any, b: any) =>
                 Number(b.totalCompensation) - Number(a.totalCompensation)
               );
               const numToRemove = Math.abs(changeNum);
 
               // Track removed employees
-              sorted.slice(0, numToRemove).forEach(emp => {
+              sorted.slice(0, numToRemove).forEach((emp: any) => {
                 affectedEmployees.push({
                   id: emp.id,
                   employeeId: emp.employeeId,
@@ -163,7 +163,7 @@ export async function POST(
               scenarioEmployees.push(...deptEmps);
 
               const avgComp = deptEmps.length > 0
-                ? deptEmps.reduce((sum, e) => sum + Number(e.totalCompensation), 0) / deptEmps.length
+                ? deptEmps.reduce((sum: number, e: any) => sum + Number(e.totalCompensation), 0) / deptEmps.length
                 : 100000;
 
               for (let i = 0; i < changeNum; i++) {
