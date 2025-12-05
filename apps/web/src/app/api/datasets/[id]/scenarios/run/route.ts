@@ -213,7 +213,7 @@ export async function POST(
           });
 
           // Add departments that weren't adjusted
-          Object.entries(employeesByDept).forEach(([dept, emps]) => {
+          Object.entries(employeesByDept).forEach(([dept, emps]: [string, any]) => {
             if (!(dept in adjustments)) {
               scenarioEmployees.push(...emps);
             }
