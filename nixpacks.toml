@@ -5,7 +5,10 @@ nixPkgs = ['nodejs_22', 'pnpm']
 cmds = ['pnpm install --frozen-lockfile']
 
 [phases.build]
-cmds = ['pnpm run build --filter=@scleorg/web']
+cmds = [
+  'pnpm --filter=@scleorg/database db:push',
+  'pnpm run build --filter=@scleorg/web'
+]
 
 [start]
 cmd = 'cd apps/web && pnpm start'
