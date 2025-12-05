@@ -56,7 +56,7 @@ export default async function ScenarioComparePage({
   const selectedIds = searchParams.scenarios?.split(',').filter(Boolean) || [];
 
   // Get selected scenarios
-  const selectedScenarios = allScenarios.filter((s) => selectedIds.includes(s.id));
+  const selectedScenarios = allScenarios.filter((s: any) => selectedIds.includes(s.id));
 
   return (
     <div className="min-h-screen bg-gray-50">
