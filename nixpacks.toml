@@ -5,7 +5,7 @@ nixPkgs = ['nodejs_22', 'pnpm']
 cmds = ['pnpm install --frozen-lockfile']
 
 [phases.build]
-cmds = ['echo "Skipping production build for dev deployment"']
+cmds = ['pnpm run build --filter=@scleorg/web']
 
 [start]
-cmd = 'cd apps/web && pnpm dev'
+cmd = 'cd apps/web && pnpm start'
