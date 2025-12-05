@@ -122,7 +122,7 @@ export async function POST(
         const level = emp.level?.toUpperCase() || '';
         if (level && !validLevels.includes(level)) {
           throw new Error(
-            `Row ${rowNum}: Invalid level. Must be one of: ${validLevels.filter(l => l).join(', ')}`
+            `Row ${rowNum}: Invalid level. Must be one of: ${validLevels.filter((l: string) => l).join(', ')}`
           );
         }
 
@@ -134,7 +134,7 @@ export async function POST(
             email: emp.email?.trim() || null,
             department: emp.department.trim(),
             role: emp.role?.trim() || null,
-            level: level || null,
+            level: (level || null) as any,
             employmentType,
             totalCompensation: totalComp,
             annualSalary: baseSalary,
