@@ -62,6 +62,7 @@ model Dataset {
   openRoles       OpenRole[]
   scenarios       Scenario[]
   insights        Insight[]
+  settings        DatasetSettings?
 
   @@index([userId])
   @@index([status])
@@ -75,6 +76,29 @@ enum DatasetStatus {
   CALCULATING
   READY
   FAILED
+}
+
+// Dataset Settings - per-company customization for analytics
+model DatasetSettings {
+  id          String   @id @default(uuid())
+  datasetId   String   @unique @map("dataset_id")
+
+  // Department categorization for R&D and GTM calculations
+  rdDepartments   String[] @default(["Engineering", "Product", "Design"]) @map("rd_departments")
+  gtmDepartments  String[] @default(["Sales", "Marketing", "Customer Success"]) @map("gtm_departments")
+
+  // Future settings can be added here
+  // enableBenchmarking Boolean @default(true)
+  // customMetrics Json?
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  dataset     Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@index([datasetId])
+  @@map("dataset_settings")
 }
 
 // Employee model
