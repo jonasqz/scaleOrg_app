@@ -315,6 +315,50 @@ model Benchmark {
   @@map("benchmarks")
 }
 
+// Department mapping for standardization
+model DepartmentMapping {
+  id                String   @id @default(uuid())
+  userId            String?  @map("user_id")  // Optional: for user-specific mappings
+
+  originalName      String   @map("original_name")
+  standardizedName  String   @map("standardized_name")
+  category          String?  // e.g., "Technology", "Business", "Operations"
+
+  isActive          Boolean  @default(true) @map("is_active")
+  usageCount        Int      @default(0) @map("usage_count")  // Track how often this mapping is used
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, originalName])
+  @@index([standardizedName])
+  @@index([category])
+  @@map("department_mappings")
+}
+
+// Role mapping for standardization
+model RoleMapping {
+  id                String   @id @default(uuid())
+  userId            String?  @map("user_id")  // Optional: for user-specific mappings
+
+  originalTitle     String   @map("original_title")
+  standardizedTitle String   @map("standardized_title")
+  seniorityLevel    String?  @map("seniority_level")  // "Junior", "Mid", "Senior", "Lead", "Director", "C-Level"
+  roleFamily        String?  @map("role_family")      // "Engineering", "Sales", "Marketing", etc.
+
+  isActive          Boolean  @default(true) @map("is_active")
+  usageCount        Int      @default(0) @map("usage_count")
+  confidenceScore   Decimal? @map("confidence_score") @db.Decimal(3, 2)  // 0.00 to 1.00
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, originalTitle])
+  @@index([standardizedTitle, seniorityLevel])
+  @@index([roleFamily])
+  @@map("role_mappings")
+}
+
 // Audit logs
 model AuditLog {
   id           String    @id @default(uuid())

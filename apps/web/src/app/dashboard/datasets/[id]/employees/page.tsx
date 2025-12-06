@@ -3,7 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@scleorg/database';
 import { Users } from 'lucide-react';
 import AddEmployeeForm from '../add-employee-form';
-import CSVUpload from '../csv-upload';
+import CSVUploadEnhanced from '../csv-upload-enhanced';
 import EmployeeTableEnhanced from '../employee-table-enhanced';
 
 export default async function EmployeesPage({
@@ -58,7 +58,7 @@ export default async function EmployeesPage({
           currency={dataset.currency}
           allEmployees={dataset.employees}
         />
-        <CSVUpload datasetId={dataset.id} />
+        <CSVUploadEnhanced datasetId={dataset.id} />
       </div>
 
       {/* Employees Table */}
