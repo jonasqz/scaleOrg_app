@@ -25,6 +25,7 @@ import {
   Settings,
   Search,
   X,
+  Filter,
 } from 'lucide-react';
 import EmployeeDetailModal from './employee-detail-modal';
 
@@ -79,6 +80,7 @@ export default function EmployeeTableEnhanced({
   });
   const [globalFilter, setGlobalFilter] = useState('');
   const [showColumnConfig, setShowColumnConfig] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const columns = useMemo<ColumnDef<Employee>[]>(
     () => [
@@ -223,6 +225,24 @@ export default function EmployeeTableEnhanced({
     { value: 'employmentType', label: 'Employment Type' },
   ];
 
+  // Get unique values for filter dropdowns
+  const uniqueDepartments = useMemo(
+    () => Array.from(new Set(employees.map((e) => e.department))).sort(),
+    [employees]
+  );
+  const uniqueLevels = useMemo(
+    () => Array.from(new Set(employees.map((e) => e.level).filter(Boolean))).sort(),
+    [employees]
+  );
+  const uniqueLocations = useMemo(
+    () => Array.from(new Set(employees.map((e) => e.location).filter(Boolean))).sort(),
+    [employees]
+  );
+  const uniqueEmploymentTypes = useMemo(
+    () => Array.from(new Set(employees.map((e) => e.employmentType))).sort(),
+    [employees]
+  );
+
   return (
     <>
       {/* Controls */}
@@ -265,6 +285,24 @@ export default function EmployeeTableEnhanced({
             </select>
           </div>
 
+          {/* Filters Toggle */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium hover:bg-gray-50 ${
+              columnFilters.length > 0
+                ? 'border-blue-600 bg-blue-50 text-blue-700'
+                : 'border-gray-300 text-gray-700'
+            }`}
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+            {columnFilters.length > 0 && (
+              <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white">
+                {columnFilters.length}
+              </span>
+            )}
+          </button>
+
           {/* Column Visibility Toggle */}
           <button
             onClick={() => setShowColumnConfig(!showColumnConfig)}
@@ -274,6 +312,116 @@ export default function EmployeeTableEnhanced({
             Columns
           </button>
         </div>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="rounded-lg border bg-white p-4 shadow-sm">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="font-medium text-gray-900">Filter Employees</h3>
+              <div className="flex items-center gap-2">
+                {columnFilters.length > 0 && (
+                  <button
+                    onClick={() => setColumnFilters([])}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Clear all
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {/* Department Filter */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Department
+                </label>
+                <select
+                  value={(table.getColumn('department')?.getFilterValue() as string) ?? ''}
+                  onChange={(e) =>
+                    table.getColumn('department')?.setFilterValue(e.target.value || undefined)
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">All Departments</option>
+                  {uniqueDepartments.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Level Filter */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Level
+                </label>
+                <select
+                  value={(table.getColumn('level')?.getFilterValue() as string) ?? ''}
+                  onChange={(e) =>
+                    table.getColumn('level')?.setFilterValue(e.target.value || undefined)
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">All Levels</option>
+                  {uniqueLevels.map((level) => (
+                    <option key={level} value={level}>
+                      {level}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Location Filter */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Location
+                </label>
+                <select
+                  value={(table.getColumn('location')?.getFilterValue() as string) ?? ''}
+                  onChange={(e) =>
+                    table.getColumn('location')?.setFilterValue(e.target.value || undefined)
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">All Locations</option>
+                  {uniqueLocations.map((location) => (
+                    <option key={location} value={location}>
+                      {location}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Employment Type Filter */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Employment Type
+                </label>
+                <select
+                  value={(table.getColumn('employmentType')?.getFilterValue() as string) ?? ''}
+                  onChange={(e) =>
+                    table.getColumn('employmentType')?.setFilterValue(e.target.value || undefined)
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">All Types</option>
+                  {uniqueEmploymentTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Column Visibility Panel */}
         {showColumnConfig && (
