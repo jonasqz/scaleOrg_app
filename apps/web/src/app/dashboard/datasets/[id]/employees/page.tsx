@@ -53,7 +53,11 @@ export default async function EmployeesPage({
 
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center gap-4">
-        <AddEmployeeForm datasetId={dataset.id} currency={dataset.currency} />
+        <AddEmployeeForm
+          datasetId={dataset.id}
+          currency={dataset.currency}
+          allEmployees={dataset.employees}
+        />
         <CSVUpload datasetId={dataset.id} />
       </div>
 

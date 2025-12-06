@@ -49,9 +49,15 @@ export async function PATCH(
         role: body.role || null,
         level: body.level || null,
         employmentType: body.employmentType,
+        fteFactor: body.fteFactor !== undefined ? body.fteFactor : (body.employmentType === 'PART_TIME' ? 0.5 : 1.0),
+        bonus: body.bonus || null,
+        equityValue: body.equityValue || null,
+        annualSalary: body.annualSalary || null,
         totalCompensation: body.totalCompensation,
-        fteFactor: body.employmentType === 'PART_TIME' ? 0.5 : 1.0,
         startDate: body.startDate ? new Date(body.startDate) : null,
+        location: body.location || null,
+        managerId: body.managerId || null,
+        costCenter: body.costCenter || null,
       },
     });
 

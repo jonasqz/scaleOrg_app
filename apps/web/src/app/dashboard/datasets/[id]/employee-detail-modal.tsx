@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Save, Trash2, Calendar, Mail, Briefcase, DollarSign, User } from 'lucide-react';
+import { X, Save, Trash2, Calendar, Mail, Briefcase, DollarSign, User, Plus } from 'lucide-react';
 
 interface Employee {
   id: string;
@@ -30,6 +30,7 @@ interface EmployeeDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   mode?: 'view' | 'add'; // 'view' for existing employee, 'add' for new
+  allEmployees?: Employee[]; // For extracting existing departments/locations
 }
 
 const emptyEmployee = {
@@ -58,6 +59,7 @@ export default function EmployeeDetailModal({
   isOpen,
   onClose,
   mode = 'view',
+  allEmployees = [],
 }: EmployeeDetailModalProps) {
   const router = useRouter();
   const isAddMode = mode === 'add';
@@ -65,6 +67,21 @@ export default function EmployeeDetailModal({
   const [loading, setLoading] = useState(false);
 
   const currentEmployee = employee || emptyEmployee;
+
+  // Extract unique departments and locations from existing employees
+  const existingDepartments = useMemo(
+    () => Array.from(new Set(allEmployees.map((e) => e.department))).sort(),
+    [allEmployees]
+  );
+
+  const existingLocations = useMemo(
+    () => Array.from(new Set(allEmployees.map((e) => e.location).filter(Boolean) as string[])).sort(),
+    [allEmployees]
+  );
+
+  // State for showing "create new" input
+  const [showNewDepartment, setShowNewDepartment] = useState(false);
+  const [showNewLocation, setShowNewLocation] = useState(false);
 
   const [formData, setFormData] = useState({
     employeeName: currentEmployee.employeeName || '',
@@ -108,6 +125,8 @@ export default function EmployeeDetailModal({
         costCenter: emp.costCenter || '',
       });
       setIsEditing(isAddMode);
+      setShowNewDepartment(false);
+      setShowNewLocation(false);
     }
   }, [employee, isOpen, isAddMode]);
 
@@ -150,7 +169,7 @@ export default function EmployeeDetailModal({
 
         if (!response.ok) throw new Error('Failed to update employee');
 
-        setIsEditing(false);
+        onClose();
         router.refresh();
       }
     } catch (error) {
@@ -358,15 +377,69 @@ export default function EmployeeDetailModal({
                       Location
                     </label>
                     {isEditing ? (
-                      <input
-                        type="text"
-                        value={formData.location}
-                        onChange={(e) =>
-                          setFormData({ ...formData, location: e.target.value })
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="San Francisco, CA"
-                      />
+                      showNewLocation ? (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={formData.location}
+                            onChange={(e) =>
+                              setFormData({ ...formData, location: e.target.value })
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                setShowNewLocation(false);
+                              } else if (e.key === 'Escape') {
+                                setShowNewLocation(false);
+                                if (!formData.location && existingLocations.length > 0) {
+                                  setFormData({ ...formData, location: existingLocations[0] });
+                                }
+                              }
+                            }}
+                            placeholder="Enter new location (e.g., San Francisco, CA)"
+                            className="flex-1 rounded-lg border border-blue-500 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowNewLocation(false);
+                            }}
+                            className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 hover:bg-blue-100"
+                          >
+                            Done
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <select
+                            value={formData.location || ''}
+                            onChange={(e) => {
+                              if (e.target.value === '__create_new__') {
+                                setShowNewLocation(true);
+                              } else {
+                                setFormData({ ...formData, location: e.target.value });
+                              }
+                            }}
+                            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option value="">Select location...</option>
+                            {existingLocations.map((loc) => (
+                              <option key={loc} value={loc}>
+                                {loc}
+                              </option>
+                            ))}
+                            {formData.location && !existingLocations.includes(formData.location) && (
+                              <option value={formData.location}>
+                                {formData.location}
+                              </option>
+                            )}
+                            <option value="__create_new__" className="font-medium text-blue-600">
+                              + Create new location
+                            </option>
+                          </select>
+                        </div>
+                      )
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
                         {currentEmployee.location || 'N/A'}
@@ -387,24 +460,82 @@ export default function EmployeeDetailModal({
                       Department
                     </label>
                     {isEditing ? (
-                      <select
-                        value={formData.department}
-                        onChange={(e) =>
-                          setFormData({ ...formData, department: e.target.value })
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      >
-                        <option value="Engineering">Engineering</option>
-                        <option value="Product">Product</option>
-                        <option value="Design">Design</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Customer Success">Customer Success</option>
-                        <option value="Finance">Finance</option>
-                        <option value="HR">HR</option>
-                        <option value="Legal">Legal</option>
-                        <option value="Operations">Operations</option>
-                      </select>
+                      showNewDepartment ? (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={formData.department}
+                            onChange={(e) =>
+                              setFormData({ ...formData, department: e.target.value })
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                setShowNewDepartment(false);
+                              } else if (e.key === 'Escape') {
+                                setShowNewDepartment(false);
+                                if (!formData.department && existingDepartments.length > 0) {
+                                  setFormData({ ...formData, department: existingDepartments[0] });
+                                }
+                              }
+                            }}
+                            placeholder="Enter new department"
+                            className="flex-1 rounded-lg border border-blue-500 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowNewDepartment(false);
+                            }}
+                            className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 hover:bg-blue-100"
+                          >
+                            Done
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <select
+                            value={formData.department}
+                            onChange={(e) => {
+                              if (e.target.value === '__create_new__') {
+                                setShowNewDepartment(true);
+                              } else {
+                                setFormData({ ...formData, department: e.target.value });
+                              }
+                            }}
+                            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            {existingDepartments.length === 0 && (
+                              <>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Product">Product</option>
+                                <option value="Design">Design</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Customer Success">Customer Success</option>
+                                <option value="Finance">Finance</option>
+                                <option value="HR">HR</option>
+                                <option value="Legal">Legal</option>
+                                <option value="Operations">Operations</option>
+                              </>
+                            )}
+                            {existingDepartments.map((dept) => (
+                              <option key={dept} value={dept}>
+                                {dept}
+                              </option>
+                            ))}
+                            {formData.department && !existingDepartments.includes(formData.department) && existingDepartments.length > 0 && (
+                              <option value={formData.department}>
+                                {formData.department}
+                              </option>
+                            )}
+                            <option value="__create_new__" className="font-medium text-blue-600">
+                              + Create new department
+                            </option>
+                          </select>
+                        </div>
+                      )
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
                         {currentEmployee.department}

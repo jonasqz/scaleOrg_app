@@ -215,6 +215,7 @@ export default function EmployeeTableEnhanced({
     getFilteredRowModel: getFilteredRowModel(),
     enableGrouping: true,
     autoResetExpanded: false,
+    autoResetPageIndex: false,
   });
 
   const groupByOptions = [
@@ -559,6 +560,7 @@ export default function EmployeeTableEnhanced({
           currency={currency}
           isOpen={true}
           onClose={() => setSelectedEmployee(null)}
+          allEmployees={employees}
         />
       )}
     </>

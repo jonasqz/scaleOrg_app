@@ -4,12 +4,32 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import EmployeeDetailModal from './employee-detail-modal';
 
+interface Employee {
+  id: string;
+  employeeName: string | null;
+  email: string | null;
+  department: string;
+  role: string | null;
+  level: string | null;
+  employmentType: string;
+  totalCompensation: number;
+  baseSalary: number | null;
+  bonus: number | null;
+  equityValue: number | null;
+  fteFactor: number;
+  startDate: Date | null;
+  location: string | null;
+  managerId: string | null;
+  costCenter: string | null;
+}
+
 interface AddEmployeeFormProps {
   datasetId: string;
   currency: string;
+  allEmployees?: Employee[];
 }
 
-export default function AddEmployeeForm({ datasetId, currency }: AddEmployeeFormProps) {
+export default function AddEmployeeForm({ datasetId, currency, allEmployees = [] }: AddEmployeeFormProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -28,6 +48,7 @@ export default function AddEmployeeForm({ datasetId, currency }: AddEmployeeForm
         currency={currency}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        allEmployees={allEmployees}
       />
     </>
   );

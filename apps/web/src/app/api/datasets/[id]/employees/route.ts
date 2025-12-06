@@ -42,9 +42,15 @@ export async function POST(
       role,
       level,
       employmentType,
+      fteFactor,
+      bonus,
+      equityValue,
       annualSalary,
       totalCompensation,
       startDate,
+      location,
+      managerId,
+      costCenter,
     } = body;
 
     const employee = await prisma.employee.create({
@@ -56,10 +62,15 @@ export async function POST(
         role,
         level: level || null,
         employmentType: employmentType || 'FTE',
-        fteFactor: 1.0,
+        fteFactor: fteFactor !== undefined ? fteFactor : 1.0,
+        bonus: bonus || null,
+        equityValue: equityValue || null,
         annualSalary: annualSalary || totalCompensation,
         totalCompensation,
         startDate: startDate ? new Date(startDate) : null,
+        location: location || null,
+        managerId: managerId || null,
+        costCenter: costCenter || null,
       },
     });
 
