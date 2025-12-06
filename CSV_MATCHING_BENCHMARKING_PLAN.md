@@ -109,8 +109,261 @@ model RoleMapping {
 
 ## Phase 2: Medium-Term Goals (1-2 months)
 
-### 2.1 Role Taxonomy System
-**Goal:** Build hierarchical role structure for standardization
+### 2.1 Role Taxonomy & Data Library System
+
+#### 2.1.1 Dynamic Role Library (Customer-Driven Growth)
+**Goal:** Build a self-growing library of job titles from real customer data
+
+**Approach:**
+Instead of manually maintaining a static list of job titles, we build a **living library** that learns from every customer interaction:
+
+**How it works:**
+1. **Capture on every employee add** (CSV import or manual entry):
+   - Original job title (exactly as entered: "Senior Fullstack Engineer")
+   - Standardized title (what it maps to: "Software Engineer")
+   - Seniority level extracted ("Senior")
+   - Role family classified ("Engineering")
+   - Context metadata (industry, company size, region)
+
+2. **Library grows organically:**
+   - Customer A: "Senior Fullstack Engineer" → saved to library
+   - Customer B: "Sr. Full Stack Developer" → saved as variation
+   - Customer C: "Senior Fullstack Engineer" → frequency counter +1
+   - System learns: All 3 variations = "Software Engineer - Senior"
+
+3. **Matching improves automatically:**
+   - New customer uploads "Senior Fullstack Engineer"
+   - System finds exact match in library (frequency: 47)
+   - Auto-maps with 100% confidence
+   - No AI needed for common titles
+
+**Database Schema:**
+```prisma
+model RoleTitleLibrary {
+  id                String   @id @default(uuid())
+
+  // Raw data from customers
+  originalTitle     String   @unique // "Senior Fullstack Engineer"
+
+  // Normalized/standardized data
+  standardizedTitle String   // "Software Engineer"
+  seniorityLevel    String?  // "Senior"
+  roleFamily        String?  // "Engineering"
+
+  // Usage tracking
+  frequency         Int      @default(1)  // How many times we've seen this exact title
+  firstSeenDate     DateTime @default(now())
+  lastSeenDate      DateTime @updatedAt
+
+  // Context for better matching
+  industries        String[] // ["SaaS", "Fintech", "Climate Tech"]
+  regions           String[] // ["EU", "US", "DACH"]
+  companySizes      String[] // ["51-200", "201-500"]
+
+  // Quality indicators
+  verifiedByUsers   Int      @default(0)  // How many users confirmed this mapping
+  reportedIssues    Int      @default(0)  // How many users reported wrong mapping
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([standardizedTitle, seniorityLevel])
+  @@index([roleFamily])
+  @@index([frequency(sort: Desc)])
+}
+```
+
+**Benefits:**
+- Library starts with 40 seed mappings (from Phase 1)
+- Grows to 500+ titles after first 50 customers
+- Grows to 5,000+ titles after 500 customers
+- Rare/unusual titles still captured (e.g., "Klimaförster")
+- Industry-specific variations preserved
+- More accurate than any manual list
+
+**Growth Timeline:**
+- Month 1: 40 job titles (seed data)
+- Month 6: 350 job titles
+- Month 12: 1,200 job titles
+- Month 24: 5,000+ job titles (near-perfect auto-mapping)
+
+---
+
+#### 2.1.2 Compensation Benchmarking Library (Salary Data Aggregation)
+**Goal:** Build an anonymized compensation database from customer data for industry benchmarking
+
+**Approach:**
+Instead of buying expensive 3rd-party benchmark data, we **crowdsource compensation data** from our customer base to create more accurate, relevant benchmarks.
+
+**How it works:**
+1. **Capture on every employee add** (with customer opt-in):
+   - Role title (standardized)
+   - Seniority level
+   - Total compensation (anonymized)
+   - Base salary, bonus, equity (anonymized)
+   - Context: industry, company size, region, date
+
+2. **Aggregate to percentiles:**
+   - When we have >10 data points for a specific role/context combination
+   - Calculate p10, p25, p50 (median), p75, p90
+   - Update monthly as new data comes in
+   - Never expose individual data points
+
+3. **Customers can use benchmarks:**
+   - "How does my Senior Software Engineer salary compare to market?"
+   - "Is €85k at p50, p75, or p90 for my region/industry?"
+   - "What's the typical range for this role in DACH SaaS companies?"
+
+**Database Schema:**
+```prisma
+model CompensationBenchmark {
+  id                String   @id @default(uuid())
+
+  // Role identification
+  roleFamily        String   // "Engineering"
+  standardizedTitle String   // "Software Engineer"
+  seniorityLevel    String   // "Senior"
+
+  // Market segmentation
+  industry          String   // "SaaS", "Fintech", "Climate Tech"
+  region            String   // "DACH", "EU", "US"
+  companySize       String   // "51-200", "201-500"
+
+  // Percentile data (anonymized)
+  p10TotalComp      Float    // €65,000
+  p25TotalComp      Float    // €75,000
+  p50TotalComp      Float    // €85,000 (median)
+  p75TotalComp      Float    // €95,000
+  p90TotalComp      Float    // €110,000
+
+  p10BaseSalary     Float
+  p25BaseSalary     Float
+  p50BaseSalary     Float
+  p75BaseSalary     Float
+  p90BaseSalary     Float
+
+  // Quality indicators
+  sampleSize        Int      // 127 data points
+  currency          String   // "EUR"
+  lastUpdated       DateTime @updatedAt
+
+  // Data lineage
+  dataSource        String   @default("customer_crowdsourced")
+
+  createdAt         DateTime @default(now())
+
+  @@unique([roleFamily, standardizedTitle, seniorityLevel, industry, region, companySize])
+  @@index([roleFamily, seniorityLevel])
+  @@index([industry, region])
+}
+```
+
+**Privacy & Compliance:**
+- ✅ **Fully anonymized** - no employee names, company names, or identifiable data
+- ✅ **Aggregated only** - minimum 10 data points required (prevents reverse-engineering)
+- ✅ **GDPR compliant** - customers explicitly opt-in to contribute
+- ✅ **Transparent** - customers see exactly what data is shared
+- ✅ **Customer control:**
+  - Opt-in to contribute their data (help build benchmarks)
+  - Use benchmarks even if they don't contribute
+  - Opt-out completely (data stays private)
+
+**Opt-in Flow:**
+```
+During CSV import or employee add:
+
+┌─────────────────────────────────────────────────┐
+│ Help improve ScaleOrg benchmarks?               │
+│                                                  │
+│ ☑ Contribute anonymized compensation data       │
+│   to help build industry benchmarks             │
+│                                                  │
+│ Your data will be:                               │
+│ • Fully anonymized (no names/companies)         │
+│ • Aggregated with 10+ other companies           │
+│ • Used to show market percentiles               │
+│                                                  │
+│ You'll get access to:                            │
+│ • Real-time market compensation data            │
+│ • Industry benchmarks for your roles            │
+│ • Competitive intelligence                      │
+│                                                  │
+│ [Learn More] [Skip] [Contribute & Continue]     │
+└─────────────────────────────────────────────────┘
+```
+
+**Benefits:**
+- **More accurate** than 3rd-party data (real-time, specific to your market)
+- **More relevant** (your actual customer base, not generic surveys)
+- **Cost-effective** (no expensive data licenses)
+- **Network effects** (more customers = better benchmarks = more value)
+- **Competitive advantage** (unique data set competitors don't have)
+
+**Example Growth:**
+- Month 1: 0 benchmarks (need min. 10 data points)
+- Month 3: 15 benchmarks (common roles like "Software Engineer - Senior" in SaaS/EU)
+- Month 6: 120 benchmarks (most common roles across industries)
+- Month 12: 500+ benchmarks (80% role coverage)
+- Month 24: 2,000+ benchmarks (near-complete coverage)
+
+---
+
+#### 2.1.3 Intelligent Matching Engine
+**Goal:** Use both libraries together to maximize auto-mapping accuracy
+
+**Matching Flow:**
+```
+1. Customer uploads CSV with role: "Tech Lead - Platform"
+
+2. System searches RoleTitleLibrary:
+   ├─ Exact match? "Tech Lead - Platform" (frequency: 5)
+   │  └─> Auto-map with 100% confidence ✅
+   │
+   ├─ Fuzzy match? "Tech Lead" (frequency: 47)
+   │  └─> Auto-map with 90% confidence ✅
+   │
+   ├─ Partial match? "Platform Lead" (frequency: 12)
+   │  └─> Suggest with 75% confidence ⚠️
+   │
+   └─ No match?
+      └─> Use AI classification (Phase 2.2) 🤖
+
+3. Customer confirms/corrects mapping
+
+4. System learns:
+   - Add "Tech Lead - Platform" → "Engineering Lead" to library
+   - Increment frequency counter
+   - Next customer gets instant match
+
+5. If compensation data provided + customer opted-in:
+   - Add to CompensationBenchmark (anonymized)
+   - Update percentiles for "Engineering Lead - Senior" in their segment
+```
+
+**Confidence Scoring:**
+- **100% (Green):** Exact match in library with frequency >5
+- **85-99% (Green):** Fuzzy match with high frequency (>10)
+- **70-84% (Yellow):** Partial match or low frequency (3-10)
+- **<70% (Red):** AI suggestion only, needs manual review
+
+**Feedback Loop:**
+```
+Customer Data
+  → Library Growth
+    → Better Matching
+      → Less Manual Work
+        → More Customers
+          → More Data
+            → Better Benchmarks
+              → Higher Customer Value 🔄
+```
+
+---
+
+### 2.1.4 Role Taxonomy (Static Foundation)
+**Goal:** Provide the base structure for categorization
+
+While the library grows dynamically, we still need a **static taxonomy** for the core role families and seniority levels:
 
 **Database Schema:**
 ```prisma
@@ -119,7 +372,7 @@ model RoleTaxonomy {
   roleFamily     String   // "Engineering", "Sales", "Product", "Marketing"
   roleTitle      String   // "Software Engineer", "Account Executive"
   seniorityLevel String   // "IC1", "IC2", "IC3", "M1", "M2", "Director", "VP"
-  aliases        String[] // Common variations
+  aliases        String[] // Common variations (for initial seeding)
   description    String?
 
   @@unique([roleFamily, roleTitle, seniorityLevel])
@@ -135,6 +388,8 @@ model RoleTaxonomy {
 - Customer Success (CSM, Support, Implementation)
 - Operations (Finance, People, Legal, Admin)
 - Leadership (C-Suite, VP, Director)
+
+This provides the **framework** that the dynamic library fills in with real customer data.
 
 ### 2.2 ML-Based Role Classification
 **Goal:** Automatically suggest role family and seniority
