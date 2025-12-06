@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@scleorg/database';
+import { saveToLibrary } from '@/lib/role-matching';
 
 interface BulkEmployeeData {
   employeeName?: string;
@@ -145,6 +146,62 @@ export async function POST(
             location: emp.location?.trim() || null,
           },
         });
+
+        // Save role title to library for future matching (if role is provided)
+        if (emp.role && emp.role.trim() !== '') {
+          try {
+            // Extract context from dataset for better matching
+            const industry = dataset.industry || undefined;
+            const companySize = dataset.companySize || undefined;
+            const region = 'EU'; // Could be inferred from location later
+
+            // Infer seniority level from employee level if available
+            let seniorityLevel: string | null = null;
+            if (level === 'IC') seniorityLevel = 'Mid';
+            else if (level === 'MANAGER') seniorityLevel = 'Manager';
+            else if (level === 'DIRECTOR') seniorityLevel = 'Director';
+            else if (level === 'VP') seniorityLevel = 'VP';
+            else if (level === 'C_LEVEL') seniorityLevel = 'C-Level';
+
+            // Infer role family from department
+            let roleFamily: string | null = null;
+            const deptLower = emp.department.toLowerCase();
+            if (deptLower.includes('eng') || deptLower.includes('tech') || deptLower.includes('dev')) {
+              roleFamily = 'Engineering';
+            } else if (deptLower.includes('sales') || deptLower.includes('revenue')) {
+              roleFamily = 'Sales';
+            } else if (deptLower.includes('product')) {
+              roleFamily = 'Product';
+            } else if (deptLower.includes('marketing')) {
+              roleFamily = 'Marketing';
+            } else if (deptLower.includes('customer') || deptLower.includes('success')) {
+              roleFamily = 'Customer Success';
+            } else if (deptLower.includes('people') || deptLower.includes('hr')) {
+              roleFamily = 'People & Culture';
+            } else if (deptLower.includes('finance')) {
+              roleFamily = 'Finance';
+            } else if (deptLower.includes('operations') || deptLower.includes('ops')) {
+              roleFamily = 'Operations';
+            } else if (deptLower.includes('legal')) {
+              roleFamily = 'Legal';
+            } else if (deptLower.includes('sustainability')) {
+              roleFamily = 'Sustainability';
+            }
+
+            await saveToLibrary({
+              originalTitle: emp.role.trim(),
+              standardizedTitle: emp.role.trim(), // For now, use original as standardized
+              seniorityLevel,
+              roleFamily,
+              industry,
+              region,
+              companySize,
+            });
+          } catch (libraryError) {
+            // Don't fail the import if library save fails
+            console.error(`Failed to save role to library for row ${rowNum}:`, libraryError);
+          }
+        }
 
         results.success++;
       } catch (error) {

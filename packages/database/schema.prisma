@@ -359,6 +359,104 @@ model RoleMapping {
   @@map("role_mappings")
 }
 
+// Role Title Library - customer-driven role title learning
+model RoleTitleLibrary {
+  id                String   @id @default(uuid())
+
+  // Raw data from customers
+  originalTitle     String   @unique @map("original_title")  // "Senior Fullstack Engineer"
+
+  // Normalized/standardized data
+  standardizedTitle String   @map("standardized_title")       // "Software Engineer"
+  seniorityLevel    String?  @map("seniority_level")          // "Senior"
+  roleFamily        String?  @map("role_family")              // "Engineering"
+
+  // Usage tracking
+  frequency         Int      @default(1)                      // How many times we've seen this exact title
+  firstSeenDate     DateTime @default(now()) @map("first_seen_date")
+  lastSeenDate      DateTime @updatedAt @map("last_seen_date")
+
+  // Context for better matching (stored as arrays)
+  industries        String[] @default([])                    // ["SaaS", "Fintech", "Climate Tech"]
+  regions           String[] @default([])                    // ["EU", "US", "DACH"]
+  companySizes      String[] @default([])                    // ["51-200", "201-500"]
+
+  // Quality indicators
+  verifiedByUsers   Int      @default(0) @map("verified_by_users")  // How many users confirmed this mapping
+  reportedIssues    Int      @default(0) @map("reported_issues")    // How many users reported wrong mapping
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([standardizedTitle, seniorityLevel])
+  @@index([roleFamily])
+  @@index([frequency(sort: Desc)])
+  @@map("role_title_library")
+}
+
+// Compensation Benchmark - crowdsourced salary data
+model CompensationBenchmark {
+  id                String   @id @default(uuid())
+
+  // Role identification
+  roleFamily        String   @map("role_family")              // "Engineering"
+  standardizedTitle String   @map("standardized_title")       // "Software Engineer"
+  seniorityLevel    String   @map("seniority_level")          // "Senior"
+
+  // Market segmentation
+  industry          String                                    // "SaaS", "Fintech", "Climate Tech"
+  region            String                                    // "DACH", "EU", "US"
+  companySize       String   @map("company_size")             // "51-200", "201-500"
+
+  // Percentile data for total compensation (anonymized)
+  p10TotalComp      Decimal? @map("p10_total_comp") @db.Decimal(12, 2)
+  p25TotalComp      Decimal? @map("p25_total_comp") @db.Decimal(12, 2)
+  p50TotalComp      Decimal? @map("p50_total_comp") @db.Decimal(12, 2)  // Median
+  p75TotalComp      Decimal? @map("p75_total_comp") @db.Decimal(12, 2)
+  p90TotalComp      Decimal? @map("p90_total_comp") @db.Decimal(12, 2)
+
+  // Percentile data for base salary (anonymized)
+  p10BaseSalary     Decimal? @map("p10_base_salary") @db.Decimal(12, 2)
+  p25BaseSalary     Decimal? @map("p25_base_salary") @db.Decimal(12, 2)
+  p50BaseSalary     Decimal? @map("p50_base_salary") @db.Decimal(12, 2)
+  p75BaseSalary     Decimal? @map("p75_base_salary") @db.Decimal(12, 2)
+  p90BaseSalary     Decimal? @map("p90_base_salary") @db.Decimal(12, 2)
+
+  // Quality indicators
+  sampleSize        Int                                       // 127 data points
+  currency          String                                    // "EUR", "USD"
+  lastUpdated       DateTime @updatedAt @map("last_updated")
+
+  // Data lineage
+  dataSource        String   @default("customer_crowdsourced") @map("data_source")
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([roleFamily, standardizedTitle, seniorityLevel, industry, region, companySize])
+  @@index([roleFamily, seniorityLevel])
+  @@index([industry, region])
+  @@map("compensation_benchmarks")
+}
+
+// Role Taxonomy - static foundation for role families
+model RoleTaxonomy {
+  id             String   @id @default(uuid())
+
+  roleFamily     String   @map("role_family")        // "Engineering", "Sales", "Product"
+  roleTitle      String   @map("role_title")         // "Software Engineer", "Account Executive"
+  seniorityLevel String   @map("seniority_level")    // "IC1", "IC2", "IC3", "Manager", "Director"
+  aliases        String[] @default([])               // Common variations for seeding
+  description    String?
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([roleFamily, roleTitle, seniorityLevel])
+  @@index([roleFamily])
+  @@map("role_taxonomy")
+}
+
 // Audit logs
 model AuditLog {
   id           String    @id @default(uuid())
