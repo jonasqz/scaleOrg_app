@@ -23,6 +23,7 @@
     "@scleorg/database": "workspace:*",
     "@scleorg/types": "workspace:*",
     "@scleorg/ui": "workspace:*",
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "d3": "^7.8.5",

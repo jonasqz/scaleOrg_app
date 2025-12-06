@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Save, Trash2, Calendar, Mail, Briefcase, DollarSign, User } from 'lucide-react';
 
@@ -24,12 +24,32 @@ interface Employee {
 }
 
 interface EmployeeDetailModalProps {
-  employee: Employee;
+  employee?: Employee; // Optional for add mode
   datasetId: string;
   currency: string;
   isOpen: boolean;
   onClose: () => void;
+  mode?: 'view' | 'add'; // 'view' for existing employee, 'add' for new
 }
+
+const emptyEmployee = {
+  id: '',
+  employeeName: '',
+  email: '',
+  department: '',
+  role: '',
+  level: '',
+  employmentType: 'FTE',
+  totalCompensation: 0,
+  baseSalary: null,
+  bonus: null,
+  equityValue: null,
+  fteFactor: 1,
+  startDate: null,
+  location: '',
+  managerId: null,
+  costCenter: '',
+};
 
 export default function EmployeeDetailModal({
   employee,
@@ -37,71 +57,119 @@ export default function EmployeeDetailModal({
   currency,
   isOpen,
   onClose,
+  mode = 'view',
 }: EmployeeDetailModalProps) {
   const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
+  const isAddMode = mode === 'add';
+  const [isEditing, setIsEditing] = useState(isAddMode);
   const [loading, setLoading] = useState(false);
+
+  const currentEmployee = employee || emptyEmployee;
+
   const [formData, setFormData] = useState({
-    employeeName: employee.employeeName || '',
-    email: employee.email || '',
-    department: employee.department,
-    role: employee.role || '',
-    level: employee.level || '',
-    employmentType: employee.employmentType,
-    totalCompensation: employee.totalCompensation.toString(),
-    baseSalary: employee.baseSalary?.toString() || '',
-    bonus: employee.bonus?.toString() || '',
-    equityValue: employee.equityValue?.toString() || '',
-    fteFactor: employee.fteFactor.toString(),
-    startDate: employee.startDate
-      ? new Date(employee.startDate).toISOString().split('T')[0]
+    employeeName: currentEmployee.employeeName || '',
+    email: currentEmployee.email || '',
+    department: currentEmployee.department,
+    role: currentEmployee.role || '',
+    level: currentEmployee.level || '',
+    employmentType: currentEmployee.employmentType,
+    totalCompensation: currentEmployee.totalCompensation.toString(),
+    baseSalary: currentEmployee.baseSalary?.toString() || '',
+    bonus: currentEmployee.bonus?.toString() || '',
+    equityValue: currentEmployee.equityValue?.toString() || '',
+    fteFactor: currentEmployee.fteFactor.toString(),
+    startDate: currentEmployee.startDate
+      ? new Date(currentEmployee.startDate).toISOString().split('T')[0]
       : '',
-    location: employee.location || '',
-    costCenter: employee.costCenter || '',
+    location: currentEmployee.location || '',
+    costCenter: currentEmployee.costCenter || '',
   });
+
+  // Reset form when employee changes or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const emp = employee || emptyEmployee;
+      setFormData({
+        employeeName: emp.employeeName || '',
+        email: emp.email || '',
+        department: emp.department,
+        role: emp.role || '',
+        level: emp.level || '',
+        employmentType: emp.employmentType,
+        totalCompensation: emp.totalCompensation.toString(),
+        baseSalary: emp.baseSalary?.toString() || '',
+        bonus: emp.bonus?.toString() || '',
+        equityValue: emp.equityValue?.toString() || '',
+        fteFactor: emp.fteFactor.toString(),
+        startDate: emp.startDate
+          ? new Date(emp.startDate).toISOString().split('T')[0]
+          : '',
+        location: emp.location || '',
+        costCenter: emp.costCenter || '',
+      });
+      setIsEditing(isAddMode);
+    }
+  }, [employee, isOpen, isAddMode]);
 
   if (!isOpen) return null;
 
-  const handleUpdate = async () => {
+  const handleSave = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `/api/datasets/${datasetId}/employees/${employee.id}`,
-        {
-          method: 'PATCH',
+      const payload = {
+        ...formData,
+        totalCompensation: parseFloat(formData.totalCompensation),
+        baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
+        bonus: formData.bonus ? parseFloat(formData.bonus) : null,
+        equityValue: formData.equityValue ? parseFloat(formData.equityValue) : null,
+        fteFactor: parseFloat(formData.fteFactor),
+      };
+
+      if (isAddMode) {
+        // Create new employee
+        const response = await fetch(`/api/datasets/${datasetId}/employees`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...formData,
-            totalCompensation: parseFloat(formData.totalCompensation),
-            baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
-            bonus: formData.bonus ? parseFloat(formData.bonus) : null,
-            equityValue: formData.equityValue ? parseFloat(formData.equityValue) : null,
-            fteFactor: parseFloat(formData.fteFactor),
-          }),
-        }
-      );
+          body: JSON.stringify(payload),
+        });
 
-      if (!response.ok) throw new Error('Failed to update employee');
+        if (!response.ok) throw new Error('Failed to add employee');
 
-      setIsEditing(false);
-      router.refresh();
+        onClose();
+        router.refresh();
+      } else {
+        // Update existing employee
+        const response = await fetch(
+          `/api/datasets/${datasetId}/employees/${currentEmployee.id}`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!response.ok) throw new Error('Failed to update employee');
+
+        setIsEditing(false);
+        router.refresh();
+      }
     } catch (error) {
-      console.error('Error updating employee:', error);
-      alert('Failed to update employee');
+      console.error('Error saving employee:', error);
+      alert(isAddMode ? 'Failed to add employee' : 'Failed to update employee');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete ${employee.employeeName || 'this employee'}?`)) {
+    if (!confirm(`Are you sure you want to delete ${currentEmployee.employeeName || 'this employee'}?`)) {
       return;
     }
 
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/datasets/${datasetId}/employees/${employee.id}`,
+        `/api/datasets/${datasetId}/employees/${currentEmployee.id}`,
         {
           method: 'DELETE',
         }
@@ -120,8 +188,8 @@ export default function EmployeeDetailModal({
   };
 
   const calculateTenure = () => {
-    if (!employee.startDate) return null;
-    const start = new Date(employee.startDate);
+    if (!currentEmployee.startDate) return null;
+    const start = new Date(currentEmployee.startDate);
     const now = new Date();
     const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
     const years = Math.floor(months / 12);
@@ -148,10 +216,14 @@ export default function EmployeeDetailModal({
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {employee.employeeName || 'Unnamed Employee'}
+                  {isAddMode
+                    ? 'Add New Employee'
+                    : currentEmployee.employeeName || 'Unnamed Employee'}
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {employee.role || employee.department}
+                  {isAddMode
+                    ? 'Fill in employee details'
+                    : currentEmployee.role || currentEmployee.department}
                 </p>
               </div>
             </div>
@@ -165,48 +237,50 @@ export default function EmployeeDetailModal({
 
           {/* Content */}
           <div className="p-6">
-            {/* Quick Stats */}
-            <div className="mb-6 grid gap-4 md:grid-cols-4">
-              <div className="rounded-lg bg-gray-50 p-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <DollarSign className="h-4 w-4" />
-                  <span>Total Compensation</span>
+            {/* Quick Stats - Only show in view mode */}
+            {!isAddMode && (
+              <div className="mb-6 grid gap-4 md:grid-cols-4">
+                <div className="rounded-lg bg-gray-50 p-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <DollarSign className="h-4 w-4" />
+                    <span>Total Compensation</span>
+                  </div>
+                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                    {currency} {currentEmployee.totalCompensation.toLocaleString()}
+                  </p>
                 </div>
-                <p className="mt-1 text-lg font-semibold text-gray-900">
-                  {currency} {employee.totalCompensation.toLocaleString()}
-                </p>
-              </div>
 
-              <div className="rounded-lg bg-gray-50 p-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Briefcase className="h-4 w-4" />
-                  <span>Department</span>
+                <div className="rounded-lg bg-gray-50 p-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Briefcase className="h-4 w-4" />
+                    <span>Department</span>
+                  </div>
+                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                    {currentEmployee.department}
+                  </p>
                 </div>
-                <p className="mt-1 text-lg font-semibold text-gray-900">
-                  {employee.department}
-                </p>
-              </div>
 
-              <div className="rounded-lg bg-gray-50 p-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Calendar className="h-4 w-4" />
-                  <span>Tenure</span>
+                <div className="rounded-lg bg-gray-50 p-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar className="h-4 w-4" />
+                    <span>Tenure</span>
+                  </div>
+                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                    {calculateTenure() || 'N/A'}
+                  </p>
                 </div>
-                <p className="mt-1 text-lg font-semibold text-gray-900">
-                  {calculateTenure() || 'N/A'}
-                </p>
-              </div>
 
-              <div className="rounded-lg bg-gray-50 p-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <User className="h-4 w-4" />
-                  <span>Employment Type</span>
+                <div className="rounded-lg bg-gray-50 p-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <User className="h-4 w-4" />
+                    <span>Employment Type</span>
+                  </div>
+                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                    {currentEmployee.employmentType}
+                  </p>
                 </div>
-                <p className="mt-1 text-lg font-semibold text-gray-900">
-                  {employee.employmentType}
-                </p>
               </div>
-            </div>
+            )}
 
             {/* Main Form */}
             <div className="space-y-6">
@@ -231,7 +305,7 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.employeeName || 'N/A'}
+                        {currentEmployee.employeeName || 'N/A'}
                       </p>
                     )}
                   </div>
@@ -252,7 +326,7 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.email || 'N/A'}
+                        {currentEmployee.email || 'N/A'}
                       </p>
                     )}
                   </div>
@@ -272,8 +346,8 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.startDate
-                          ? new Date(employee.startDate).toLocaleDateString()
+                        {currentEmployee.startDate
+                          ? new Date(currentEmployee.startDate).toLocaleDateString()
                           : 'N/A'}
                       </p>
                     )}
@@ -295,7 +369,7 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.location || 'N/A'}
+                        {currentEmployee.location || 'N/A'}
                       </p>
                     )}
                   </div>
@@ -333,7 +407,7 @@ export default function EmployeeDetailModal({
                       </select>
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.department}
+                        {currentEmployee.department}
                       </p>
                     )}
                   </div>
@@ -354,7 +428,7 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.role || 'N/A'}
+                        {currentEmployee.role || 'N/A'}
                       </p>
                     )}
                   </div>
@@ -380,7 +454,7 @@ export default function EmployeeDetailModal({
                       </select>
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.level || 'N/A'}
+                        {currentEmployee.level || 'N/A'}
                       </p>
                     )}
                   </div>
@@ -404,7 +478,7 @@ export default function EmployeeDetailModal({
                       </select>
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.employmentType}
+                        {currentEmployee.employmentType}
                       </p>
                     )}
                   </div>
@@ -427,7 +501,7 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.fteFactor}
+                        {currentEmployee.fteFactor}
                       </p>
                     )}
                   </div>
@@ -448,7 +522,7 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.costCenter || 'N/A'}
+                        {currentEmployee.costCenter || 'N/A'}
                       </p>
                     )}
                   </div>
@@ -479,7 +553,7 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {currency} {employee.totalCompensation.toLocaleString()}
+                        {currency} {currentEmployee.totalCompensation.toLocaleString()}
                       </p>
                     )}
                   </div>
@@ -500,8 +574,8 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.baseSalary
-                          ? `${currency} ${employee.baseSalary.toLocaleString()}`
+                        {currentEmployee.baseSalary
+                          ? `${currency} ${currentEmployee.baseSalary.toLocaleString()}`
                           : 'N/A'}
                       </p>
                     )}
@@ -523,8 +597,8 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.bonus
-                          ? `${currency} ${employee.bonus.toLocaleString()}`
+                        {currentEmployee.bonus
+                          ? `${currency} ${currentEmployee.bonus.toLocaleString()}`
                           : 'N/A'}
                       </p>
                     )}
@@ -546,8 +620,8 @@ export default function EmployeeDetailModal({
                       />
                     ) : (
                       <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {employee.equityValue
-                          ? `${currency} ${employee.equityValue.toLocaleString()}`
+                        {currentEmployee.equityValue
+                          ? `${currency} ${currentEmployee.equityValue.toLocaleString()}`
                           : 'N/A'}
                       </p>
                     )}
@@ -559,32 +633,48 @@ export default function EmployeeDetailModal({
 
           {/* Footer Actions */}
           <div className="sticky bottom-0 flex items-center justify-between border-t bg-white px-6 py-4">
-            <button
-              onClick={handleDelete}
-              disabled={loading}
-              className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Employee
-            </button>
+            {!isAddMode && (
+              <button
+                onClick={handleDelete}
+                disabled={loading}
+                className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Employee
+              </button>
+            )}
+
+            {isAddMode && <div />}
 
             <div className="flex items-center gap-3">
               {isEditing ? (
                 <>
                   <button
-                    onClick={() => setIsEditing(false)}
+                    onClick={() => {
+                      if (isAddMode) {
+                        onClose();
+                      } else {
+                        setIsEditing(false);
+                      }
+                    }}
                     disabled={loading}
                     className="rounded-lg border px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={handleUpdate}
+                    onClick={handleSave}
                     disabled={loading}
                     className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Save className="h-4 w-4" />
-                    {loading ? 'Saving...' : 'Save Changes'}
+                    {loading
+                      ? isAddMode
+                        ? 'Adding...'
+                        : 'Saving...'
+                      : isAddMode
+                      ? 'Add Employee'
+                      : 'Save Changes'}
                   </button>
                 </>
               ) : (

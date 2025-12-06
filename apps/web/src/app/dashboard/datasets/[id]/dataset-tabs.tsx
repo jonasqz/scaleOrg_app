@@ -7,6 +7,7 @@ import Link from 'next/link';
 import AddEmployeeForm from './add-employee-form';
 import CSVUpload from './csv-upload';
 import EmployeeListClient from './employee-list-client';
+import EmployeeTableEnhanced from './employee-table-enhanced';
 import MetricsCharts from './metrics-charts';
 import BenchmarkComparison from './benchmark-comparison';
 import OutliersDisplay from './outliers-display';
@@ -305,7 +306,7 @@ export default function DatasetTabs({
           <div className="space-y-6">
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-4">
-              <AddEmployeeForm datasetId={datasetId} />
+              <AddEmployeeForm datasetId={datasetId} currency={currency} />
               <CSVUpload datasetId={datasetId} />
             </div>
 
@@ -326,7 +327,7 @@ export default function DatasetTabs({
                   </p>
                 </div>
               ) : (
-                <EmployeeListClient
+                <EmployeeTableEnhanced
                   employees={employees}
                   datasetId={datasetId}
                   currency={currency}
