@@ -414,6 +414,7 @@ export default function CompensationTrackingClient({
                         const monthInfo = monthlySummary.find(m => m.month === monthTotal.month);
                         const isCurrent = monthInfo?.isCurrent;
                         const isPast = monthInfo?.isPast;
+                        const isFuture = monthInfo?.isFuture;
                         return (
                           <td
                             key={monthTotal.month}
@@ -422,15 +423,26 @@ export default function CompensationTrackingClient({
                             } ${getVarianceBackground(monthTotal.variancePercent)}`}
                           >
                             <div className="text-xs">
-                              <div className="font-semibold text-gray-900">
-                                {formatCurrency(monthTotal.actual || monthTotal.planned)}
+                              {/* Planned / Actual values */}
+                              <div className="font-semibold text-gray-900 flex items-center gap-1 justify-center">
+                                <span>{formatCurrency(monthTotal.planned)}</span>
+                                <span className="text-gray-400">/</span>
+                                <span className={monthTotal.actual !== null ? 'text-gray-900' : 'text-gray-400'}>
+                                  {formatCurrency(monthTotal.actual)}
+                                </span>
                               </div>
-                              {isPast && monthTotal.actual && (
+
+                              {/* Status badge below */}
+                              {isPast && monthTotal.actual !== null && monthTotal.variancePercent !== null ? (
                                 <div className={`text-xs ${getVarianceColor(monthTotal.variancePercent)}`}>
-                                  {monthTotal.variancePercent !== null
-                                    ? `${monthTotal.variancePercent > 0 ? '+' : ''}${monthTotal.variancePercent.toFixed(0)}%`
-                                    : ''}
+                                  {`${monthTotal.variancePercent > 0 ? '+' : ''}${monthTotal.variancePercent.toFixed(1)}%`}
                                 </div>
+                              ) : isPast ? (
+                                <div className="text-xs text-yellow-600">Pending</div>
+                              ) : isFuture ? (
+                                <div className="text-xs text-blue-600">Forecast</div>
+                              ) : (
+                                <div className="text-xs text-purple-600">Current</div>
                               )}
                             </div>
                           </td>
@@ -490,42 +502,47 @@ export default function CompensationTrackingClient({
                                     </button>
                                   </div>
                                 ) : (
-                                  <div className="text-xs">
+                                  <div
+                                    className="text-xs group cursor-pointer"
+                                    onClick={() =>
+                                      !isPast &&
+                                      startEdit(
+                                        employee.employeeId,
+                                        monthData.month,
+                                        monthData.planned.totalEmployerCost
+                                      )
+                                    }
+                                  >
+                                    {/* Planned / Actual values */}
+                                    <div className="font-medium text-gray-900 flex items-center gap-1 justify-center">
+                                      <span>{formatCurrency(monthData.planned.totalEmployerCost)}</span>
+                                      <span className="text-gray-400">/</span>
+                                      <span className={monthData.actual.totalEmployerCost !== null ? 'text-gray-900' : 'text-gray-400'}>
+                                        {formatCurrency(monthData.actual.totalEmployerCost)}
+                                      </span>
+                                      {(isCurrent || isFuture) && (
+                                        <Edit2 className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100" />
+                                      )}
+                                    </div>
+
+                                    {/* Status badge below */}
                                     {isPast && monthData.actual.totalEmployerCost !== null ? (
+                                      <div className={`text-xs ${getVarianceColor(monthData.variance.percent)}`}>
+                                        {monthData.variance.percent !== null
+                                          ? `${monthData.variance.percent > 0 ? '+' : ''}${monthData.variance.percent.toFixed(1)}%`
+                                          : ''}
+                                      </div>
+                                    ) : isPast ? (
+                                      <div className="text-xs text-yellow-600">Pending</div>
+                                    ) : isFuture ? (
                                       <>
-                                        <div className="font-medium text-gray-900">
-                                          {formatCurrency(monthData.actual.totalEmployerCost)}
-                                        </div>
-                                        <div className={getVarianceColor(monthData.variance.percent)}>
-                                          {monthData.variance.percent !== null
-                                            ? `${monthData.variance.percent > 0 ? '+' : ''}${monthData.variance.percent.toFixed(0)}%`
-                                            : ''}
-                                        </div>
+                                        <div className="text-xs text-blue-600">Forecast</div>
+                                        {monthData.planned.isManualOverride && (
+                                          <div className="text-xs text-green-600">✓ Edited</div>
+                                        )}
                                       </>
                                     ) : (
-                                      <div
-                                        className="group cursor-pointer"
-                                        onClick={() =>
-                                          !isPast &&
-                                          startEdit(
-                                            employee.employeeId,
-                                            monthData.month,
-                                            monthData.planned.totalEmployerCost
-                                          )
-                                        }
-                                      >
-                                        <div className="flex items-center gap-1 justify-center">
-                                          <span className="text-gray-700">
-                                            {formatCurrency(monthData.planned.totalEmployerCost)}
-                                          </span>
-                                          {(isCurrent || isFuture) && (
-                                            <Edit2 className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100" />
-                                          )}
-                                        </div>
-                                        {monthData.planned.isManualOverride && (
-                                          <div className="text-xs text-blue-600">✓ Edited</div>
-                                        )}
-                                      </div>
+                                      <div className="text-xs text-purple-600">Current</div>
                                     )}
                                   </div>
                                 )}
