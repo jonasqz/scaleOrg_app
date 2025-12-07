@@ -63,6 +63,7 @@ model Dataset {
   scenarios       Scenario[]
   insights        Insight[]
   settings        DatasetSettings?
+  monthlyEmployerCosts MonthlyEmployerCost[]
 
   @@index([userId])
   @@index([status])
@@ -142,6 +143,7 @@ model Employee {
   dataset            Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
   manager            Employee? @relation("EmployeeManager", fields: [managerId], references: [id])
   directReports      Employee[] @relation("EmployeeManager")
+  monthlyEmployerCosts MonthlyEmployerCost[]
 
   @@index([datasetId])
   @@index([datasetId, department])
@@ -651,6 +653,68 @@ model BenchmarkAuditLog {
   @@index([action])
   @@index([createdAt(sort: Desc)])
   @@map("benchmark_audit_logs")
+}
+
+// Monthly Employer Costs - Track actual employer costs over time
+model MonthlyEmployerCost {
+  id           String    @id @default(uuid())
+  datasetId    String    @map("dataset_id")
+
+  // Period tracking
+  period       DateTime                             // First day of the month (e.g., 2025-01-01)
+  periodLabel  String    @map("period_label")       // Human-readable "January 2025"
+
+  // Scope: employee-specific or dataset-wide aggregate
+  employeeId   String?   @map("employee_id")        // NULL for aggregated data
+  department   String?                              // Department (copied from employee or aggregated)
+
+  // Gross compensation (what employee receives)
+  grossSalary  Decimal   @map("gross_salary") @db.Decimal(12, 2)
+  grossBonus   Decimal?  @map("gross_bonus") @db.Decimal(12, 2)
+  grossEquity  Decimal?  @map("gross_equity") @db.Decimal(12, 2)
+  grossTotal   Decimal   @map("gross_total") @db.Decimal(12, 2)
+
+  // Employer costs (what company pays)
+  employerTaxes         Decimal? @map("employer_taxes") @db.Decimal(12, 2)          // Employer-side taxes
+  socialContributions   Decimal? @map("social_contributions") @db.Decimal(12, 2)    // Social security, pension, etc.
+  healthInsurance       Decimal? @map("health_insurance") @db.Decimal(12, 2)        // Health insurance contributions
+  benefits              Decimal? @map("benefits") @db.Decimal(12, 2)                // Other benefits (gym, meals, etc.)
+  otherEmployerCosts    Decimal? @map("other_employer_costs") @db.Decimal(12, 2)    // Training, equipment, etc.
+
+  // Total employer cost
+  totalEmployerCost     Decimal  @map("total_employer_cost") @db.Decimal(12, 2)     // Sum of all above
+
+  // Metrics
+  employerCostRatio     Decimal? @map("employer_cost_ratio") @db.Decimal(5, 2)      // Total employer cost / Gross total (e.g., 1.35 = 35% overhead)
+
+  // Data source tracking
+  source                CostDataSource @default(MANUAL)                              // How was this data added
+  importedFrom          String?  @map("imported_from")                               // File name or API source
+
+  // Metadata
+  notes                 String?
+  currency              String   @default("EUR")
+
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  dataset               Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  employee              Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([datasetId, period, employeeId])  // One record per employee per month
+  @@index([datasetId, period])
+  @@index([datasetId, period, department])
+  @@index([employeeId])
+  @@index([source])
+  @@map("monthly_employer_costs")
+}
+
+enum CostDataSource {
+  MANUAL         // Manually entered by user
+  CSV_IMPORT     // Imported from payroll CSV
+  API_IMPORT     // Imported via API (future)
+  CALCULATED     // Calculated from employee data
 }
 
 // Audit logs
