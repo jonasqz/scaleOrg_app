@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { DollarSign, TrendingUp, TrendingDown, Calendar, ChevronDown, ChevronRight, Edit2, Check, X, Download } from 'lucide-react';
+import { toast } from 'sonner';
 import CompensationSetupWizard from './compensation-setup-wizard';
 
 interface CompensationTrackingClientProps {
@@ -176,7 +177,9 @@ export default function CompensationTrackingClient({
 
     const newValue = parseFloat(editValue);
     if (isNaN(newValue) || newValue < 0) {
-      alert('Please enter a valid positive number');
+      toast.error('Invalid value', {
+        description: 'Please enter a valid positive number',
+      });
       return;
     }
 
@@ -192,15 +195,22 @@ export default function CompensationTrackingClient({
       });
 
       if (response.ok) {
+        toast.success('Planned value updated', {
+          description: 'Compensation forecast has been updated',
+        });
         // Refresh data
         await fetchData();
         cancelEdit();
       } else {
-        alert('Failed to update planned value');
+        toast.error('Failed to update', {
+          description: 'Could not save the planned value. Please try again.',
+        });
       }
     } catch (error) {
       console.error('Failed to save:', error);
-      alert('Failed to update planned value');
+      toast.error('Failed to update', {
+        description: 'An error occurred while saving. Please try again.',
+      });
     }
   };
 

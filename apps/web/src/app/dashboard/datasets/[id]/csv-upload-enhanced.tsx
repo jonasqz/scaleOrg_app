@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, X, Check } from 'lucide-react';
 import Papa from 'papaparse';
+import { toast } from 'sonner';
 import { autoMapColumns, parseNumber, mergeNames, standardizeDepartment, extractSeniorityLevel, normalizeRoleTitle, classifyRoleFamily } from '@/lib/csv-utils';
 
 interface CSVUploadProps {
@@ -66,7 +67,9 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
 
   const handleFileSelect = (selectedFile: File) => {
     if (!selectedFile.name.endsWith('.csv')) {
-      alert('Please upload a CSV file');
+      toast.error('Invalid file type', {
+        description: 'Please upload a CSV file',
+      });
       return;
     }
 
@@ -85,12 +88,17 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
           const autoMapping = autoMapColumns(csvColumns);
 
           setColumnMapping(autoMapping);
+          toast.success('File parsed successfully', {
+            description: `Found ${data.length} rows and ${csvColumns.length} columns`,
+          });
           setStep('match');
         }
       },
       error: (error) => {
         console.error('Error parsing CSV:', error);
-        alert('Failed to parse CSV file');
+        toast.error('Failed to parse CSV file', {
+          description: 'Please check the file format and try again',
+        });
       },
     });
   };
@@ -199,11 +207,16 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
         throw new Error(errorData.error || 'Import failed');
       }
 
+      toast.success('Employees imported successfully', {
+        description: `${rowsToImport.length} employee(s) added to your team`,
+      });
       router.refresh();
       handleClose();
     } catch (error) {
       console.error('Import error:', error);
-      alert(error instanceof Error ? error.message : 'Failed to import employees');
+      toast.error('Failed to import employees', {
+        description: error instanceof Error ? error.message : 'Please try again',
+      });
       setStep('validate');
     } finally {
       setImporting(false);

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Save, Trash2, Calendar, Mail, Briefcase, DollarSign, User, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Employee {
   id: string;
@@ -162,6 +163,9 @@ export default function EmployeeDetailModal({
 
         if (!response.ok) throw new Error('Failed to add employee');
 
+        toast.success('Employee added successfully', {
+          description: `${formData.employeeName} has been added to the team`,
+        });
         onClose();
         router.refresh();
       } else {
@@ -177,12 +181,17 @@ export default function EmployeeDetailModal({
 
         if (!response.ok) throw new Error('Failed to update employee');
 
+        toast.success('Employee updated successfully', {
+          description: 'Changes have been saved',
+        });
         onClose();
         router.refresh();
       }
     } catch (error) {
       console.error('Error saving employee:', error);
-      alert(isAddMode ? 'Failed to add employee' : 'Failed to update employee');
+      toast.error(isAddMode ? 'Failed to add employee' : 'Failed to update employee', {
+        description: 'Please check the form and try again',
+      });
     } finally {
       setLoading(false);
     }
@@ -204,11 +213,16 @@ export default function EmployeeDetailModal({
 
       if (!response.ok) throw new Error('Failed to delete employee');
 
+      toast.success('Employee deleted', {
+        description: `${currentEmployee.employeeName || 'Employee'} has been removed from the team`,
+      });
       onClose();
       router.refresh();
     } catch (error) {
       console.error('Error deleting employee:', error);
-      alert('Failed to delete employee');
+      toast.error('Failed to delete employee', {
+        description: 'Please try again',
+      });
     } finally {
       setLoading(false);
     }
