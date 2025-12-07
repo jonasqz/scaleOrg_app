@@ -276,56 +276,68 @@ export default function OrganizationalBenchmarksTab({
             {/* Market Segmentation */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Industry *</label>
-              <input
-                type="text"
+              <select
                 required
                 value={formData.industry}
                 onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                list="industries-list"
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <datalist id="industries-list">
-                {uniqueIndustries.map((ind) => (
-                  <option key={ind} value={ind} />
-                ))}
-              </datalist>
-              <p className="mt-1 text-xs text-gray-500">The industry vertical (e.g., SaaS, Fintech, Climate Tech)</p>
+              >
+                <option value="">-- Select Industry --</option>
+                <option value="SaaS">SaaS</option>
+                <option value="Fintech">Fintech</option>
+                <option value="Climate Tech">Climate Tech</option>
+                <option value="E-Commerce">E-Commerce</option>
+                <option value="Healthcare Tech">Healthcare Tech</option>
+                <option value="EdTech">EdTech</option>
+                <option value="Enterprise Software">Enterprise Software</option>
+                <option value="Consumer Tech">Consumer Tech</option>
+                <option value="Deep Tech">Deep Tech</option>
+                <option value="Marketplace">Marketplace</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Other">Other</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">The industry vertical - standardized categories for reliable matching</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Region *</label>
-              <input
-                type="text"
+              <select
                 required
                 value={formData.region}
                 onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                list="regions-list"
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <datalist id="regions-list">
-                {uniqueRegions.map((reg) => (
-                  <option key={reg} value={reg} />
-                ))}
-              </datalist>
-              <p className="mt-1 text-xs text-gray-500">Geographic region (e.g., DACH, EU, US, Global)</p>
+              >
+                <option value="">-- Select Region --</option>
+                <option value="DACH">DACH (Germany, Austria, Switzerland)</option>
+                <option value="EU">EU (Europe)</option>
+                <option value="US">US (United States)</option>
+                <option value="UK">UK (United Kingdom)</option>
+                <option value="APAC">APAC (Asia-Pacific)</option>
+                <option value="LATAM">LATAM (Latin America)</option>
+                <option value="MEA">MEA (Middle East & Africa)</option>
+                <option value="Global">Global</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">Geographic market - select the most specific region available</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Company Size *</label>
-              <input
-                type="text"
+              <select
                 required
                 value={formData.companySize}
                 onChange={(e) => setFormData({ ...formData, companySize: e.target.value })}
-                list="sizes-list"
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <datalist id="sizes-list">
-                {uniqueCompanySizes.map((size) => (
-                  <option key={size} value={size} />
-                ))}
-              </datalist>
-              <p className="mt-1 text-xs text-gray-500">Employee count range (e.g., 11-50, 51-200, 201-500)</p>
+              >
+                <option value="">-- Select Size --</option>
+                <option value="1-10">1-10 employees</option>
+                <option value="11-50">11-50 employees</option>
+                <option value="51-200">51-200 employees</option>
+                <option value="201-500">201-500 employees</option>
+                <option value="501-1000">501-1000 employees</option>
+                <option value="1001-5000">1001-5000 employees</option>
+                <option value="5001+">5001+ employees</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">Headcount range - ensures consistent grouping across benchmarks</p>
             </div>
 
             <div>
