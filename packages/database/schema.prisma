@@ -477,6 +477,136 @@ model RoleTaxonomy {
   @@map("role_taxonomy")
 }
 
+// Organizational Benchmarks - structural and efficiency metrics
+model OrganizationalBenchmark {
+  id              String   @id @default(uuid())
+
+  // Market segmentation
+  industry        String
+  region          String
+  companySize     String   @map("company_size")
+  growthStage     String?  @map("growth_stage")  // "Seed", "Series A", "Series B+", "Public"
+
+  // Benchmark type and metric name
+  benchmarkType   BenchmarkType @map("benchmark_type")  // STRUCTURE, EFFICIENCY, TENURE
+  metricName      String   @map("metric_name")          // "rd_to_gtm_ratio", "revenue_per_fte", etc.
+
+  // Percentile data
+  p10Value        Decimal? @map("p10_value") @db.Decimal(12, 2)
+  p25Value        Decimal? @map("p25_value") @db.Decimal(12, 2)
+  p50Value        Decimal? @map("p50_value") @db.Decimal(12, 2)  // Median
+  p75Value        Decimal? @map("p75_value") @db.Decimal(12, 2)
+  p90Value        Decimal? @map("p90_value") @db.Decimal(12, 2)
+
+  // Department-specific data (optional, stored as JSON)
+  // Example: { "Engineering": { "p50_fte": 25, "p50_percentage": 35 } }
+  departmentData  Json?    @map("department_data")
+
+  // Data quality and lineage
+  sampleSize      Int                                    // Number of companies in sample
+  currency        String?                                // For monetary metrics
+  unit            String?                                // "ratio", "percentage", "euros", "days", etc.
+  sourceId        String?  @map("source_id")             // FK to BenchmarkSource
+  source          BenchmarkSource? @relation(fields: [sourceId], references: [id])
+
+  // Temporal validity
+  effectiveDate   DateTime @map("effective_date")        // When this benchmark becomes valid
+  expirationDate  DateTime? @map("expiration_date")      // When this benchmark expires (optional)
+  lastVerified    DateTime @default(now()) @map("last_verified")
+
+  // Metadata
+  notes           String?
+  methodology     String?                                // Brief description of how data was collected
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([industry, region, companySize, benchmarkType, metricName, effectiveDate])
+  @@index([industry, region, companySize])
+  @@index([benchmarkType, metricName])
+  @@index([effectiveDate, expirationDate])
+  @@index([sourceId])
+  @@map("organizational_benchmarks")
+}
+
+enum BenchmarkType {
+  STRUCTURE      // rd_to_gtm_ratio, manager_to_ic_ratio, span_of_control, dept_distribution
+  EFFICIENCY     // revenue_per_fte, cost_per_fte, revenue_per_sales_fte, gross_margin
+  TENURE         // avg_tenure, retention_rate, time_to_promotion, new_hire_retention
+}
+
+// Benchmark Source - track third-party data providers
+model BenchmarkSource {
+  id              String   @id @default(uuid())
+
+  name            String   @unique                       // "Pave", "Radford", "Manual Entry", "Customer Crowdsourced"
+  type            SourceType                            // THIRD_PARTY, MANUAL, CROWDSOURCED
+  website         String?
+  contactEmail    String?  @map("contact_email")
+  description     String?
+
+  // Licensing and access
+  licenseType     String?  @map("license_type")          // "Paid", "Free", "Partnership"
+  accessNotes     String?  @map("access_notes")
+  lastContacted   DateTime? @map("last_contacted")
+
+  // Quality indicators
+  reliability     String?                                // "High", "Medium", "Low"
+  updateFrequency String?  @map("update_frequency")      // "Quarterly", "Annual", "Ad-hoc"
+
+  isActive        Boolean  @default(true) @map("is_active")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organizationalBenchmarks OrganizationalBenchmark[]
+  auditLogs       BenchmarkAuditLog[]
+
+  @@index([type])
+  @@index([isActive])
+  @@map("benchmark_sources")
+}
+
+enum SourceType {
+  THIRD_PARTY    // Pave, Radford, etc.
+  MANUAL         // Admin-entered data
+  CROWDSOURCED   // Aggregated from customer data
+}
+
+// Benchmark Audit Log - track all changes to benchmark data
+model BenchmarkAuditLog {
+  id              String   @id @default(uuid())
+
+  // What was changed
+  resourceType    String   @map("resource_type")         // "OrganizationalBenchmark", "CompensationBenchmark"
+  resourceId      String   @map("resource_id")
+  action          String                                 // "CREATE", "UPDATE", "DELETE", "VERIFY"
+
+  // Who changed it
+  userId          String?  @map("user_id")               // Admin user who made the change
+  sourceId        String?  @map("source_id")
+  source          BenchmarkSource? @relation(fields: [sourceId], references: [id])
+
+  // Change details
+  previousData    Json?    @map("previous_data")         // Snapshot before change
+  newData         Json?    @map("new_data")              // Snapshot after change
+  changeReason    String?  @map("change_reason")         // Why this change was made
+
+  // Context
+  ipAddress       String?  @map("ip_address")
+  userAgent       String?  @map("user_agent")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([resourceType, resourceId])
+  @@index([userId])
+  @@index([sourceId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@map("benchmark_audit_logs")
+}
+
 // Audit logs
 model AuditLog {
   id           String    @id @default(uuid())

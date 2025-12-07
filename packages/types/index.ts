@@ -175,3 +175,146 @@ export interface ScenarioResult {
   runway?: RunwayAnalysis;
   yearEndProjection?: YearEndProjection;
 }
+
+// Organizational Benchmark Types
+export type BenchmarkType = 'STRUCTURE' | 'EFFICIENCY' | 'TENURE';
+
+export interface OrganizationalBenchmarkInput {
+  industry: string;
+  region: string;
+  companySize: string;
+  growthStage?: string;
+  benchmarkType: BenchmarkType;
+  metricName: string;
+  p10Value?: number;
+  p25Value?: number;
+  p50Value?: number;
+  p75Value?: number;
+  p90Value?: number;
+  departmentData?: Record<string, any>;
+  sampleSize: number;
+  currency?: string;
+  unit?: string;
+  sourceId?: string;
+  effectiveDate: Date;
+  expirationDate?: Date;
+  notes?: string;
+  methodology?: string;
+}
+
+export interface OrganizationalBenchmarkData {
+  id: string;
+  industry: string;
+  region: string;
+  companySize: string;
+  growthStage?: string;
+  benchmarkType: BenchmarkType;
+  metricName: string;
+  p10Value?: number;
+  p25Value?: number;
+  p50Value?: number;
+  p75Value?: number;
+  p90Value?: number;
+  departmentData?: Record<string, any>;
+  sampleSize: number;
+  currency?: string;
+  unit?: string;
+  sourceId?: string;
+  effectiveDate: Date;
+  expirationDate?: Date;
+  lastVerified: Date;
+  notes?: string;
+  methodology?: string;
+  source?: BenchmarkSourceData;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type SourceType = 'THIRD_PARTY' | 'MANUAL' | 'CROWDSOURCED';
+
+export interface BenchmarkSourceInput {
+  name: string;
+  type: SourceType;
+  website?: string;
+  contactEmail?: string;
+  description?: string;
+  licenseType?: string;
+  accessNotes?: string;
+  lastContacted?: Date;
+  reliability?: string;
+  updateFrequency?: string;
+}
+
+export interface BenchmarkSourceData {
+  id: string;
+  name: string;
+  type: SourceType;
+  website?: string;
+  contactEmail?: string;
+  description?: string;
+  licenseType?: string;
+  accessNotes?: string;
+  lastContacted?: Date;
+  reliability?: string;
+  updateFrequency?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface BenchmarkAuditLogInput {
+  resourceType: string;
+  resourceId: string;
+  action: string;
+  userId?: string;
+  sourceId?: string;
+  previousData?: Record<string, any>;
+  newData?: Record<string, any>;
+  changeReason?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+export interface BenchmarkAuditLogData {
+  id: string;
+  resourceType: string;
+  resourceId: string;
+  action: string;
+  userId?: string;
+  sourceId?: string;
+  previousData?: Record<string, any>;
+  newData?: Record<string, any>;
+  changeReason?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
+}
+
+// Benchmark matching and filtering
+export interface BenchmarkFilter {
+  industry?: string;
+  region?: string;
+  companySize?: string;
+  growthStage?: string;
+  benchmarkType?: BenchmarkType;
+  metricName?: string;
+  effectiveAsOf?: Date; // Get benchmarks effective as of this date
+}
+
+// Helper type for benchmark comparison
+export interface BenchmarkComparison {
+  metricName: string;
+  userValue: number;
+  benchmark: {
+    p10?: number;
+    p25?: number;
+    p50?: number;
+    p75?: number;
+    p90?: number;
+  };
+  percentile: number; // Where the user's value falls in the distribution
+  status: 'below_p25' | 'p25_to_p50' | 'p50_to_p75' | 'above_p75';
+  deltaFromMedian: number;
+  deltaFromMedianPct: number;
+  unit?: string;
+}
