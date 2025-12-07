@@ -593,7 +593,7 @@ export default function OrganizationalBenchmarksTab({
                   </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {benchmark.p50Value?.toFixed(2)} {benchmark.unit}
+                  {benchmark.p50Value ? Number(benchmark.p50Value).toFixed(2) : '—'} {benchmark.unit}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
                   {benchmark.sampleSize}
