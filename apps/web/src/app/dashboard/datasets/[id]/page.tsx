@@ -33,6 +33,7 @@ export default async function DatasetOverviewPage({
       employees: {
         orderBy: { createdAt: 'desc' },
       },
+      settings: true,
     },
   });
 
@@ -40,9 +41,12 @@ export default async function DatasetOverviewPage({
     notFound();
   }
 
+  // Get department categories from settings
+  const departmentCategories = dataset.settings?.departmentCategories as Record<string, string> | undefined;
+
   const metrics =
     dataset.employees.length > 0
-      ? calculateAllMetrics(dataset.employees, dataset)
+      ? calculateAllMetrics(dataset.employees, dataset, departmentCategories)
       : null;
 
   return (

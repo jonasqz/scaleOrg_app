@@ -9,6 +9,7 @@ import {
   GitCompare,
   ArrowLeft,
   BarChart3,
+  Settings,
 } from 'lucide-react';
 
 interface DatasetSidebarProps {
@@ -40,6 +41,11 @@ export default function DatasetSidebar({ datasetId, datasetName }: DatasetSideba
       name: 'Scenarios',
       href: `/dashboard/datasets/${datasetId}/scenarios`,
       icon: GitCompare,
+    },
+    {
+      name: 'Settings',
+      href: `/dashboard/datasets/${datasetId}/settings`,
+      icon: Settings,
     },
   ];
 

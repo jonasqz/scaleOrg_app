@@ -15,6 +15,7 @@ import TenureDisplay from './tenure-display';
 import InsightsDisplay from './insights-display';
 import ScenarioBuilder from './scenario-builder';
 import SavedScenariosList from './saved-scenarios-list';
+import AnalyticsTabs from './analytics-tabs';
 
 interface Employee {
   id: string;

@@ -31,6 +31,7 @@ export async function GET(
       },
       include: {
         employees: true,
+        settings: true,
       },
     });
 
@@ -45,8 +46,11 @@ export async function GET(
       );
     }
 
+    // Get department categories from settings
+    const departmentCategories = dataset.settings?.departmentCategories as Record<string, string> | undefined;
+
     // Calculate metrics
-    const metrics = calculateAllMetrics(dataset.employees, dataset);
+    const metrics = calculateAllMetrics(dataset.employees, dataset, departmentCategories);
 
     // Determine company size based on employee count
     let companySize = '50-100';

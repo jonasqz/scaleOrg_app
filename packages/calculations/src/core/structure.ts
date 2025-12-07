@@ -12,7 +12,8 @@ import { normalizeDepartment } from '../utils/normalizations';
 import { calculateTotalCost } from './cost';
 
 export function calculateDepartmentBreakdown(
-  employees: Employee[]
+  employees: Employee[],
+  departmentCategories?: Record<string, string>
 ): DepartmentBreakdown {
   const active = filterActiveEmployees(employees);
   const totalCost = calculateTotalCost(active);
@@ -21,7 +22,11 @@ export function calculateDepartmentBreakdown(
   const deptMap = new Map<string, Employee[]>();
 
   active.forEach((emp) => {
-    const dept = normalizeDepartment(emp.department);
+    // Use departmentCategories if provided, otherwise fall back to normalizeDepartment
+    const dept = departmentCategories && departmentCategories[emp.department]
+      ? departmentCategories[emp.department]
+      : normalizeDepartment(emp.department);
+
     if (!deptMap.has(dept)) {
       deptMap.set(dept, []);
     }

@@ -5,7 +5,7 @@ import { prisma } from '@scleorg/database';
 /**
  * GET /api/datasets/[id]/settings
  *
- * Get dataset settings (R&D/GTM department mappings, etc.)
+ * Get dataset settings with actual departments from employees
  */
 export async function GET(
   req: NextRequest,
@@ -17,35 +17,80 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const datasetId = params.id;
-
-    // Verify user owns this dataset
-    const dataset = await prisma.dataset.findUnique({
-      where: { id: datasetId },
-      select: { userId: true },
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
     });
 
-    if (!dataset || dataset.userId !== userId) {
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const datasetId = params.id;
+
+    // Verify dataset ownership
+    const dataset = await prisma.dataset.findFirst({
+      where: {
+        id: datasetId,
+        userId: user.id,
+      },
+      include: {
+        employees: {
+          select: {
+            department: true,
+          },
+        },
+      },
+    });
+
+    if (!dataset) {
       return NextResponse.json({ error: 'Dataset not found' }, { status: 404 });
     }
+
+    // Get unique departments from employees
+    const departments = Array.from(
+      new Set(
+        dataset.employees
+          .map((e) => e.department)
+          .filter((d) => d && d.trim() !== '')
+      )
+    ).sort();
 
     // Get or create settings
     let settings = await prisma.datasetSettings.findUnique({
       where: { datasetId },
     });
 
-    // If settings don't exist, create with defaults
     if (!settings) {
+      // Create with smart defaults based on existing departments
+      const defaultCategories: Record<string, string> = {};
+
+      departments.forEach((dept) => {
+        const lower = dept.toLowerCase();
+        if (/(eng|product|design|data|qa|r&d|tech|develop)/i.test(lower)) {
+          defaultCategories[dept] = 'R&D';
+        } else if (/(sales|market|customer|cs|gtm|sdr|partner|revenue|account|commercial)/i.test(lower)) {
+          defaultCategories[dept] = 'GTM';
+        } else if (/(finance|hr|legal|it|admin|recruit|people|talent|executive|c-level)/i.test(lower)) {
+          defaultCategories[dept] = 'G&A';
+        } else if (/(ops|logistic|supply|manufactur|facility|production)/i.test(lower)) {
+          defaultCategories[dept] = 'Operations';
+        } else {
+          defaultCategories[dept] = 'Other';
+        }
+      });
+
       settings = await prisma.datasetSettings.create({
         data: {
           datasetId,
-          rdDepartments: ['Engineering', 'Product', 'Design'],
-          gtmDepartments: ['Sales', 'Marketing', 'Customer Success'],
+          departmentCategories: defaultCategories,
         },
       });
     }
 
-    return NextResponse.json(settings);
+    return NextResponse.json({
+      departments,
+      departmentCategories: settings.departmentCategories || {},
+    });
   } catch (error) {
     console.error('Error fetching dataset settings:', error);
     return NextResponse.json(
@@ -62,8 +107,7 @@ export async function GET(
  *
  * Request body:
  * {
- *   rdDepartments?: string[];
- *   gtmDepartments?: string[];
+ *   departmentCategories: { "Engineering": "R&D", "Sales": "GTM", ... }
  * }
  */
 export async function PUT(
@@ -76,47 +120,58 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const datasetId = params.id;
-
-    // Verify user owns this dataset
-    const dataset = await prisma.dataset.findUnique({
-      where: { id: datasetId },
-      select: { userId: true },
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
     });
 
-    if (!dataset || dataset.userId !== userId) {
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const datasetId = params.id;
+
+    // Verify dataset ownership
+    const dataset = await prisma.dataset.findFirst({
+      where: {
+        id: datasetId,
+        userId: user.id,
+      },
+    });
+
+    if (!dataset) {
       return NextResponse.json({ error: 'Dataset not found' }, { status: 404 });
     }
 
     const body = await req.json();
-    const { rdDepartments, gtmDepartments } = body;
+    const { departmentCategories } = body;
 
-    // Validate arrays if provided
-    if (rdDepartments !== undefined && !Array.isArray(rdDepartments)) {
+    if (!departmentCategories || typeof departmentCategories !== 'object') {
       return NextResponse.json(
-        { error: 'rdDepartments must be an array' },
+        { error: 'Invalid department categories' },
         { status: 400 }
       );
     }
 
-    if (gtmDepartments !== undefined && !Array.isArray(gtmDepartments)) {
-      return NextResponse.json(
-        { error: 'gtmDepartments must be an array' },
-        { status: 400 }
-      );
+    // Validate categories
+    const validCategories = ['R&D', 'GTM', 'G&A', 'Operations', 'Other'];
+    for (const [dept, category] of Object.entries(departmentCategories)) {
+      if (typeof category !== 'string' || !validCategories.includes(category)) {
+        return NextResponse.json(
+          { error: `Invalid category for ${dept}: ${category}` },
+          { status: 400 }
+        );
+      }
     }
 
-    // Update or create settings
+    // Upsert settings
     const settings = await prisma.datasetSettings.upsert({
       where: { datasetId },
       create: {
         datasetId,
-        rdDepartments: rdDepartments || ['Engineering', 'Product', 'Design'],
-        gtmDepartments: gtmDepartments || ['Sales', 'Marketing', 'Customer Success'],
+        departmentCategories,
       },
       update: {
-        ...(rdDepartments !== undefined && { rdDepartments }),
-        ...(gtmDepartments !== undefined && { gtmDepartments }),
+        departmentCategories,
       },
     });
 

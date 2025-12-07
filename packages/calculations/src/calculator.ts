@@ -25,7 +25,8 @@ import { filterActiveEmployees } from './utils/aggregations';
 
 export function calculateAllMetrics(
   employees: Employee[],
-  dataset: Dataset
+  dataset: Dataset,
+  departmentCategories?: Record<string, string>
 ): CalculationResult {
   const active = filterActiveEmployees(employees);
 
@@ -47,8 +48,8 @@ export function calculateAllMetrics(
     employeeCount: active.length,
   };
 
-  // Calculate department breakdown
-  const departments = calculateDepartmentBreakdown(active);
+  // Calculate department breakdown with custom categories
+  const departments = calculateDepartmentBreakdown(active, departmentCategories);
 
   // Calculate ratios
   const ratios = calculateRatios(active, departments);
