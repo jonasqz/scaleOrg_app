@@ -83,6 +83,9 @@ export default function EmployeeDetailModal({
   const [showNewDepartment, setShowNewDepartment] = useState(false);
   const [showNewLocation, setShowNewLocation] = useState(false);
 
+  // Compensation input mode: 'annual' or 'monthly'
+  const [compensationInputMode, setCompensationInputMode] = useState<'annual' | 'monthly'>('annual');
+
   const [formData, setFormData] = useState({
     employeeName: currentEmployee.employeeName || '',
     email: currentEmployee.email || '',
@@ -137,12 +140,15 @@ export default function EmployeeDetailModal({
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Convert monthly to annual if needed (we always store as annual)
+      const multiplier = compensationInputMode === 'monthly' ? 12 : 1;
+
       const payload = {
         ...formData,
-        totalCompensation: parseFloat(formData.totalCompensation),
-        baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
-        bonus: formData.bonus ? parseFloat(formData.bonus) : null,
-        equityValue: formData.equityValue ? parseFloat(formData.equityValue) : null,
+        totalCompensation: parseFloat(formData.totalCompensation) * multiplier,
+        baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) * multiplier : null,
+        bonus: formData.bonus ? parseFloat(formData.bonus) * multiplier : null,
+        equityValue: formData.equityValue ? parseFloat(formData.equityValue) * multiplier : null,
         fteFactor: parseFloat(formData.fteFactor),
       };
 
@@ -714,99 +720,196 @@ export default function EmployeeDetailModal({
 
               {/* Compensation */}
               <div>
-                <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                  Compensation Breakdown
-                </h3>
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Compensation Breakdown
+                  </h3>
+                  {isEditing && (
+                    <div className="inline-flex rounded-lg border border-gray-300 bg-gray-50 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setCompensationInputMode('annual')}
+                        className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                          compensationInputMode === 'annual'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Annual
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCompensationInputMode('monthly')}
+                        className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                          compensationInputMode === 'monthly'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Monthly
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {isEditing && (
+                  <p className="mb-4 text-sm text-gray-600">
+                    {compensationInputMode === 'monthly'
+                      ? 'Enter monthly values. They will be converted to annual (×12) when saved.'
+                      : 'Enter annual values. All compensation is stored annually.'}
+                  </p>
+                )}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Total Annual Compensation
+                      Total {isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'} Compensation
                     </label>
                     {isEditing ? (
-                      <input
-                        type="number"
-                        value={formData.totalCompensation}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            totalCompensation: e.target.value,
-                          })
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
+                      <>
+                        <input
+                          type="number"
+                          value={formData.totalCompensation}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              totalCompensation: e.target.value,
+                            })
+                          }
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        {formData.totalCompensation && parseFloat(formData.totalCompensation) > 0 && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {compensationInputMode === 'monthly'
+                              ? `≈ ${currency} ${(parseFloat(formData.totalCompensation) * 12).toLocaleString()} annually`
+                              : `≈ ${currency} ${(parseFloat(formData.totalCompensation) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
+                          </p>
+                        )}
+                      </>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {currency} {currentEmployee.totalCompensation.toLocaleString()}
-                      </p>
+                      <>
+                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                          {currency} {currentEmployee.totalCompensation.toLocaleString()} / year
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          {currency} {(currentEmployee.totalCompensation / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
+                        </p>
+                      </>
                     )}
                   </div>
 
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Base Salary
+                      Base Salary ({isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'})
                     </label>
                     {isEditing ? (
-                      <input
-                        type="number"
-                        value={formData.baseSalary}
-                        onChange={(e) =>
-                          setFormData({ ...formData, baseSalary: e.target.value })
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Optional"
-                      />
+                      <>
+                        <input
+                          type="number"
+                          value={formData.baseSalary}
+                          onChange={(e) =>
+                            setFormData({ ...formData, baseSalary: e.target.value })
+                          }
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="Optional"
+                        />
+                        {formData.baseSalary && parseFloat(formData.baseSalary) > 0 && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {compensationInputMode === 'monthly'
+                              ? `≈ ${currency} ${(parseFloat(formData.baseSalary) * 12).toLocaleString()} annually`
+                              : `≈ ${currency} ${(parseFloat(formData.baseSalary) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
+                          </p>
+                        )}
+                      </>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {currentEmployee.baseSalary
-                          ? `${currency} ${currentEmployee.baseSalary.toLocaleString()}`
-                          : 'N/A'}
-                      </p>
+                      <>
+                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                          {currentEmployee.baseSalary
+                            ? `${currency} ${currentEmployee.baseSalary.toLocaleString()} / year`
+                            : 'N/A'}
+                        </p>
+                        {currentEmployee.baseSalary && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {currency} {(currentEmployee.baseSalary / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
 
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Bonus
+                      Bonus ({isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'})
                     </label>
                     {isEditing ? (
-                      <input
-                        type="number"
-                        value={formData.bonus}
-                        onChange={(e) =>
-                          setFormData({ ...formData, bonus: e.target.value })
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Optional"
-                      />
+                      <>
+                        <input
+                          type="number"
+                          value={formData.bonus}
+                          onChange={(e) =>
+                            setFormData({ ...formData, bonus: e.target.value })
+                          }
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="Optional"
+                        />
+                        {formData.bonus && parseFloat(formData.bonus) > 0 && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {compensationInputMode === 'monthly'
+                              ? `≈ ${currency} ${(parseFloat(formData.bonus) * 12).toLocaleString()} annually`
+                              : `≈ ${currency} ${(parseFloat(formData.bonus) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
+                          </p>
+                        )}
+                      </>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {currentEmployee.bonus
-                          ? `${currency} ${currentEmployee.bonus.toLocaleString()}`
-                          : 'N/A'}
-                      </p>
+                      <>
+                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                          {currentEmployee.bonus
+                            ? `${currency} ${currentEmployee.bonus.toLocaleString()} / year`
+                            : 'N/A'}
+                        </p>
+                        {currentEmployee.bonus && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {currency} {(currentEmployee.bonus / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
 
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Equity Value (Annual)
+                      Equity Value ({isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'})
                     </label>
                     {isEditing ? (
-                      <input
-                        type="number"
-                        value={formData.equityValue}
-                        onChange={(e) =>
-                          setFormData({ ...formData, equityValue: e.target.value })
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Optional"
-                      />
+                      <>
+                        <input
+                          type="number"
+                          value={formData.equityValue}
+                          onChange={(e) =>
+                            setFormData({ ...formData, equityValue: e.target.value })
+                          }
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="Optional"
+                        />
+                        {formData.equityValue && parseFloat(formData.equityValue) > 0 && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {compensationInputMode === 'monthly'
+                              ? `≈ ${currency} ${(parseFloat(formData.equityValue) * 12).toLocaleString()} annually`
+                              : `≈ ${currency} ${(parseFloat(formData.equityValue) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
+                          </p>
+                        )}
+                      </>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                        {currentEmployee.equityValue
-                          ? `${currency} ${currentEmployee.equityValue.toLocaleString()}`
-                          : 'N/A'}
-                      </p>
+                      <>
+                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                          {currentEmployee.equityValue
+                            ? `${currency} ${currentEmployee.equityValue.toLocaleString()} / year`
+                            : 'N/A'}
+                        </p>
+                        {currentEmployee.equityValue && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {currency} {(currentEmployee.equityValue / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

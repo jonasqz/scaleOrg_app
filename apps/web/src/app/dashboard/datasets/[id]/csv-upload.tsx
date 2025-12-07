@@ -46,6 +46,7 @@ export default function CSVUpload({ datasetId }: CSVUploadProps) {
   const [step, setStep] = useState<'upload' | 'mapping' | 'preview' | 'importing' | 'complete'>('upload');
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<{ success: number; failed: number; errors: string[] } | null>(null);
+  const [compensationMode, setCompensationMode] = useState<'annual' | 'monthly'>('annual');
 
   const handleFileSelect = (selectedFile: File) => {
     if (!selectedFile.name.endsWith('.csv')) {
@@ -160,13 +161,27 @@ Bob Johnson,bob@example.com,Engineering,Engineering Manager,MANAGER,FTE,180000,1
     setStep('importing');
 
     try {
+      // Compensation fields that need conversion
+      const compensationFields = ['totalCompensation', 'baseSalary', 'bonus', 'equityValue'];
+      const multiplier = compensationMode === 'monthly' ? 12 : 1;
+
       // Transform data based on column mapping
       const transformedData = parsedData.map(row => {
         const transformed: any = {};
 
         Object.entries(columnMapping).forEach(([csvCol, fieldName]) => {
           if (fieldName && fieldName !== '') {
-            transformed[fieldName] = row[csvCol];
+            let value = row[csvCol];
+
+            // Convert monthly compensation to annual if needed
+            if (compensationFields.includes(fieldName) && value) {
+              const numValue = parseFloat(value);
+              if (!isNaN(numValue)) {
+                value = (numValue * multiplier).toString();
+              }
+            }
+
+            transformed[fieldName] = value;
           }
         });
 
@@ -211,6 +226,7 @@ Bob Johnson,bob@example.com,Engineering,Engineering Manager,MANAGER,FTE,180000,1
     setColumnMapping({});
     setStep('upload');
     setImportResult(null);
+    setCompensationMode('annual');
   };
 
   if (!isOpen) {
@@ -328,6 +344,49 @@ Bob Johnson,bob@example.com,Engineering,Engineering Manager,MANAGER,FTE,180000,1
             <p className="text-sm text-blue-700">
               <strong>Ready to import {parsedData.length} employees</strong>. Preview the first 5 rows below.
             </p>
+          </div>
+
+          {/* Compensation Mode Selector */}
+          <div className="rounded-lg border border-gray-300 bg-gray-50 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  Compensation Data Format
+                </p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Are the compensation values in your CSV monthly or annual?
+                </p>
+              </div>
+              <div className="inline-flex rounded-lg border border-gray-300 bg-white p-1">
+                <button
+                  type="button"
+                  onClick={() => setCompensationMode('annual')}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                    compensationMode === 'annual'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Annual
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCompensationMode('monthly')}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                    compensationMode === 'monthly'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Monthly
+                </button>
+              </div>
+            </div>
+            {compensationMode === 'monthly' && (
+              <p className="mt-2 text-xs text-blue-700">
+                All monthly values will be converted to annual (×12) during import.
+              </p>
+            )}
           </div>
 
           <div className="overflow-x-auto">
