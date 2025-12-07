@@ -87,6 +87,11 @@ model DatasetSettings {
   // JSON structure: { "Engineering": "R&D", "Sales": "GTM", "Finance": "G&A", "IT": "Operations", ... }
   departmentCategories Json? @map("department_categories")
 
+  // Benchmark matching criteria (optional - defaults to user-level settings if not set)
+  industry    String?                                  // "SaaS", "Fintech", "Climate Tech", etc.
+  region      String?                                  // "DACH", "EU", "US", "Global", etc.
+  growthStage String?  @map("growth_stage")           // "Seed", "Series A", "Series B+", "Growth", "Public"
+
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -94,6 +99,7 @@ model DatasetSettings {
   dataset     Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
 
   @@index([datasetId])
+  @@index([industry, region])
   @@map("dataset_settings")
 }
 
@@ -487,21 +493,42 @@ model OrganizationalBenchmark {
   companySize     String   @map("company_size")
   growthStage     String?  @map("growth_stage")  // "Seed", "Series A", "Series B+", "Public"
 
-  // Benchmark type and metric name
-  benchmarkType   BenchmarkType @map("benchmark_type")  // STRUCTURE, EFFICIENCY, TENURE
-  metricName      String   @map("metric_name")          // "rd_to_gtm_ratio", "revenue_per_fte", etc.
+  // Entry mode (determines data structure)
+  entryMode       BenchmarkEntryMode @default(FALLBACK) @map("entry_mode")  // DETAILED or FALLBACK
 
-  // Percentile data
+  // === DETAILED MODE: Raw department headcount data ===
+  // Percentile-based department breakdown (JSON)
+  // Uses standard department categories to match user data structure
+  // Categories: R&D, GTM (Go-to-Market), G&A (General & Administrative), Operations, Other
+  // Example structure:
+  // {
+  //   "p10": { "rd": 15, "gtm": 13, "ga": 8, "operations": 3, "other": 1, "total": 40 },
+  //   "p25": { "rd": 27, "gtm": 19, "ga": 10, "operations": 3, "other": 1, "total": 60 },
+  //   "p50": { "rd": 43, "gtm": 30, "ga": 16, "operations": 5, "other": 2, "total": 96 },
+  //   "p75": { "rd": 64, "gtm": 46, "ga": 24, "operations": 7, "other": 3, "total": 144 },
+  //   "p90": { "rd": 86, "gtm": 63, "ga": 32, "operations": 10, "other": 4, "total": 195 }
+  // }
+  // This allows direct comparison with user data which uses the same categories via DatasetSettings.departmentCategories
+  departmentHeadcount Json? @map("department_headcount")
+
+  // === FALLBACK MODE: Pre-calculated metric values ===
+  // Used when detailed department data is not available
+  benchmarkType   BenchmarkType? @map("benchmark_type")  // STRUCTURE, EFFICIENCY, TENURE
+  metricName      String?   @map("metric_name")          // "rd_to_gtm_ratio", "revenue_per_fte", etc.
+
+  // Percentile data for the specific metric
   p10Value        Decimal? @map("p10_value") @db.Decimal(12, 2)
   p25Value        Decimal? @map("p25_value") @db.Decimal(12, 2)
   p50Value        Decimal? @map("p50_value") @db.Decimal(12, 2)  // Median
   p75Value        Decimal? @map("p75_value") @db.Decimal(12, 2)
   p90Value        Decimal? @map("p90_value") @db.Decimal(12, 2)
 
-  // Department-specific data (optional, stored as JSON)
-  // Example: { "Engineering": { "p50_fte": 25, "p50_percentage": 35 } }
-  departmentData  Json?    @map("department_data")
+  // === EFFICIENCY METRICS (for both modes) ===
+  // Revenue data (optional, for efficiency benchmarks)
+  revenueData     Json?    @map("revenue_data")
+  // Example: { "p10": 4800000, "p25": 7200000, "p50": 12000000, "p75": 18000000, "p90": 25000000 }
 
+  // === SHARED METADATA ===
   // Data quality and lineage
   sampleSize      Int                                    // Number of companies in sample
   currency        String?                                // For monetary metrics
@@ -514,6 +541,12 @@ model OrganizationalBenchmark {
   expirationDate  DateTime? @map("expiration_date")      // When this benchmark expires (optional)
   lastVerified    DateTime @default(now()) @map("last_verified")
 
+  // Approval workflow
+  approvalStatus  BenchmarkApprovalStatus @default(PENDING) @map("approval_status")
+  approvedBy      String?  @map("approved_by")           // Admin user ID who approved
+  approvedAt      DateTime? @map("approved_at")
+  rejectionReason String?  @map("rejection_reason")      // Why it was rejected
+
   // Metadata
   notes           String?
   methodology     String?                                // Brief description of how data was collected
@@ -521,18 +554,31 @@ model OrganizationalBenchmark {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  @@unique([industry, region, companySize, benchmarkType, metricName, effectiveDate])
+  @@unique([industry, region, companySize, entryMode, benchmarkType, metricName, effectiveDate])
   @@index([industry, region, companySize])
   @@index([benchmarkType, metricName])
   @@index([effectiveDate, expirationDate])
   @@index([sourceId])
+  @@index([entryMode])
+  @@index([approvalStatus])
   @@map("organizational_benchmarks")
+}
+
+enum BenchmarkEntryMode {
+  DETAILED       // Raw department headcount data (preferred)
+  FALLBACK       // Pre-calculated metrics only
 }
 
 enum BenchmarkType {
   STRUCTURE      // rd_to_gtm_ratio, manager_to_ic_ratio, span_of_control, dept_distribution
   EFFICIENCY     // revenue_per_fte, cost_per_fte, revenue_per_sales_fte, gross_margin
   TENURE         // avg_tenure, retention_rate, time_to_promotion, new_hire_retention
+}
+
+enum BenchmarkApprovalStatus {
+  PENDING        // Awaiting admin review
+  APPROVED       // Approved for use in benchmarks
+  REJECTED       // Rejected, will not be used
 }
 
 // Benchmark Source - track third-party data providers

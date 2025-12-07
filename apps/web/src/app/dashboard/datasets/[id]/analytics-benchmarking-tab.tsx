@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import BenchmarkComparison from './benchmark-comparison';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
@@ -11,6 +12,26 @@ interface AnalyticsBenchmarkingTabProps {
   dataset: any;
 }
 
+interface BenchmarkData {
+  benchmark?: {
+    segment?: string;
+    companySize?: string;
+    metrics?: {
+      rdToGTMRatio?: { p25: number; p50: number; p75: number } | null;
+    };
+  };
+}
+
+const loadingMessages = [
+  'Counting employees...',
+  'Analyzing department structures...',
+  'Crunching industry benchmarks...',
+  'Comparing with peer companies...',
+  'Calculating efficiency ratios...',
+  'Reviewing compensation data...',
+  'Generating insights...',
+];
+
 export default function AnalyticsBenchmarkingTab({
   datasetId,
   currency,
@@ -18,6 +39,35 @@ export default function AnalyticsBenchmarkingTab({
   metrics,
   dataset,
 }: AnalyticsBenchmarkingTabProps) {
+  const [benchmarkData, setBenchmarkData] = useState<BenchmarkData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    async function fetchBenchmarks() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/datasets/${datasetId}/benchmarks`);
+        if (response.ok) {
+          const data = await response.json();
+          setBenchmarkData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch benchmarks:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBenchmarks();
+  }, [datasetId]);
+
   if (!metrics) {
     return <div>No metrics available</div>;
   }
@@ -88,6 +138,25 @@ export default function AnalyticsBenchmarkingTab({
     return acc;
   }, {});
 
+  // Show loading state while fetching benchmarks
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+        <div className="text-center space-y-2">
+          <p className="text-lg font-semibold text-gray-900 animate-pulse">
+            {loadingMessages[loadingMessageIndex]}
+          </p>
+          <p className="text-sm text-gray-500">
+            Fetching benchmark data for your organization
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* R&D to GTM Ratio Rating */}
@@ -113,7 +182,9 @@ export default function AnalyticsBenchmarkingTab({
         </p>
         <div className="mt-4 flex items-center gap-2 text-xs text-gray-600">
           <span className="rounded bg-white px-2 py-1">
-            Industry Benchmark: 1.5 - 2.5 (SaaS)
+            {benchmarkData?.benchmark?.metrics?.rdToGTMRatio
+              ? `Industry Benchmark: ${benchmarkData.benchmark.metrics.rdToGTMRatio.p25.toFixed(1)} - ${benchmarkData.benchmark.metrics.rdToGTMRatio.p75.toFixed(1)} (${benchmarkData.benchmark.segment})`
+              : 'Loading benchmark...'}
           </span>
         </div>
       </div>
@@ -136,9 +207,6 @@ export default function AnalyticsBenchmarkingTab({
                 <div className="text-right">
                   <p className="font-semibold text-gray-900">
                     {data.percentage.toFixed(1)}% of total
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Benchmark: TBD
                   </p>
                 </div>
               </div>
@@ -164,9 +232,6 @@ export default function AnalyticsBenchmarkingTab({
               <div className="text-right">
                 <p className="font-semibold text-gray-900">
                   {currency} {(avgComp / 1000).toFixed(0)}k avg
-                </p>
-                <p className="text-xs text-gray-500">
-                  Benchmark: TBD
                 </p>
               </div>
             </div>
@@ -208,9 +273,6 @@ export default function AnalyticsBenchmarkingTab({
                       {currency} {((avgBaseSalary + avgBonus) / 1000).toFixed(0)}k
                     </p>
                   </div>
-                </div>
-                <div className="mt-2 text-xs text-gray-500">
-                  Benchmark: TBD
                 </div>
               </div>
             ))}

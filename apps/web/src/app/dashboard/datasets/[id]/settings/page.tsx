@@ -27,6 +27,9 @@ export default async function SettingsPage({
       id: params.id,
       userId: user.id,
     },
+    include: {
+      settings: true,
+    },
   });
 
   if (!dataset) {
@@ -39,7 +42,7 @@ export default async function SettingsPage({
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dataset Settings</h1>
         <p className="mt-2 text-gray-600">
-          Configure general settings and department categorization
+          Configure general settings, benchmarking, and department categorization
         </p>
       </div>
 

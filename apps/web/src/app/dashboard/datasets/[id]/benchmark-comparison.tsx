@@ -4,34 +4,17 @@ import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, AlertCircle } from 'lucide-react';
 
 interface BenchmarkData {
-  metrics: any;
   benchmark: {
     segment: string;
     companySize: string;
     metrics: {
-      rdToGTMRatio?: { median: number; p25: number; p75: number };
-      revenuePerFTE?: { median: number; p25: number; p75: number };
-      spanOfControl?: { median: number; p25: number; p75: number };
-      costPerFTE?: { median: number; p25: number; p75: number };
+      rdToGTMRatio?: { p25: number; p50: number; p75: number };
+      revenuePerFTE?: { p25: number; p50: number; p75: number };
+      spanOfControl?: { p25: number; p50: number; p75: number };
+      costPerFTE?: { p25: number; p50: number; p75: number };
     };
   };
-  comparisons: {
-    rdToGTM: ComparisonResult | null;
-    revenuePerFTE: ComparisonResult | null;
-    spanOfControl: ComparisonResult | null;
-    costPerFTE: ComparisonResult | null;
-  };
   companySize: string;
-}
-
-interface ComparisonResult {
-  status: 'below' | 'within' | 'above';
-  severity: 'low' | 'medium' | 'high';
-  percentile: number;
-  actualValue: number;
-  benchmarkMedian: number;
-  benchmarkP25: number;
-  benchmarkP75: number;
 }
 
 interface BenchmarkComparisonProps {
@@ -90,41 +73,6 @@ export default function BenchmarkComparison({ datasetId, currency }: BenchmarkCo
 
   if (!data) return null;
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'above':
-        return <TrendingUp className="h-5 w-5 text-green-600" />;
-      case 'below':
-        return <TrendingDown className="h-5 w-5 text-red-600" />;
-      default:
-        return <Minus className="h-5 w-5 text-gray-600" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'above':
-        return 'text-green-700 bg-green-100';
-      case 'below':
-        return 'text-red-700 bg-red-100';
-      default:
-        return 'text-gray-700 bg-gray-100';
-    }
-  };
-
-  const getSeverityBadge = (severity: string) => {
-    const colors = {
-      low: 'bg-blue-100 text-blue-700',
-      medium: 'bg-yellow-100 text-yellow-700',
-      high: 'bg-red-100 text-red-700',
-    };
-    return (
-      <span className={`rounded-full px-2 py-1 text-xs font-medium ${colors[severity as keyof typeof colors]}`}>
-        {severity}
-      </span>
-    );
-  };
-
   const formatValue = (value: number | undefined | null, isRevenue: boolean = false, isCost: boolean = false) => {
     if (value === undefined || value === null || isNaN(value)) {
       return 'N/A';
@@ -137,27 +85,27 @@ export default function BenchmarkComparison({ datasetId, currency }: BenchmarkCo
 
   const metrics = [
     {
-      key: 'rdToGTM',
+      key: 'rdToGTMRatio',
       label: 'R&D to GTM Ratio',
-      comparison: data.comparisons.rdToGTM,
+      benchmarkData: data.benchmark?.metrics?.rdToGTMRatio,
       format: (v: number) => formatValue(v),
     },
     {
       key: 'revenuePerFTE',
       label: 'Revenue per FTE',
-      comparison: data.comparisons.revenuePerFTE,
+      benchmarkData: data.benchmark?.metrics?.revenuePerFTE,
       format: (v: number) => formatValue(v, true),
     },
     {
       key: 'spanOfControl',
       label: 'Span of Control',
-      comparison: data.comparisons.spanOfControl,
+      benchmarkData: data.benchmark?.metrics?.spanOfControl,
       format: (v: number) => formatValue(v),
     },
     {
       key: 'costPerFTE',
       label: 'Cost per FTE',
-      comparison: data.comparisons.costPerFTE,
+      benchmarkData: data.benchmark?.metrics?.costPerFTE,
       format: (v: number) => formatValue(v, false, true),
     },
   ];
@@ -172,8 +120,8 @@ export default function BenchmarkComparison({ datasetId, currency }: BenchmarkCo
       </div>
 
       <div className="space-y-4">
-        {metrics.map(({ key, label, comparison, format }) => {
-          if (!comparison) {
+        {metrics.map(({ key, label, benchmarkData, format }) => {
+          if (!benchmarkData) {
             return (
               <div key={key} className="rounded-lg bg-gray-50 p-4">
                 <div className="flex items-center justify-between">
@@ -188,56 +136,32 @@ export default function BenchmarkComparison({ datasetId, currency }: BenchmarkCo
 
           return (
             <div key={key} className="rounded-lg border p-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  {getStatusIcon(comparison.status)}
-                  <div>
-                    <p className="font-medium text-gray-900">{label}</p>
-                    <p className="text-sm text-gray-600 mt-0.5">
-                      Your value: <span className="font-semibold">{format(comparison.actualValue)}</span>
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {getSeverityBadge(comparison.severity)}
-                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(comparison.status)}`}>
-                    {comparison.status}
-                  </span>
-                </div>
+              <div className="mb-3">
+                <p className="font-medium text-gray-900">{label}</p>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  Industry benchmark range
+                </p>
               </div>
 
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500">25th percentile</p>
                   <p className="font-semibold text-gray-900 mt-1">
-                    {format(comparison.benchmarkP25)}
+                    {format(benchmarkData.p25)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Median</p>
+                  <p className="text-gray-500">Median (P50)</p>
                   <p className="font-semibold text-gray-900 mt-1">
-                    {format(comparison.benchmarkMedian)}
+                    {format(benchmarkData.p50)}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-500">75th percentile</p>
                   <p className="font-semibold text-gray-900 mt-1">
-                    {format(comparison.benchmarkP75)}
+                    {format(benchmarkData.p75)}
                   </p>
                 </div>
-              </div>
-
-              {/* Visual percentile indicator */}
-              <div className="mt-4">
-                <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="absolute h-full bg-blue-600 rounded-full transition-all"
-                    style={{ width: `${comparison.percentile}%` }}
-                  />
-                </div>
-                <p className="text-xs text-gray-600 mt-1 text-right">
-                  {comparison.percentile.toFixed(0)}th percentile
-                </p>
               </div>
             </div>
           );
@@ -247,11 +171,11 @@ export default function BenchmarkComparison({ datasetId, currency }: BenchmarkCo
       <div className="mt-6 rounded-lg bg-blue-50 p-4">
         <h3 className="font-semibold text-blue-900 text-sm mb-2">How to interpret</h3>
         <ul className="space-y-1 text-sm text-blue-700">
-          <li><span className="font-semibold">Above:</span> Your metric is higher than the benchmark median</li>
-          <li><span className="font-semibold">Within:</span> Your metric is within the 25th-75th percentile range</li>
-          <li><span className="font-semibold">Below:</span> Your metric is lower than the benchmark median</li>
+          <li><span className="font-semibold">P25 (25th percentile):</span> 25% of companies are below this value</li>
+          <li><span className="font-semibold">P50 (Median):</span> The middle value - 50% of companies are below this</li>
+          <li><span className="font-semibold">P75 (75th percentile):</span> 75% of companies are below this value</li>
           <li className="mt-2 text-xs">
-            Severity indicates how far you are from industry norms (low: good, high: needs attention)
+            Compare your organization's metrics to these ranges to understand your position in the market
           </li>
         </ul>
       </div>

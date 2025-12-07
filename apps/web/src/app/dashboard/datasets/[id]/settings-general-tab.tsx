@@ -18,6 +18,10 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
       ? new Date(dataset.fiscalYearStart).toISOString().split('T')[0]
       : '',
     currency: dataset.currency || 'EUR',
+    // Benchmarking settings
+    industry: dataset.settings?.industry || '',
+    region: dataset.settings?.region || '',
+    growthStage: dataset.settings?.growthStage || '',
   });
 
   const [saving, setSaving] = useState(false);
@@ -34,7 +38,8 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
     setMessage(null);
 
     try {
-      const res = await fetch(`/api/datasets/${datasetId}`, {
+      // Update dataset basic info
+      const datasetRes = await fetch(`/api/datasets/${datasetId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -47,14 +52,29 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
         }),
       });
 
-      if (res.ok) {
-        setMessage({ type: 'success', text: 'Settings saved successfully!' });
-        setTimeout(() => setMessage(null), 3000);
-        // Refresh the page to update sidebar and other components
-        window.location.reload();
-      } else {
-        throw new Error('Failed to save settings');
+      if (!datasetRes.ok) {
+        throw new Error('Failed to save dataset settings');
       }
+
+      // Update dataset settings (benchmarking)
+      const settingsRes = await fetch(`/api/datasets/${datasetId}/settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          industry: formData.industry || null,
+          region: formData.region || null,
+          growthStage: formData.growthStage || null,
+        }),
+      });
+
+      if (!settingsRes.ok) {
+        throw new Error('Failed to save benchmarking settings');
+      }
+
+      setMessage({ type: 'success', text: 'Settings saved successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+      // Refresh the page to update sidebar and other components
+      window.location.reload();
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to save settings. Please try again.' });
     } finally {
@@ -199,6 +219,98 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
         </div>
       </div>
 
+      {/* Benchmarking Settings */}
+      <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-lg font-semibold text-gray-900">Benchmarking Settings</h3>
+        <p className="mb-4 text-sm text-gray-600">
+          Configure these settings to get more accurate benchmark comparisons for your organization.
+          These are optional - if not set, we'll use your account-level settings.
+        </p>
+
+        <div className="space-y-4">
+          {/* Industry, Region, Growth Stage in a grid */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <div>
+              <label htmlFor="industry" className="block text-sm font-medium text-gray-700">
+                Industry
+              </label>
+              <select
+                id="industry"
+                name="industry"
+                value={formData.industry}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Use account default</option>
+                <option value="SaaS">SaaS</option>
+                <option value="Fintech">Fintech</option>
+                <option value="E-commerce">E-commerce</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Climate Tech">Climate Tech</option>
+                <option value="AI/ML">AI/ML</option>
+                <option value="Enterprise Software">Enterprise Software</option>
+                <option value="Consumer">Consumer</option>
+                <option value="B2B">B2B</option>
+                <option value="Marketplace">Marketplace</option>
+                <option value="Other">Other</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Industry vertical for benchmarking
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="region" className="block text-sm font-medium text-gray-700">
+                Region
+              </label>
+              <select
+                id="region"
+                name="region"
+                value={formData.region}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Global (default)</option>
+                <option value="DACH">DACH (Germany, Austria, Switzerland)</option>
+                <option value="EU">European Union</option>
+                <option value="US">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="APAC">Asia-Pacific</option>
+                <option value="LATAM">Latin America</option>
+                <option value="MEA">Middle East & Africa</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Geographic region for comparison
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="growthStage" className="block text-sm font-medium text-gray-700">
+                Growth Stage
+              </label>
+              <select
+                id="growthStage"
+                name="growthStage"
+                value={formData.growthStage}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Any stage</option>
+                <option value="Seed">Seed</option>
+                <option value="Series A">Series A</option>
+                <option value="Series B">Series B</option>
+                <option value="Series B+">Series B+</option>
+                <option value="Growth">Growth</option>
+                <option value="Public">Public</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Company maturity stage
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Info Banner */}
       <div className="rounded-lg border bg-blue-50 p-6">
         <h4 className="font-medium text-blue-900">About These Settings</h4>
@@ -207,6 +319,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
           <li>• <strong>Annual Revenue:</strong> Enables revenue per FTE and productivity metrics</li>
           <li>• <strong>Currency:</strong> All monetary values will be displayed in this currency</li>
           <li>• <strong>Fiscal Year:</strong> Used for year-over-year comparisons and projections</li>
+          <li>• <strong>Benchmarking:</strong> Configure industry, region, and growth stage for more accurate benchmark comparisons in analytics</li>
         </ul>
       </div>
 

@@ -58,34 +58,59 @@ export async function PATCH(
     return NextResponse.json({ error: 'Benchmark not found' }, { status: 404 });
   }
 
-  const body: Partial<OrganizationalBenchmarkInput> = await request.json();
+  const body: Partial<OrganizationalBenchmarkInput> & {
+    approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+    rejectionReason?: string;
+  } = await request.json();
+
+  // Build update data object
+  const updateData: any = {
+    industry: body.industry,
+    region: body.region,
+    companySize: body.companySize,
+    growthStage: body.growthStage,
+    benchmarkType: body.benchmarkType,
+    metricName: body.metricName,
+    p10Value: body.p10Value,
+    p25Value: body.p25Value,
+    p50Value: body.p50Value,
+    p75Value: body.p75Value,
+    p90Value: body.p90Value,
+    departmentData: body.departmentData,
+    sampleSize: body.sampleSize,
+    currency: body.currency,
+    unit: body.unit,
+    sourceId: body.sourceId,
+    effectiveDate: body.effectiveDate ? new Date(body.effectiveDate) : undefined,
+    expirationDate: body.expirationDate ? new Date(body.expirationDate) : undefined,
+    notes: body.notes,
+    methodology: body.methodology,
+    lastVerified: new Date(), // Update verification timestamp
+  };
+
+  // Handle approval status changes
+  if (body.approvalStatus) {
+    updateData.approvalStatus = body.approvalStatus;
+
+    if (body.approvalStatus === 'APPROVED') {
+      updateData.approvedBy = user.id;
+      updateData.approvedAt = new Date();
+      updateData.rejectionReason = null; // Clear any previous rejection reason
+    } else if (body.approvalStatus === 'REJECTED') {
+      updateData.rejectionReason = body.rejectionReason || 'No reason provided';
+      updateData.approvedBy = null;
+      updateData.approvedAt = null;
+    } else if (body.approvalStatus === 'PENDING') {
+      updateData.approvedBy = null;
+      updateData.approvedAt = null;
+      updateData.rejectionReason = null;
+    }
+  }
 
   // Update the benchmark
   const updated = await prisma.organizationalBenchmark.update({
     where: { id: params.id },
-    data: {
-      industry: body.industry,
-      region: body.region,
-      companySize: body.companySize,
-      growthStage: body.growthStage,
-      benchmarkType: body.benchmarkType,
-      metricName: body.metricName,
-      p10Value: body.p10Value,
-      p25Value: body.p25Value,
-      p50Value: body.p50Value,
-      p75Value: body.p75Value,
-      p90Value: body.p90Value,
-      departmentData: body.departmentData,
-      sampleSize: body.sampleSize,
-      currency: body.currency,
-      unit: body.unit,
-      sourceId: body.sourceId,
-      effectiveDate: body.effectiveDate ? new Date(body.effectiveDate) : undefined,
-      expirationDate: body.expirationDate ? new Date(body.expirationDate) : undefined,
-      notes: body.notes,
-      methodology: body.methodology,
-      lastVerified: new Date(), // Update verification timestamp
-    },
+    data: updateData,
     include: {
       source: true,
     },

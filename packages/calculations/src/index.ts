@@ -10,6 +10,7 @@ export * from './utils/normalizations';
 export * from './utils/aggregations';
 export * from './benchmarks/compare';
 export * from './benchmarks/data';
+export * from './benchmarks/calculate-from-headcount';
 export * from './scenarios/transform';
 export * from './scenarios/timeline';
 export * from './calculator';

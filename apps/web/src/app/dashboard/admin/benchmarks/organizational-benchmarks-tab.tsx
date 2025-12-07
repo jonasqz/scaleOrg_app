@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2, Save, X } from 'lucide-react';
 import type { BenchmarkType } from '@scleorg/types';
+import OrganizationalBenchmarksWizard from './organizational-benchmarks-wizard';
 
 interface OrganizationalBenchmark {
   id: string;
@@ -10,8 +11,11 @@ interface OrganizationalBenchmark {
   region: string;
   companySize: string;
   growthStage?: string | null;
-  benchmarkType: BenchmarkType;
-  metricName: string;
+  entryMode?: 'DETAILED' | 'FALLBACK';
+  benchmarkType?: BenchmarkType | null;
+  metricName?: string | null;
+  departmentHeadcount?: any;
+  revenueData?: any;
   p10Value?: number | null;
   p25Value?: number | null;
   p50Value?: number | null;
@@ -338,10 +342,40 @@ export default function OrganizationalBenchmarksTab({
         </button>
       </div>
 
-      {showForm && (
+      {showForm && !editingId && (
+        <OrganizationalBenchmarksWizard
+          sources={sources}
+          onSave={async (payload) => {
+            setLoading(true);
+            setMessage(null);
+
+            const res = await fetch('/api/admin/benchmarks/organizational', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+
+            setLoading(false);
+
+            if (res.ok) {
+              const data = await res.json();
+              setMessage({ type: 'success', text: 'Benchmark created!' });
+              setBenchmarks([data, ...benchmarks]);
+              resetForm();
+              setTimeout(() => setMessage(null), 3000);
+            } else {
+              const error = await res.json();
+              throw new Error(error.error || 'Failed to save benchmark');
+            }
+          }}
+          onCancel={resetForm}
+        />
+      )}
+
+      {showForm && editingId && (
         <form onSubmit={handleSubmit} className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <h3 className="mb-4 text-lg font-medium text-gray-900">
-            {editingId ? 'Edit Benchmark' : 'New Benchmark'}
+            Edit Benchmark (Fallback Mode Only)
           </h3>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -704,8 +738,14 @@ export default function OrganizationalBenchmarksTab({
               <tr key={benchmark.id} className="hover:bg-gray-50">
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
                   <div>
-                    <div className="font-medium">{benchmark.metricName.replace(/_/g, ' ')}</div>
-                    <div className="text-xs text-gray-500">{benchmark.benchmarkType}</div>
+                    <div className="font-medium">
+                      {benchmark.metricName
+                        ? benchmark.metricName.replace(/_/g, ' ')
+                        : 'Department Headcount (Detailed)'}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {benchmark.benchmarkType || 'DETAILED'}
+                    </div>
                   </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">

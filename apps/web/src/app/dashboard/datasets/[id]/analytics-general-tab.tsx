@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { DollarSign, Users, TrendingUp, Briefcase } from 'lucide-react';
 import MetricsCharts from './metrics-charts';
 import InsightsDisplay from './insights-display';
@@ -13,6 +14,19 @@ interface AnalyticsGeneralTabProps {
   departmentCategories?: Record<string, string>;
 }
 
+interface BenchmarkData {
+  benchmark?: {
+    segment?: string;
+    companySize?: string;
+    metrics?: {
+      rdToGTMRatio?: { p25: number; p50: number; p75: number } | null;
+      revenuePerFTE?: { p25: number; p50: number; p75: number } | null;
+      spanOfControl?: { p25: number; p50: number; p75: number } | null;
+      costPerFTE?: { p25: number; p50: number; p75: number } | null;
+    };
+  };
+}
+
 export default function AnalyticsGeneralTab({
   datasetId,
   currency,
@@ -21,6 +35,23 @@ export default function AnalyticsGeneralTab({
   dataset,
   departmentCategories,
 }: AnalyticsGeneralTabProps) {
+  const [benchmarkData, setBenchmarkData] = useState<BenchmarkData | null>(null);
+
+  useEffect(() => {
+    async function fetchBenchmarks() {
+      try {
+        const response = await fetch(`/api/datasets/${datasetId}/benchmarks`);
+        if (response.ok) {
+          const data = await response.json();
+          setBenchmarkData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch benchmarks:', error);
+      }
+    }
+    fetchBenchmarks();
+  }, [datasetId]);
+
   if (!metrics) {
     return <div>No metrics available</div>;
   }
@@ -84,11 +115,6 @@ export default function AnalyticsGeneralTab({
             {totalFTE.toFixed(1)}
           </p>
           <p className="text-sm text-gray-600">Total FTE</p>
-          <div className="mt-2 flex items-center gap-2 text-xs">
-            <span className="rounded bg-gray-100 px-2 py-1 text-gray-700">
-              Benchmark: TBD
-            </span>
-          </div>
         </div>
 
         {/* Avg Revenue per FTE with Benchmark */}
@@ -100,10 +126,10 @@ export default function AnalyticsGeneralTab({
             {totalRevenue > 0 ? `${currency} ${(avgRevenuePerFTE / 1000).toFixed(0)}k` : 'N/A'}
           </p>
           <p className="text-sm text-gray-600">Avg Revenue per FTE</p>
-          {totalRevenue > 0 && (
+          {totalRevenue > 0 && benchmarkData?.benchmark?.metrics?.revenuePerFTE && (
             <div className="mt-2 flex items-center gap-2 text-xs">
               <span className="rounded bg-gray-100 px-2 py-1 text-gray-700">
-                Benchmark: TBD
+                {currency} {(benchmarkData.benchmark.metrics.revenuePerFTE.p25 / 1000).toFixed(0)}k - {(benchmarkData.benchmark.metrics.revenuePerFTE.p75 / 1000).toFixed(0)}k
               </span>
             </div>
           )}
@@ -121,11 +147,6 @@ export default function AnalyticsGeneralTab({
           <p className="mt-1 text-xs text-gray-500">
             Engineering, Product, Design
           </p>
-          <div className="mt-2 flex items-center gap-2 text-xs">
-            <span className="rounded bg-gray-100 px-2 py-1 text-gray-700">
-              Benchmark: TBD
-            </span>
-          </div>
         </div>
       </div>
 
@@ -140,11 +161,13 @@ export default function AnalyticsGeneralTab({
             {metrics.ratios.rdToGTM.toFixed(2)}
           </p>
           <p className="text-sm text-gray-600">R&D to GTM Ratio</p>
-          <div className="mt-2 flex items-center gap-2 text-xs">
-            <span className="rounded bg-gray-100 px-2 py-1 text-gray-700">
-              Benchmark: TBD
-            </span>
-          </div>
+          {benchmarkData?.benchmark?.metrics?.rdToGTMRatio && (
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <span className="rounded bg-gray-100 px-2 py-1 text-gray-700">
+                {benchmarkData.benchmark.metrics.rdToGTMRatio.p25.toFixed(1)} - {benchmarkData.benchmark.metrics.rdToGTMRatio.p75.toFixed(1)}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Revenue per Sales FTE */}
