@@ -289,6 +289,7 @@ export default function OrganizationalBenchmarksTab({
                   <option key={ind} value={ind} />
                 ))}
               </datalist>
+              <p className="mt-1 text-xs text-gray-500">The industry vertical (e.g., SaaS, Fintech, Climate Tech)</p>
             </div>
 
             <div>
@@ -306,6 +307,7 @@ export default function OrganizationalBenchmarksTab({
                   <option key={reg} value={reg} />
                 ))}
               </datalist>
+              <p className="mt-1 text-xs text-gray-500">Geographic region (e.g., DACH, EU, US, Global)</p>
             </div>
 
             <div>
@@ -323,6 +325,7 @@ export default function OrganizationalBenchmarksTab({
                   <option key={size} value={size} />
                 ))}
               </datalist>
+              <p className="mt-1 text-xs text-gray-500">Employee count range (e.g., 11-50, 51-200, 201-500)</p>
             </div>
 
             <div>
@@ -339,6 +342,7 @@ export default function OrganizationalBenchmarksTab({
                 <option value="Series C+">Series C+</option>
                 <option value="Public">Public</option>
               </select>
+              <p className="mt-1 text-xs text-gray-500">Optional: Funding stage for more granular benchmarking</p>
             </div>
 
             {/* Metric Information */}
@@ -356,6 +360,7 @@ export default function OrganizationalBenchmarksTab({
                 <option value="EFFICIENCY">Efficiency</option>
                 <option value="TENURE">Tenure</option>
               </select>
+              <p className="mt-1 text-xs text-gray-500">Structure: org ratios • Efficiency: productivity • Tenure: retention</p>
             </div>
 
             <div>
@@ -373,6 +378,7 @@ export default function OrganizationalBenchmarksTab({
                   </option>
                 ))}
               </select>
+              <p className="mt-1 text-xs text-gray-500">The specific metric being benchmarked</p>
             </div>
 
             {/* Percentile Values */}
@@ -385,6 +391,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, p10Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">10th percentile - bottom 10% of companies</p>
             </div>
 
             <div>
@@ -396,6 +403,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, p25Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">25th percentile - lower quartile</p>
             </div>
 
             <div>
@@ -408,6 +416,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, p50Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">50th percentile - middle/typical value (required)</p>
             </div>
 
             <div>
@@ -419,6 +428,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, p75Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">75th percentile - upper quartile</p>
             </div>
 
             <div>
@@ -430,6 +440,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, p90Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">90th percentile - top 10% of companies</p>
             </div>
 
             {/* Quality & Metadata */}
@@ -443,6 +454,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, sampleSize: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">Number of companies in this benchmark dataset</p>
             </div>
 
             <div>
@@ -454,6 +466,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">Unit of measurement (e.g., ratio for 1.5, % for 35, EUR for €200k)</p>
             </div>
 
             <div>
@@ -468,6 +481,7 @@ export default function OrganizationalBenchmarksTab({
                 <option value="USD">USD</option>
                 <option value="GBP">GBP</option>
               </select>
+              <p className="mt-1 text-xs text-gray-500">Only for monetary metrics (revenue, cost per FTE, etc.)</p>
             </div>
 
             <div>
@@ -484,6 +498,7 @@ export default function OrganizationalBenchmarksTab({
                   </option>
                 ))}
               </select>
+              <p className="mt-1 text-xs text-gray-500">Where this benchmark data came from (Pave, Radford, manual entry, etc.)</p>
             </div>
 
             <div>
@@ -495,6 +510,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, effectiveDate: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">When this benchmark becomes valid/active</p>
             </div>
 
             <div>
@@ -505,6 +521,7 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, expirationDate: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">Optional: When this benchmark should no longer be used</p>
             </div>
 
             <div className="md:col-span-3">
