@@ -124,6 +124,8 @@ export default function ScenarioBuilder({
 
   // Financial planning
   const [currentCash, setCurrentCash] = useState<string>('');
+  const [revenueGrowthRate, setRevenueGrowthRate] = useState<number>(0);
+  const [includeRevenue, setIncludeRevenue] = useState(false);
 
   const handleRunScenario = async () => {
     setLoading(true);
@@ -133,6 +135,7 @@ export default function ScenarioBuilder({
         name: scenarioName || getDefaultScenarioName(),
         currentCash: currentCash ? parseFloat(currentCash) : undefined,
         includeTimeline: true,
+        revenueGrowthRate: includeRevenue ? revenueGrowthRate : undefined,
       };
 
       if (scenarioType === 'custom') {
@@ -312,6 +315,46 @@ export default function ScenarioBuilder({
             <p className="mt-1 text-xs text-gray-500">
               Enter your current cash balance to see runway projections
             </p>
+          </div>
+
+          {/* Revenue Projections */}
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-medium text-blue-900">
+                Include Revenue Projections
+              </label>
+              <button
+                onClick={() => setIncludeRevenue(!includeRevenue)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  includeRevenue ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    includeRevenue ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            {includeRevenue && (
+              <div>
+                <label className="mb-2 block text-sm font-medium text-blue-900">
+                  Monthly Revenue Growth Rate: {revenueGrowthRate > 0 ? '+' : ''}{revenueGrowthRate}%
+                </label>
+                <input
+                  type="range"
+                  min="-10"
+                  max="20"
+                  step="1"
+                  value={revenueGrowthRate}
+                  onChange={(e) => setRevenueGrowthRate(parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <p className="mt-1 text-xs text-blue-700">
+                  Project revenue growth or decline for more accurate runway calculations
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Custom Adjustments */}

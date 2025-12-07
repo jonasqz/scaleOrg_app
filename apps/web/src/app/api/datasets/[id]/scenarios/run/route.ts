@@ -45,11 +45,21 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { type, adjustments, reductionPct, targetDepartments, additionalFTE, distribution, targetRatio, currentCash, includeTimeline } = body;
+    const { type, adjustments, reductionPct, targetDepartments, additionalFTE, distribution, targetRatio, currentCash, includeTimeline, revenueGrowthRate, customRevenue } = body;
 
     const baselineEmployees = dataset.employees.filter((emp: any) => !emp.endDate);
     let scenarioEmployees = [...baselineEmployees];
     const affectedEmployees: AffectedEmployee[] = [];
+
+    // Fetch existing revenue data
+    const monthlyRevenues = await prisma.monthlyRevenue.findMany({
+      where: {
+        datasetId: params.id,
+      },
+      orderBy: {
+        period: 'asc',
+      },
+    });
 
     // Apply transformation based on scenario type
     switch (type) {
@@ -228,6 +238,9 @@ export async function POST(
         return NextResponse.json({ error: 'Invalid scenario type' }, { status: 400 });
     }
 
+    // Prepare revenue projections for scenario
+    const revenueProjections = customRevenue || (revenueGrowthRate ? calculateRevenueProjections(monthlyRevenues, revenueGrowthRate) : null);
+
     // Calculate metrics for both baseline and scenario
     const result = calculateScenarioMetrics(
       baselineEmployees,
@@ -235,8 +248,13 @@ export async function POST(
       dataset.totalRevenue ? Number(dataset.totalRevenue) : null,
       {
         includeTimeline: includeTimeline !== false, // Default to true
-        currentCash: currentCash ? Number(currentCash) : undefined,
+        currentCash: currentCash ? Number(currentCash) : (dataset.currentCashBalance ? Number(dataset.currentCashBalance) : undefined),
         affectedEmployees: affectedEmployees.length > 0 ? affectedEmployees : undefined,
+        revenueProjections,
+        monthlyRevenues: monthlyRevenues.map(r => ({
+          period: r.period.toISOString().split('T')[0],
+          revenue: Number(r.revenue),
+        })),
       }
     );
 
@@ -248,4 +266,39 @@ export async function POST(
       { status: 500 }
     );
   }
+}
+
+// Helper function to calculate revenue projections with growth rate
+function calculateRevenueProjections(
+  existingRevenues: any[],
+  growthRate: number
+): { period: string; revenue: number }[] {
+  const projections: { period: string; revenue: number }[] = [];
+  const now = new Date();
+
+  // Get most recent revenue or use 0
+  const latestRevenue = existingRevenues.length > 0
+    ? Number(existingRevenues[existingRevenues.length - 1].revenue)
+    : 0;
+
+  // Project 12 months forward
+  let currentRevenue = latestRevenue;
+  const monthlyGrowthMultiplier = 1 + (growthRate / 100);
+
+  for (let i = 0; i < 12; i++) {
+    const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const period = date.toISOString().split('T')[0];
+
+    // Apply growth
+    if (i > 0) {
+      currentRevenue = currentRevenue * monthlyGrowthMultiplier;
+    }
+
+    projections.push({
+      period,
+      revenue: currentRevenue,
+    });
+  }
+
+  return projections;
 }

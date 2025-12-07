@@ -1,6 +1,17 @@
 'use client';
 
 import { Calendar, TrendingDown, TrendingUp, AlertTriangle } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ReferenceLine,
+} from 'recharts';
 
 interface AffectedEmployee {
   id: string;
@@ -257,6 +268,60 @@ export default function ScenarioResultsEnhanced({
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Cash Flow Projection Chart */}
+      {monthlyBurnRate && monthlyBurnRate.length > 0 && runway && runway.currentCash && (
+        <div className="rounded-lg border bg-white p-6">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900">
+            Cash Flow Projection
+          </h3>
+          <p className="mb-4 text-sm text-gray-600">
+            Projected burn rate impact on cash balance over 12 months
+          </p>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={monthlyBurnRate.slice(0, 12).map((month, idx) => {
+                // Calculate cumulative cash balance
+                const baselineCash = runway.currentCash - monthlyBurnRate.slice(0, idx + 1).reduce((sum, m) => sum + m.baselineCost, 0);
+                const scenarioCash = runway.currentCash - monthlyBurnRate.slice(0, idx + 1).reduce((sum, m) => sum + m.scenarioCost, 0);
+
+                return {
+                  month: formatMonth(month.month),
+                  baseline: baselineCash,
+                  scenario: scenarioCash,
+                };
+              })}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis tickFormatter={(value) => `${currency} ${(value / 1000000).toFixed(1)}M`} />
+              <Tooltip
+                formatter={(value: number) => `${currency} ${(value / 1000000).toFixed(2)}M`}
+                contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb' }}
+              />
+              <Legend />
+              <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="3 3" />
+              <Line
+                type="monotone"
+                dataKey="baseline"
+                stroke="#60a5fa"
+                strokeWidth={2}
+                name="Baseline Cash"
+                dot={{ fill: '#60a5fa' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="scenario"
+                stroke="#10b981"
+                strokeWidth={2}
+                name="Scenario Cash"
+                dot={{ fill: '#10b981' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       )}
 
