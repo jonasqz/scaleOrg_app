@@ -103,6 +103,34 @@ export default function OrganizationalBenchmarksTab({
     setLoading(true);
     setMessage(null);
 
+    // Validate percentile ordering
+    const p10 = formData.p10Value ? Number(formData.p10Value) : null;
+    const p25 = formData.p25Value ? Number(formData.p25Value) : null;
+    const p50 = Number(formData.p50Value);
+    const p75 = formData.p75Value ? Number(formData.p75Value) : null;
+    const p90 = formData.p90Value ? Number(formData.p90Value) : null;
+
+    if (p10 && p25 && p10 > p25) {
+      setMessage({ type: 'error', text: 'P10 must be ≤ P25' });
+      setLoading(false);
+      return;
+    }
+    if (p25 && p25 > p50) {
+      setMessage({ type: 'error', text: 'P25 must be ≤ P50' });
+      setLoading(false);
+      return;
+    }
+    if (p75 && p50 > p75) {
+      setMessage({ type: 'error', text: 'P50 must be ≤ P75' });
+      setLoading(false);
+      return;
+    }
+    if (p90 && p75 && p75 > p90) {
+      setMessage({ type: 'error', text: 'P75 must be ≤ P90' });
+      setLoading(false);
+      return;
+    }
+
     const payload = {
       industry: formData.industry,
       region: formData.region,
@@ -438,16 +466,25 @@ export default function OrganizationalBenchmarksTab({
             </div>
 
             {/* Percentile Values */}
+            <div className="md:col-span-3">
+              <p className="text-sm font-medium text-gray-900 mb-2">Percentile Values</p>
+              <p className="text-xs text-gray-600 mb-3">
+                Enter numeric values only (e.g., for R&D:GTM ratio of 1.5:1, enter <strong>1.5</strong>).
+                Values must be in ascending order: P10 ≤ P25 ≤ P50 ≤ P75 ≤ P90
+              </p>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">P10 Value</label>
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 value={formData.p10Value}
                 onChange={(e) => setFormData({ ...formData, p10Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">10th percentile - bottom 10% of companies</p>
+              <p className="mt-1 text-xs text-gray-500">10th percentile (bottom 10%)</p>
             </div>
 
             <div>
@@ -455,11 +492,12 @@ export default function OrganizationalBenchmarksTab({
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 value={formData.p25Value}
                 onChange={(e) => setFormData({ ...formData, p25Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">25th percentile - lower quartile</p>
+              <p className="mt-1 text-xs text-gray-500">25th percentile (lower quartile)</p>
             </div>
 
             <div>
@@ -467,12 +505,13 @@ export default function OrganizationalBenchmarksTab({
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 required
                 value={formData.p50Value}
                 onChange={(e) => setFormData({ ...formData, p50Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">50th percentile - middle/typical value (required)</p>
+              <p className="mt-1 text-xs text-gray-500">50th percentile (median/typical)</p>
             </div>
 
             <div>
@@ -480,11 +519,12 @@ export default function OrganizationalBenchmarksTab({
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 value={formData.p75Value}
                 onChange={(e) => setFormData({ ...formData, p75Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">75th percentile - upper quartile</p>
+              <p className="mt-1 text-xs text-gray-500">75th percentile (upper quartile)</p>
             </div>
 
             <div>
@@ -492,11 +532,12 @@ export default function OrganizationalBenchmarksTab({
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 value={formData.p90Value}
                 onChange={(e) => setFormData({ ...formData, p90Value: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">90th percentile - top 10% of companies</p>
+              <p className="mt-1 text-xs text-gray-500">90th percentile (top 10%)</p>
             </div>
 
             {/* Quality & Metadata */}
@@ -506,11 +547,15 @@ export default function OrganizationalBenchmarksTab({
                 type="number"
                 required
                 min="1"
+                step="1"
                 value={formData.sampleSize}
                 onChange={(e) => setFormData({ ...formData, sampleSize: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="e.g., 127"
               />
-              <p className="mt-1 text-xs text-gray-500">Number of companies in this benchmark dataset</p>
+              <p className="mt-1 text-xs text-gray-500">
+                <strong>Whole number only</strong> - how many companies were surveyed (e.g., 127, not 1:2)
+              </p>
             </div>
 
             <div>
