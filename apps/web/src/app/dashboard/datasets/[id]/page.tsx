@@ -221,60 +221,46 @@ export default async function DatasetOverviewPage({
             <p className="text-sm text-gray-600">Avg Span of Control</p>
           </div>
         </div>
-      ) : (
-        <div className="rounded-lg border bg-yellow-50 p-8 text-center">
-          <BarChart3 className="mx-auto h-12 w-12 text-yellow-600" />
-          <p className="mt-4 font-medium text-yellow-900">No data yet</p>
-          <p className="mt-1 text-sm text-yellow-700">
-            Add employees to see metrics and analytics
-          </p>
-          <Link
-            href={`/dashboard/datasets/${dataset.id}/employees`}
-            className="mt-4 inline-block rounded-lg bg-yellow-600 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-700"
-          >
-            Go to Employees
-          </Link>
-        </div>
-
-        {/* Cash Flow Summary */}
-        {cashFlowSummary && (
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <Wallet className="h-8 w-8 text-green-600" />
-              </div>
-              <p className="mt-4 text-2xl font-bold text-gray-900">
-                {dataset.currency} {(cashFlowSummary.currentCash / 1000000).toFixed(1)}M
-              </p>
-              <p className="text-sm text-gray-600">Current Cash</p>
-            </div>
-
-            <div className="rounded-lg border bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <TrendingDown className="h-8 w-8 text-red-600" />
-              </div>
-              <p className="mt-4 text-2xl font-bold text-gray-900">
-                {dataset.currency} {(cashFlowSummary.avgMonthlyBurn / 1000).toFixed(0)}k
-              </p>
-              <p className="text-sm text-gray-600">Monthly Burn</p>
-            </div>
-
-            <div className="rounded-lg border bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <Calendar className={`h-8 w-8 ${
-                  cashFlowSummary.runway && cashFlowSummary.runway < 6 ? 'text-orange-600' : 'text-purple-600'
-                }`} />
-              </div>
-              <p className={`mt-4 text-2xl font-bold ${
-                cashFlowSummary.runway && cashFlowSummary.runway < 6 ? 'text-orange-600' : 'text-gray-900'
-              }`}>
-                {cashFlowSummary.runway !== null ? `${cashFlowSummary.runway.toFixed(1)} mo` : 'N/A'}
-              </p>
-              <p className="text-sm text-gray-600">Cash Runway</p>
-            </div>
-          </div>
-        )}
       ) : null}
+
+      {/* Cash Flow Summary */}
+      {cashFlowSummary && (
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <Wallet className="h-8 w-8 text-green-600" />
+            </div>
+            <p className="mt-4 text-2xl font-bold text-gray-900">
+              {dataset.currency} {(cashFlowSummary.currentCash / 1000000).toFixed(1)}M
+            </p>
+            <p className="text-sm text-gray-600">Current Cash</p>
+          </div>
+
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <TrendingDown className="h-8 w-8 text-red-600" />
+            </div>
+            <p className="mt-4 text-2xl font-bold text-gray-900">
+              {dataset.currency} {(cashFlowSummary.avgMonthlyBurn / 1000).toFixed(0)}k
+            </p>
+            <p className="text-sm text-gray-600">Monthly Burn</p>
+          </div>
+
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <Calendar className={`h-8 w-8 ${
+                cashFlowSummary.runway && cashFlowSummary.runway < 6 ? 'text-orange-600' : 'text-purple-600'
+              }`} />
+            </div>
+            <p className={`mt-4 text-2xl font-bold ${
+              cashFlowSummary.runway && cashFlowSummary.runway < 6 ? 'text-orange-600' : 'text-gray-900'
+            }`}>
+              {cashFlowSummary.runway !== null ? `${cashFlowSummary.runway.toFixed(1)} mo` : 'N/A'}
+            </p>
+            <p className="text-sm text-gray-600">Cash Runway</p>
+          </div>
+        </div>
+      )}
 
       {/* Department Breakdown */}
       {metrics && (
