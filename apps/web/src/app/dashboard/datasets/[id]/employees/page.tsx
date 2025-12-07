@@ -1,7 +1,8 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@scleorg/database';
-import { Users } from 'lucide-react';
+import { Users, Download } from 'lucide-react';
+import Link from 'next/link';
 import AddEmployeeForm from '../add-employee-form';
 import CSVUploadEnhanced from '../csv-upload-enhanced';
 import EmployeeTableEnhanced from '../employee-table-enhanced';
@@ -52,13 +53,25 @@ export default async function EmployeesPage({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap items-center gap-3">
-        <AddEmployeeForm
-          datasetId={dataset.id}
-          currency={dataset.currency}
-          allEmployees={dataset.employees}
-        />
-        <CSVUploadEnhanced datasetId={dataset.id} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <AddEmployeeForm
+            datasetId={dataset.id}
+            currency={dataset.currency}
+            allEmployees={dataset.employees}
+          />
+          <CSVUploadEnhanced datasetId={dataset.id} />
+        </div>
+        {dataset.employees.length > 0 && (
+          <Link
+            href={`/api/datasets/${dataset.id}/employees/export`}
+            download
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Link>
+        )}
       </div>
 
       {/* Employees Table */}

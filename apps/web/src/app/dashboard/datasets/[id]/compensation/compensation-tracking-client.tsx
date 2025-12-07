@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { DollarSign, TrendingUp, TrendingDown, Calendar, ChevronDown, ChevronRight, Edit2, Check, X } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Calendar, ChevronDown, ChevronRight, Edit2, Check, X, Download } from 'lucide-react';
 import CompensationSetupWizard from './compensation-setup-wizard';
 
 interface CompensationTrackingClientProps {
@@ -352,13 +352,23 @@ export default function CompensationTrackingClient({
 
       {/* Main Table */}
       <div className="rounded-lg border bg-white shadow-sm">
-        <div className="border-b p-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Planned vs Actual by Department
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Click department to expand • Click planned values to edit • Past months show actual vs planned
-          </p>
+        <div className="border-b p-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Planned vs Actual by Department
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Click department to expand • Click planned values to edit • Past months show actual vs planned
+            </p>
+          </div>
+          <a
+            href={`/api/datasets/${datasetId}/compensation/export`}
+            download
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </a>
         </div>
 
         {/* Scrollable table container */}
