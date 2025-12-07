@@ -14,6 +14,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
     description: dataset.description || '',
     companyName: dataset.companyName || '',
     totalRevenue: dataset.totalRevenue ? Number(dataset.totalRevenue) : '',
+    currentCashBalance: dataset.currentCashBalance ? Number(dataset.currentCashBalance) : '',
     fiscalYearStart: dataset.fiscalYearStart
       ? new Date(dataset.fiscalYearStart).toISOString().split('T')[0]
       : '',
@@ -54,6 +55,21 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
 
       if (!datasetRes.ok) {
         throw new Error('Failed to save dataset settings');
+      }
+
+      // Update cash balance separately (uses PUT endpoint)
+      if (formData.currentCashBalance !== (dataset.currentCashBalance ? Number(dataset.currentCashBalance) : '')) {
+        const cashBalanceRes = await fetch(`/api/datasets/${datasetId}/settings`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            currentCashBalance: formData.currentCashBalance ? Number(formData.currentCashBalance) : null,
+          }),
+        });
+
+        if (!cashBalanceRes.ok) {
+          throw new Error('Failed to save cash balance');
+        }
       }
 
       // Update dataset settings (benchmarking)
@@ -158,7 +174,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
             />
           </div>
 
-          {/* Total Revenue and Currency */}
+          {/* Financial Metrics */}
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="totalRevenue" className="block text-sm font-medium text-gray-700">
@@ -181,22 +197,46 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
             </div>
 
             <div>
-              <label htmlFor="currency" className="block text-sm font-medium text-gray-700">
-                Currency
+              <label htmlFor="currentCashBalance" className="block text-sm font-medium text-gray-700">
+                Current Cash Balance
               </label>
-              <select
-                id="currency"
-                name="currency"
-                value={formData.currency}
+              <input
+                type="number"
+                id="currentCashBalance"
+                name="currentCashBalance"
+                value={formData.currentCashBalance}
                 onChange={handleChange}
+                step="0.01"
+                min="0"
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <option value="EUR">EUR (€)</option>
-                <option value="USD">USD ($)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="CHF">CHF (Fr)</option>
-              </select>
+                placeholder="500000"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Used for runway calculations in Compensation Tracking
+              </p>
             </div>
+          </div>
+
+          {/* Currency */}
+          <div>
+            <label htmlFor="currency" className="block text-sm font-medium text-gray-700">
+              Currency
+            </label>
+            <select
+              id="currency"
+              name="currency"
+              value={formData.currency}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="EUR">EUR (€)</option>
+              <option value="USD">USD ($)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="CHF">CHF (Fr)</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              All monetary values will be displayed in this currency
+            </p>
           </div>
 
           {/* Fiscal Year Start */}
@@ -317,6 +357,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
         <ul className="mt-2 space-y-1 text-sm text-blue-800">
           <li>• <strong>Dataset Name:</strong> Helps you identify this dataset in your dashboard</li>
           <li>• <strong>Annual Revenue:</strong> Enables revenue per FTE and productivity metrics</li>
+          <li>• <strong>Current Cash Balance:</strong> Used to calculate runway (months until cash runs out) in Compensation Tracking</li>
           <li>• <strong>Currency:</strong> All monetary values will be displayed in this currency</li>
           <li>• <strong>Fiscal Year:</strong> Used for year-over-year comparisons and projections</li>
           <li>• <strong>Benchmarking:</strong> Configure industry, region, and growth stage for more accurate benchmark comparisons in analytics</li>
