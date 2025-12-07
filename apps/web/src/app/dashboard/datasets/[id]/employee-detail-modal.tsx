@@ -99,6 +99,7 @@ export default function EmployeeDetailModal({
       ? new Date(currentEmployee.startDate).toISOString().split('T')[0]
       : '',
     location: currentEmployee.location || '',
+    managerId: currentEmployee.managerId || '',
     costCenter: currentEmployee.costCenter || '',
   });
 
@@ -122,6 +123,7 @@ export default function EmployeeDetailModal({
           ? new Date(emp.startDate).toISOString().split('T')[0]
           : '',
         location: emp.location || '',
+        managerId: emp.managerId || '',
         costCenter: emp.costCenter || '',
       });
       setIsEditing(isAddMode);
@@ -656,6 +658,56 @@ export default function EmployeeDetailModal({
                         {currentEmployee.costCenter || 'N/A'}
                       </p>
                     )}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      <User className="inline h-4 w-4 mr-1" />
+                      Reports To (Manager)
+                    </label>
+                    {isEditing ? (
+                      <select
+                        value={formData.managerId}
+                        onChange={(e) =>
+                          setFormData({ ...formData, managerId: e.target.value })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      >
+                        <option value="">No manager / Reports to CEO</option>
+                        {allEmployees
+                          .filter(emp => emp.id !== currentEmployee.id) // Don't allow selecting self
+                          .sort((a, b) => {
+                            // Sort by name, prioritize those with management levels
+                            const aIsManager = ['MANAGER', 'DIRECTOR', 'VP', 'C_LEVEL'].includes(a.level || '');
+                            const bIsManager = ['MANAGER', 'DIRECTOR', 'VP', 'C_LEVEL'].includes(b.level || '');
+                            if (aIsManager && !bIsManager) return -1;
+                            if (!aIsManager && bIsManager) return 1;
+                            return (a.employeeName || '').localeCompare(b.employeeName || '');
+                          })
+                          .map((emp) => (
+                            <option key={emp.id} value={emp.id}>
+                              {emp.employeeName || 'Unnamed'}
+                              {emp.role && ` - ${emp.role}`}
+                              {emp.level && ` (${emp.level})`}
+                              {emp.department && ` - ${emp.department}`}
+                            </option>
+                          ))}
+                      </select>
+                    ) : (
+                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                        {currentEmployee.managerId
+                          ? (() => {
+                              const manager = allEmployees.find(e => e.id === currentEmployee.managerId);
+                              return manager
+                                ? `${manager.employeeName || 'Unnamed'} ${manager.role ? `- ${manager.role}` : ''}`
+                                : 'Manager not found';
+                            })()
+                          : 'No manager set'}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Optional: Select who this employee reports to. Used for span of control calculations.
+                    </p>
                   </div>
                 </div>
               </div>

@@ -31,6 +31,7 @@ const FIELD_OPTIONS = [
   { value: 'equityValue', label: 'Equity Value' },
   { value: 'startDate', label: 'Start Date' },
   { value: 'location', label: 'Location' },
+  { value: 'managerId', label: 'Manager ID (for span of control)' },
   { value: 'fteFactor', label: 'FTE Factor' },
 ];
 
@@ -94,6 +95,8 @@ export default function CSVUpload({ datasetId }: CSVUploadProps) {
               autoMapping[col] = 'startDate';
             } else if (lowerCol.includes('location') || lowerCol.includes('office')) {
               autoMapping[col] = 'location';
+            } else if (lowerCol.includes('manager') && (lowerCol.includes('id') || lowerCol.includes('email'))) {
+              autoMapping[col] = 'managerId';
             } else if (lowerCol.includes('fte')) {
               autoMapping[col] = 'fteFactor';
             }
@@ -123,9 +126,10 @@ export default function CSVUpload({ datasetId }: CSVUploadProps) {
   };
 
   const downloadTemplate = () => {
-    const template = `Employee Name,Email,Department,Role,Level,Employment Type,Total Compensation,Base Salary,Bonus,Equity Value,Start Date,Location,FTE Factor
-John Doe,john@example.com,Engineering,Senior Engineer,IC,FTE,150000,120000,20000,10000,2023-01-15,San Francisco,1.0
-Jane Smith,jane@example.com,Sales,Account Executive,IC,FTE,130000,100000,25000,5000,2023-03-01,New York,1.0`;
+    const template = `Employee Name,Email,Department,Role,Level,Employment Type,Total Compensation,Base Salary,Bonus,Equity Value,Start Date,Location,Manager ID,FTE Factor
+John Doe,john@example.com,Engineering,Senior Engineer,IC,FTE,150000,120000,20000,10000,2023-01-15,San Francisco,,1.0
+Jane Smith,jane@example.com,Sales,Account Executive,IC,FTE,130000,100000,25000,5000,2023-03-01,New York,john@example.com,1.0
+Bob Johnson,bob@example.com,Engineering,Engineering Manager,MANAGER,FTE,180000,150000,20000,10000,2022-06-01,San Francisco,,1.0`;
 
     const blob = new Blob([template], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
