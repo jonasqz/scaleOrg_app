@@ -52,7 +52,7 @@ export default async function EmployeesPage({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <AddEmployeeForm
           datasetId={dataset.id}
           currency={dataset.currency}

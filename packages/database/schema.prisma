@@ -46,10 +46,11 @@ model Dataset {
   columnMapping   Json?     @map("column_mapping")
 
   // Organization metadata
-  companyName     String?   @map("company_name")
-  totalRevenue    Decimal?  @map("total_revenue") @db.Decimal(15, 2)
-  fiscalYearStart DateTime? @map("fiscal_year_start")
-  currency        String    @default("EUR")
+  companyName       String?   @map("company_name")
+  totalRevenue      Decimal?  @map("total_revenue") @db.Decimal(15, 2)
+  currentCashBalance Decimal? @map("current_cash_balance") @db.Decimal(15, 2)  // Cash in bank for runway calculations
+  fiscalYearStart   DateTime? @map("fiscal_year_start")
+  currency          String    @default("EUR")
 
   // Timestamps
   createdAt       DateTime  @default(now()) @map("created_at")
@@ -57,13 +58,15 @@ model Dataset {
   processedAt     DateTime? @map("processed_at")
 
   // Relations
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  employees       Employee[]
-  openRoles       OpenRole[]
-  scenarios       Scenario[]
-  insights        Insight[]
-  settings        DatasetSettings?
-  monthlyEmployerCosts MonthlyEmployerCost[]
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employees               Employee[]
+  openRoles               OpenRole[]
+  scenarios               Scenario[]
+  insights                Insight[]
+  settings                DatasetSettings?
+  monthlyEmployerCosts    MonthlyEmployerCost[]
+  monthlyPlannedCompensation MonthlyPlannedCompensation[]
+  monthlyRevenue          MonthlyRevenue[]
 
   @@index([userId])
   @@index([status])
@@ -140,10 +143,11 @@ model Employee {
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  dataset            Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
-  manager            Employee? @relation("EmployeeManager", fields: [managerId], references: [id])
-  directReports      Employee[] @relation("EmployeeManager")
-  monthlyEmployerCosts MonthlyEmployerCost[]
+  dataset                    Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  manager                    Employee? @relation("EmployeeManager", fields: [managerId], references: [id])
+  directReports              Employee[] @relation("EmployeeManager")
+  monthlyEmployerCosts       MonthlyEmployerCost[]
+  monthlyPlannedCompensation MonthlyPlannedCompensation[]
 
   @@index([datasetId])
   @@index([datasetId, department])
@@ -715,6 +719,85 @@ enum CostDataSource {
   CSV_IMPORT     // Imported from payroll CSV
   API_IMPORT     // Imported via API (future)
   CALCULATED     // Calculated from employee data
+}
+
+// Monthly Planned Compensation - Track planned/budgeted compensation over time
+model MonthlyPlannedCompensation {
+  id           String    @id @default(uuid())
+  datasetId    String    @map("dataset_id")
+
+  // Period tracking
+  period       DateTime                             // First day of the month (e.g., 2025-01-01)
+  periodLabel  String    @map("period_label")       // Human-readable "January 2025"
+
+  // Employee reference
+  employeeId   String    @map("employee_id")
+
+  // Planned gross compensation (what employee should receive)
+  plannedGrossSalary  Decimal   @map("planned_gross_salary") @db.Decimal(12, 2)
+  plannedGrossBonus   Decimal?  @map("planned_gross_bonus") @db.Decimal(12, 2)
+  plannedGrossEquity  Decimal?  @map("planned_gross_equity") @db.Decimal(12, 2)
+  plannedGrossTotal   Decimal   @map("planned_gross_total") @db.Decimal(12, 2)
+
+  // Planned employer costs (what company expects to pay)
+  plannedEmployerTaxes         Decimal? @map("planned_employer_taxes") @db.Decimal(12, 2)
+  plannedSocialContributions   Decimal? @map("planned_social_contributions") @db.Decimal(12, 2)
+  plannedHealthInsurance       Decimal? @map("planned_health_insurance") @db.Decimal(12, 2)
+  plannedBenefits              Decimal? @map("planned_benefits") @db.Decimal(12, 2)
+  plannedOtherEmployerCosts    Decimal? @map("planned_other_employer_costs") @db.Decimal(12, 2)
+
+  // Total planned employer cost
+  plannedTotalEmployerCost     Decimal  @map("planned_total_employer_cost") @db.Decimal(12, 2)
+
+  // Metadata
+  isManualOverride  Boolean  @default(false) @map("is_manual_override")  // True if manually edited, false if auto-calculated
+  notes             String?
+  currency          String   @default("EUR")
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  dataset           Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  employee          Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([datasetId, period, employeeId])  // One planned record per employee per month
+  @@index([datasetId, period])
+  @@index([employeeId])
+  @@index([isManualOverride])
+  @@map("monthly_planned_compensation")
+}
+
+// Monthly Revenue - Track actual revenue over time for burn vs revenue analysis
+model MonthlyRevenue {
+  id           String    @id @default(uuid())
+  datasetId    String    @map("dataset_id")
+
+  // Period tracking
+  period       DateTime                             // First day of the month (e.g., 2025-01-01)
+  periodLabel  String    @map("period_label")       // Human-readable "January 2025"
+
+  // Revenue data
+  revenue      Decimal   @db.Decimal(15, 2)         // Total revenue for the month
+
+  // Data source tracking
+  source       CostDataSource @default(MANUAL)      // How was this data added
+  importedFrom String?  @map("imported_from")       // File name or API source
+
+  // Metadata
+  notes        String?
+  currency     String   @default("EUR")
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  dataset      Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@unique([datasetId, period])  // One revenue record per dataset per month
+  @@index([datasetId, period])
+  @@index([source])
+  @@map("monthly_revenue")
 }
 
 // Audit logs

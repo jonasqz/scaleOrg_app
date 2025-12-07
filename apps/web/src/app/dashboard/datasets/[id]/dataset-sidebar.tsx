@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   BarChart3,
   Settings,
+  DollarSign,
 } from 'lucide-react';
 
 interface DatasetSidebarProps {
@@ -31,6 +32,11 @@ export default function DatasetSidebar({ datasetId, datasetName }: DatasetSideba
       name: 'Employees',
       href: `/dashboard/datasets/${datasetId}/employees`,
       icon: Users,
+    },
+    {
+      name: 'Compensation',
+      href: `/dashboard/datasets/${datasetId}/compensation`,
+      icon: DollarSign,
     },
     {
       name: 'Analytics',
