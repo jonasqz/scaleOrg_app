@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, BarChart3, TrendingUp, GitCompare, Upload, Download, Plus, Scale } from 'lucide-react';
+import { Users, BarChart3, TrendingUp, GitCompare, Upload, Download, Plus, Scale, Receipt } from 'lucide-react';
 import { exportAnalyticsToPDF } from './export-analytics-pdf';
 import Link from 'next/link';
 import AddEmployeeForm from './add-employee-form';
 import CSVUpload from './csv-upload';
+import PayrollUpload from './payroll-upload';
 import EmployeeListClient from './employee-list-client';
 import EmployeeTableEnhanced from './employee-table-enhanced';
 import MetricsCharts from './metrics-charts';
@@ -309,6 +310,7 @@ export default function DatasetTabs({
             <div className="flex flex-wrap items-center gap-4">
               <AddEmployeeForm datasetId={datasetId} currency={currency} />
               <CSVUpload datasetId={datasetId} />
+              <PayrollUpload datasetId={datasetId} currency={currency} />
             </div>
 
             {/* Employees List */}

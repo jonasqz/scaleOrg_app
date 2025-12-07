@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { BarChart3, Scale, Users, Lightbulb } from 'lucide-react';
+import { BarChart3, Scale, Users, Lightbulb, DollarSign } from 'lucide-react';
 import AnalyticsGeneralTab from './analytics-general-tab';
 import AnalyticsBenchmarkingTab from './analytics-benchmarking-tab';
 import AnalyticsTenureTab from './analytics-tenure-tab';
 import AnalyticsRecommendationsTab from './analytics-recommendations-tab';
+import AnalyticsCostsTab from './analytics-costs-tab';
 
 interface AnalyticsTabsProps {
   datasetId: string;
@@ -16,7 +17,7 @@ interface AnalyticsTabsProps {
   departmentCategories?: Record<string, string>;
 }
 
-type AnalyticsTabId = 'general' | 'benchmarking' | 'tenure' | 'recommendations';
+type AnalyticsTabId = 'general' | 'benchmarking' | 'tenure' | 'costs' | 'recommendations';
 
 export default function AnalyticsTabs({
   datasetId,
@@ -32,6 +33,7 @@ export default function AnalyticsTabs({
     { id: 'general' as AnalyticsTabId, label: 'General Overview', icon: BarChart3 },
     { id: 'benchmarking' as AnalyticsTabId, label: 'Benchmarking', icon: Scale },
     { id: 'tenure' as AnalyticsTabId, label: 'Team & Span of Control', icon: Users },
+    { id: 'costs' as AnalyticsTabId, label: 'Employer Costs', icon: DollarSign },
     { id: 'recommendations' as AnalyticsTabId, label: 'Recommendations', icon: Lightbulb },
   ];
 
@@ -104,6 +106,14 @@ export default function AnalyticsTabs({
             employees={employees}
             metrics={metrics}
             dataset={dataset}
+          />
+        )}
+
+        {activeTab === 'costs' && (
+          <AnalyticsCostsTab
+            datasetId={datasetId}
+            currency={currency}
+            employees={employees}
           />
         )}
 
