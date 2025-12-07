@@ -67,6 +67,23 @@ export default function AnalyticsTenureTab({
 
   return (
     <div className="space-y-8">
+      {/* Warning if no managers detected */}
+      {managers.length === 0 && (
+        <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div>
+              <p className="font-medium text-yellow-900">No managers detected in your dataset</p>
+              <p className="mt-1 text-sm text-yellow-700">
+                To calculate span of control metrics, ensure your employee data includes the "Manager ID" field
+                that links each employee to their manager. You can add this in the dataset settings or upload a new file
+                with manager relationships.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Span of Control Overview */}
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border bg-white p-6 shadow-sm">
@@ -91,7 +108,7 @@ export default function AnalyticsTenureTab({
           </p>
           <p className="text-sm text-gray-600">Total Managers</p>
           <p className="mt-1 text-xs text-gray-500">
-            {((managers.length / totalEmployees) * 100).toFixed(1)}% of workforce
+            {totalEmployees > 0 ? ((managers.length / totalEmployees) * 100).toFixed(1) : '0.0'}% of workforce
           </p>
         </div>
 
@@ -100,11 +117,11 @@ export default function AnalyticsTenureTab({
             <TrendingUp className="h-8 w-8 text-green-600" />
           </div>
           <p className="mt-4 text-2xl font-bold text-gray-900">
-            {(totalEmployees / managers.length).toFixed(1)}
+            {managers.length > 0 ? (totalEmployees / managers.length).toFixed(1) : '—'}
           </p>
           <p className="text-sm text-gray-600">Employees per Manager</p>
           <p className="mt-1 text-xs text-gray-500">
-            Overall company ratio
+            {managers.length > 0 ? 'Overall company ratio' : 'No managers found'}
           </p>
         </div>
       </div>
@@ -155,10 +172,17 @@ export default function AnalyticsTenureTab({
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Span of Control by Manager
         </h3>
-        <div className="space-y-3">
-          {spanOfControlData
-            .sort((a, b) => b.directReportsCount - a.directReportsCount)
-            .map((mgr) => (
+        {spanOfControlData.length === 0 ? (
+          <div className="text-center py-8">
+            <Users className="mx-auto h-12 w-12 text-gray-400" />
+            <p className="mt-2 text-sm text-gray-600">No manager data available</p>
+            <p className="text-xs text-gray-500">Add manager relationships to see span of control details</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {spanOfControlData
+              .sort((a, b) => b.directReportsCount - a.directReportsCount)
+              .map((mgr) => (
               <div
                 key={mgr.managerId}
                 className={`flex items-center justify-between rounded-lg p-4 ${
@@ -191,9 +215,10 @@ export default function AnalyticsTenureTab({
                 </div>
               </div>
             ))}
-        </div>
+          </div>
+        )}
 
-        {lowSpanManagers.length > 0 && (
+        {spanOfControlData.length > 0 && lowSpanManagers.length > 0 && (
           <div className="mt-6 rounded-lg bg-yellow-50 p-4">
             <p className="font-medium text-yellow-900">
               ⚠️ {lowSpanManagers.length} manager{lowSpanManagers.length > 1 ? 's' : ''} with low span of control (&lt; 5 reports)
@@ -204,7 +229,7 @@ export default function AnalyticsTenureTab({
           </div>
         )}
 
-        {highSpanManagers.length > 0 && (
+        {spanOfControlData.length > 0 && highSpanManagers.length > 0 && (
           <div className="mt-4 rounded-lg bg-orange-50 p-4">
             <p className="font-medium text-orange-900">
               ⚠️ {highSpanManagers.length} manager{highSpanManagers.length > 1 ? 's' : ''} with high span of control (&gt; 10 reports)
