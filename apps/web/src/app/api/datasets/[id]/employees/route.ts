@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@scleorg/database';
+import { syncPlannedCompensation, validateEmployeeData } from '@/lib/sync-planned-compensation';
 
 // POST /api/datasets/:id/employees - Add employee
 export async function POST(
@@ -53,6 +54,15 @@ export async function POST(
       costCenter,
     } = body;
 
+    // Validate employee data
+    const validation = validateEmployeeData(body);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
     const employee = await prisma.employee.create({
       data: {
         datasetId: params.id,
@@ -73,6 +83,9 @@ export async function POST(
         costCenter: costCenter || null,
       },
     });
+
+    // Sync planned compensation for future months
+    await syncPlannedCompensation(params.id);
 
     return NextResponse.json({ employee }, { status: 201 });
   } catch (error) {

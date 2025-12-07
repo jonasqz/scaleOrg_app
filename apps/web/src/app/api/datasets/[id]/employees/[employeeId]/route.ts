@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@scleorg/database';
+import { syncPlannedCompensation, validateEmployeeData } from '@/lib/sync-planned-compensation';
 
 export async function PATCH(
   request: Request,
@@ -36,6 +37,15 @@ export async function PATCH(
     // Get request body
     const body = await request.json();
 
+    // Validate employee data
+    const validation = validateEmployeeData(body);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
     // Update employee
     const employee = await prisma.employee.update({
       where: {
@@ -60,6 +70,9 @@ export async function PATCH(
         costCenter: body.costCenter || null,
       },
     });
+
+    // Sync planned compensation for future months
+    await syncPlannedCompensation(params.id);
 
     return NextResponse.json(employee);
   } catch (error) {
@@ -102,15 +115,23 @@ export async function DELETE(
       return NextResponse.json({ error: 'Dataset not found' }, { status: 404 });
     }
 
-    // Delete employee
-    await prisma.employee.delete({
+    // Soft delete employee by setting endDate to now
+    // This preserves data integrity and allows historical reporting
+    const employee = await prisma.employee.update({
       where: {
         id: params.employeeId,
         datasetId: params.id, // Ensure employee belongs to this dataset
       },
+      data: {
+        endDate: new Date(),
+      },
     });
 
-    return NextResponse.json({ success: true });
+    // Sync planned compensation for future months
+    // This will exclude the deleted employee from future calculations
+    await syncPlannedCompensation(params.id);
+
+    return NextResponse.json({ success: true, employee });
   } catch (error) {
     console.error('Error deleting employee:', error);
     return NextResponse.json(

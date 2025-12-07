@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@scleorg/database';
 import { saveToLibrary } from '@/lib/role-matching';
+import { syncPlannedCompensation } from '@/lib/sync-planned-compensation';
 
 interface BulkEmployeeData {
   employeeName?: string;
@@ -209,6 +210,17 @@ export async function POST(
         const errorMsg = error instanceof Error ? error.message : `Row ${rowNum}: Unknown error`;
         results.errors.push(errorMsg);
         console.error(`Import error on row ${rowNum}:`, error);
+      }
+    }
+
+    // Sync planned compensation for future months after all employees are imported
+    if (results.success > 0) {
+      try {
+        await syncPlannedCompensation(params.id);
+      } catch (syncError) {
+        console.error('Failed to sync planned compensation after bulk import:', syncError);
+        // Don't fail the entire import if sync fails
+        results.errors.push('Warning: Failed to sync planned compensation. Please refresh the page.');
       }
     }
 
