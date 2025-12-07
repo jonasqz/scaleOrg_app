@@ -232,6 +232,50 @@ export default function OrganizationalBenchmarksTab({
     ],
   };
 
+  // Auto-fill unit and currency based on metric selection
+  const getMetricDefaults = (metricName: string) => {
+    const defaults: { unit: string; currency: string } = { unit: '', currency: '' };
+
+    // Ratio metrics
+    if (metricName.includes('ratio')) {
+      defaults.unit = 'ratio';
+      defaults.currency = '';
+    }
+    // Percentage metrics
+    else if (metricName.includes('percentage') || metricName.includes('retention') || metricName.includes('rate')) {
+      defaults.unit = '%';
+      defaults.currency = '';
+    }
+    // Time-based metrics
+    else if (metricName.includes('months') || metricName.includes('days')) {
+      defaults.unit = metricName.includes('months') ? 'months' : 'days';
+      defaults.currency = '';
+    }
+    // Span of control
+    else if (metricName === 'span_of_control') {
+      defaults.unit = 'reports';
+      defaults.currency = '';
+    }
+    // Revenue/cost metrics - monetary
+    else if (metricName.includes('revenue') || metricName.includes('cost')) {
+      defaults.unit = 'EUR';
+      defaults.currency = 'EUR';
+    }
+
+    return defaults;
+  };
+
+  // Update metric name handler to auto-fill unit and currency
+  const handleMetricChange = (metricName: string) => {
+    const defaults = getMetricDefaults(metricName);
+    setFormData({
+      ...formData,
+      metricName,
+      unit: defaults.unit,
+      currency: defaults.currency,
+    });
+  };
+
   return (
     <div className="space-y-6">
       {message && (
@@ -380,7 +424,7 @@ export default function OrganizationalBenchmarksTab({
               <select
                 required
                 value={formData.metricName}
-                onChange={(e) => setFormData({ ...formData, metricName: e.target.value })}
+                onChange={(e) => handleMetricChange(e.target.value)}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <option value="">-- Select --</option>
@@ -390,7 +434,7 @@ export default function OrganizationalBenchmarksTab({
                   </option>
                 ))}
               </select>
-              <p className="mt-1 text-xs text-gray-500">The specific metric being benchmarked</p>
+              <p className="mt-1 text-xs text-gray-500">The specific metric being benchmarked (auto-fills Unit & Currency)</p>
             </div>
 
             {/* Percentile Values */}
@@ -478,7 +522,9 @@ export default function OrganizationalBenchmarksTab({
                 onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">Unit of measurement (e.g., ratio for 1.5, % for 35, EUR for €200k)</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Auto-filled based on metric • Edit if needed
+              </p>
             </div>
 
             <div>
@@ -493,7 +539,9 @@ export default function OrganizationalBenchmarksTab({
                 <option value="USD">USD</option>
                 <option value="GBP">GBP</option>
               </select>
-              <p className="mt-1 text-xs text-gray-500">Only for monetary metrics (revenue, cost per FTE, etc.)</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Auto-set for revenue/cost metrics • Change if different currency needed
+              </p>
             </div>
 
             <div>
