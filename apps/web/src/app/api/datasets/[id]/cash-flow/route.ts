@@ -93,10 +93,11 @@ export async function GET(
       const monthCompData = compensationData?.monthlySummary?.find((m: any) => m.month === month.period);
       const burn = monthCompData?.actual || monthCompData?.planned || null;
 
-      // Calculate net cash flow
+      // Calculate net cash flow (treat null revenue as 0 for forecasting purposes)
       const revenueValue = revenue ? Number(revenue.revenue) : null;
-      const netCashFlow = revenueValue !== null && burn !== null
-        ? revenueValue - burn
+      const revenueForCalculation = revenueValue ?? 0; // Use 0 for calculations if null
+      const netCashFlow = burn !== null
+        ? revenueForCalculation - burn
         : null;
 
       return {
@@ -105,7 +106,7 @@ export async function GET(
         isPast: month.isPast,
         isCurrent: month.isCurrent,
         isFuture: month.isFuture,
-        revenue: revenueValue,
+        revenue: revenueValue, // Show actual value (null or number)
         burn: burn,
         netCashFlow: netCashFlow,
         isRevenueEditable: month.isCurrent || month.isFuture,
@@ -113,24 +114,27 @@ export async function GET(
     });
 
     // Calculate ending cash for each month
-    let runningCash = dataset.currentCashBalance ? Number(dataset.currentCashBalance) : 0;
+    let currentCashBalance = dataset.currentCashBalance ? Number(dataset.currentCashBalance) : 0;
     const currentMonthIndex = monthlyData.findIndex(m => m.isCurrent);
 
-    // For past months, work backwards from current cash
-    // For current/future months, work forwards
+    // For past months, we don't have enough data to calculate backwards, so set to null
+    // For current and future months, calculate forward from current cash balance
+    let runningCash = currentCashBalance;
+
     monthlyData.forEach((month, idx) => {
       if (idx < currentMonthIndex) {
-        // Past month - we don't recalculate, just show current as-is
-        month.endingCash = null; // Could calculate backwards if needed
+        // Past months - we don't calculate (would need historical cash balance data)
+        month.endingCash = null;
       } else if (idx === currentMonthIndex) {
-        // Current month
-        month.endingCash = runningCash;
+        // Current month - start with current cash balance, add this month's net flow
+        const netFlow = month.netCashFlow !== null ? month.netCashFlow : 0;
+        month.endingCash = runningCash + netFlow;
+        runningCash = month.endingCash;
       } else {
-        // Future months
-        const prevMonth = monthlyData[idx - 1];
-        const startingCash = prevMonth.endingCash || runningCash;
-        const netFlow = month.netCashFlow || 0;
-        month.endingCash = startingCash + netFlow;
+        // Future months - calculate based on previous month's ending cash
+        const netFlow = month.netCashFlow !== null ? month.netCashFlow : 0;
+        month.endingCash = runningCash + netFlow;
+        runningCash = month.endingCash;
       }
     });
 
@@ -151,8 +155,8 @@ export async function GET(
 
     if (avgMonthlyBurn > 0) {
       const netBurn = avgMonthlyBurn - avgMonthlyRevenue;
-      if (netBurn > 0 && runningCash > 0) {
-        runway = runningCash / netBurn;
+      if (netBurn > 0 && currentCashBalance > 0) {
+        runway = currentCashBalance / netBurn;
         const runwayMonths = Math.floor(runway);
         const futureDate = new Date();
         futureDate.setMonth(futureDate.getMonth() + runwayMonths);
@@ -163,7 +167,7 @@ export async function GET(
     return NextResponse.json({
       monthlyData,
       summary: {
-        currentCash: runningCash,
+        currentCash: currentCashBalance,
         avgMonthlyRevenue,
         avgMonthlyBurn,
         runway,
