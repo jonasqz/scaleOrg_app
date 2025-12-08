@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import BenchmarkComparison from './benchmark-comparison';
+import EmployeeBenchmarkComparison from './employee-benchmark-comparison';
+import EmployeeBenchmarkRangeView from './employee-benchmark-range-view';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
 interface AnalyticsBenchmarkingTabProps {
@@ -188,6 +190,12 @@ export default function AnalyticsBenchmarkingTab({
           </span>
         </div>
       </div>
+
+      {/* Individual Employee Benchmark Range View */}
+      <EmployeeBenchmarkRangeView
+        datasetId={datasetId}
+        currency={currency}
+      />
 
       {/* Department Benchmarking */}
       <div className="rounded-lg border bg-white p-6 shadow-sm">

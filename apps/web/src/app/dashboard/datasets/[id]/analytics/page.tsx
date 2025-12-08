@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@scleorg/database';
 import { calculateAllMetrics } from '@scleorg/calculations';
 import AnalyticsTabs from '../analytics-tabs';
+import { AnalyticsHeader } from '../analytics-header';
 
 export default async function AnalyticsPage({
   params,
@@ -48,15 +49,16 @@ export default async function AnalyticsPage({
       ? calculateAllMetrics(dataset.employees, dataset, departmentCategories)
       : null;
 
+  // Note: Benchmark summary will be fetched in the client component export modal
+  // to keep the server component fast
   return (
     <div className="space-y-8">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Analytics & Insights</h1>
-        <p className="mt-2 text-gray-600">
-          Deep dive into your workforce metrics and trends
-        </p>
-      </div>
+      {/* Page Header with Export Button */}
+      <AnalyticsHeader
+        dataset={dataset}
+        employees={dataset.employees}
+        metrics={metrics}
+      />
 
       {/* Analytics Sub-Tabs */}
       <AnalyticsTabs
