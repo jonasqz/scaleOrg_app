@@ -14,7 +14,7 @@ interface Employee {
   level: string | null;
   employmentType: string;
   totalCompensation: number;
-  baseSalary: number | null;
+  annualSalary: number | null;
   bonus: number | null;
   equityValue: number | null;
   fteFactor: number;
@@ -43,7 +43,7 @@ const emptyEmployee = {
   level: '',
   employmentType: 'FTE',
   totalCompensation: 0,
-  baseSalary: null,
+  annualSalary: null,
   bonus: null,
   equityValue: null,
   fteFactor: 1,
@@ -95,7 +95,7 @@ export default function EmployeeDetailModal({
     level: currentEmployee.level || '',
     employmentType: currentEmployee.employmentType,
     totalCompensation: currentEmployee.totalCompensation.toString(),
-    baseSalary: currentEmployee.baseSalary?.toString() || '',
+    baseSalary: currentEmployee.annualSalary?.toString() || '',
     bonus: currentEmployee.bonus?.toString() || '',
     equityValue: currentEmployee.equityValue?.toString() || '',
     fteFactor: currentEmployee.fteFactor.toString(),
@@ -119,7 +119,7 @@ export default function EmployeeDetailModal({
         level: emp.level || '',
         employmentType: emp.employmentType,
         totalCompensation: emp.totalCompensation.toString(),
-        baseSalary: emp.baseSalary?.toString() || '',
+        baseSalary: emp.annualSalary?.toString() || '',
         bonus: emp.bonus?.toString() || '',
         equityValue: emp.equityValue?.toString() || '',
         fteFactor: emp.fteFactor.toString(),
@@ -147,7 +147,7 @@ export default function EmployeeDetailModal({
       const payload = {
         ...formData,
         totalCompensation: parseFloat(formData.totalCompensation) * multiplier,
-        baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) * multiplier : null,
+        annualSalary: formData.baseSalary ? parseFloat(formData.baseSalary) * multiplier : null,
         bonus: formData.bonus ? parseFloat(formData.bonus) * multiplier : null,
         equityValue: formData.equityValue ? parseFloat(formData.equityValue) * multiplier : null,
         fteFactor: parseFloat(formData.fteFactor),
@@ -836,13 +836,13 @@ export default function EmployeeDetailModal({
                     ) : (
                       <>
                         <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
-                          {currentEmployee.baseSalary
-                            ? `${currency} ${currentEmployee.baseSalary.toLocaleString()} / year`
+                          {currentEmployee.annualSalary
+                            ? `${currency} ${currentEmployee.annualSalary.toLocaleString()} / year`
                             : 'N/A'}
                         </p>
-                        {currentEmployee.baseSalary && (
+                        {currentEmployee.annualSalary && (
                           <p className="mt-1 text-xs text-gray-500">
-                            {currency} {(currentEmployee.baseSalary / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
+                            {currency} {(currentEmployee.annualSalary / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
                           </p>
                         )}
                       </>

@@ -28,78 +28,88 @@ export async function syncPlannedCompensation(datasetId: string): Promise<void> 
     monthsToSync.push(monthDate);
   }
 
-  // For each future month, recalculate planned compensation
+  // For each future month, sync planned compensation for each employee
   for (const month of monthsToSync) {
-    const monthStr = month.toISOString().split('T')[0];
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                        'July', 'August', 'September', 'October', 'November', 'December'];
     const periodLabel = `${monthNames[month.getMonth()]} ${month.getFullYear()}`;
 
-    // Calculate total planned compensation for this month
-    // This is the sum of all active employees' monthly costs
-    const totalPlanned = employees.reduce((sum, emp) => {
+    // For each active employee, create/update their planned compensation
+    for (const employee of employees) {
       // Check if employee will be active in this month
-      const startDate = emp.startDate ? new Date(emp.startDate) : null;
-      const endDate = emp.endDate ? new Date(emp.endDate) : null;
+      const startDate = employee.startDate ? new Date(employee.startDate) : null;
+      const endDate = employee.endDate ? new Date(employee.endDate) : null;
 
-      // Skip if employee hasn't started yet
-      if (startDate && startDate > month) {
-        return sum;
+      // Skip if employee hasn't started yet or has already left
+      if ((startDate && startDate > month) || (endDate && endDate < month)) {
+        continue;
       }
 
-      // Skip if employee has already left
-      if (endDate && endDate < month) {
-        return sum;
-      }
+      // Calculate monthly planned compensation
+      const annualSalary = Number(employee.annualSalary || 0);
+      const bonus = Number(employee.bonus || 0);
+      const equityValue = Number(employee.equityValue || 0);
 
-      // Monthly cost = annual compensation / 12
-      const monthlyCost = Number(emp.totalCompensation) / 12;
-      return sum + monthlyCost;
-    }, 0);
+      const plannedGrossSalary = new Prisma.Decimal(annualSalary / 12);
+      const plannedGrossBonus = bonus > 0 ? new Prisma.Decimal(bonus / 12) : null;
+      const plannedGrossEquity = equityValue > 0 ? new Prisma.Decimal(equityValue / 12) : null;
+      const plannedGrossTotal = new Prisma.Decimal((annualSalary + bonus + equityValue) / 12);
 
-    // Check if this month already has a record
-    const existingRecord = await prisma.monthlyPlannedCompensation.findUnique({
-      where: {
-        datasetId_period: {
-          datasetId,
-          period: month,
-        },
-      },
-    });
+      // Estimate employer costs (rough estimates - can be improved)
+      const grossTotal = (annualSalary + bonus + equityValue) / 12;
+      const employerTaxRate = 0.20; // 20% rough estimate
+      const plannedTotalEmployerCost = new Prisma.Decimal(grossTotal * (1 + employerTaxRate));
 
-    if (existingRecord) {
-      // Update only if:
-      // 1. No manual override exists, OR
-      // 2. Actual hasn't been entered yet (month is still in future/current)
-      const shouldUpdate = !existingRecord.isManualOverride && !existingRecord.actualEmployerCost;
-
-      if (shouldUpdate) {
-        await prisma.monthlyPlannedCompensation.update({
-          where: {
-            datasetId_period: {
-              datasetId,
-              period: month,
-            },
+      // Check if this employee already has a record for this month
+      const existingRecord = await prisma.monthlyPlannedCompensation.findUnique({
+        where: {
+          datasetId_period_employeeId: {
+            datasetId,
+            period: month,
+            employeeId: employee.id,
           },
+        },
+      });
+
+      if (existingRecord) {
+        // Update only if not manually overridden
+        if (!existingRecord.isManualOverride) {
+          await prisma.monthlyPlannedCompensation.update({
+            where: {
+              datasetId_period_employeeId: {
+                datasetId,
+                period: month,
+                employeeId: employee.id,
+              },
+            },
+            data: {
+              plannedGrossSalary,
+              plannedGrossBonus,
+              plannedGrossEquity,
+              plannedGrossTotal,
+              plannedTotalEmployerCost,
+              currency: employee.currency || 'EUR',
+            },
+          });
+        }
+      } else {
+        // Create new record
+        await prisma.monthlyPlannedCompensation.create({
           data: {
-            plannedEmployerCost: new Prisma.Decimal(totalPlanned),
-            activeEmployeeCount: employees.length,
+            datasetId,
+            period: month,
+            periodLabel,
+            employeeId: employee.id,
+            plannedGrossSalary,
+            plannedGrossBonus,
+            plannedGrossEquity,
+            plannedGrossTotal,
+            plannedTotalEmployerCost,
+            isManualOverride: false,
+            currency: employee.currency || 'EUR',
           },
         });
       }
-    } else {
-      // Create new record
-      await prisma.monthlyPlannedCompensation.create({
-        data: {
-          datasetId,
-          period: month,
-          periodLabel,
-          plannedEmployerCost: new Prisma.Decimal(totalPlanned),
-          actualEmployerCost: null,
-          activeEmployeeCount: employees.length,
-          isManualOverride: false,
-        },
-      });
     }
   }
 }
