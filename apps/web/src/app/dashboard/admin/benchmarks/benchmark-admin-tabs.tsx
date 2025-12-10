@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Database, BarChart3, Upload, FileText, Clock } from 'lucide-react';
+import { Database, BarChart3, Upload, FileText, Clock, DollarSign } from 'lucide-react';
 import BenchmarkSourcesTab from './benchmark-sources-tab';
 import OrganizationalBenchmarksTab from './organizational-benchmarks-tab';
+import CompensationBenchmarksTab from './compensation-benchmarks-tab';
 import BulkImportTab from './bulk-import-tab';
 import AuditLogTab from './audit-log-tab';
 import PendingApprovalTab from './pending-approval-tab';
 
-type AdminTabId = 'pending' | 'organizational' | 'sources' | 'import' | 'audit';
+type AdminTabId = 'pending' | 'organizational' | 'compensation' | 'sources' | 'import' | 'audit';
 
 interface BenchmarkAdminTabsProps {
   initialSources: any[];
@@ -29,6 +30,7 @@ export default function BenchmarkAdminTabs({
 
   const tabs = [
     { id: 'pending' as AdminTabId, label: 'Pending Approval', icon: Clock },
+    { id: 'compensation' as AdminTabId, label: 'Compensation Benchmarks', icon: DollarSign },
     { id: 'organizational' as AdminTabId, label: 'Organizational Benchmarks', icon: BarChart3 },
     { id: 'sources' as AdminTabId, label: 'Data Sources', icon: Database },
     { id: 'import' as AdminTabId, label: 'Bulk Import', icon: Upload },
@@ -61,6 +63,7 @@ export default function BenchmarkAdminTabs({
 
       <div>
         {activeTab === 'pending' && <PendingApprovalTab />}
+        {activeTab === 'compensation' && <CompensationBenchmarksTab />}
         {activeTab === 'organizational' && (
           <OrganizationalBenchmarksTab
             initialBenchmarks={initialOrganizationalBenchmarks}
