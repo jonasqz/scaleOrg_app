@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Save, DollarSign, Info } from 'lucide-react';
+import { X, Save, DollarSign, Info, Sparkles, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CompensationBenchmark {
@@ -66,8 +66,30 @@ const COMPANY_SIZES = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF'];
 
+interface AIResearchResult {
+  suggested: {
+    p10TotalComp: number | null;
+    p25TotalComp: number | null;
+    p50TotalComp: number | null;
+    p75TotalComp: number | null;
+    p90TotalComp: number | null;
+    p10BaseSalary: number | null;
+    p25BaseSalary: number | null;
+    p50BaseSalary: number | null;
+    p75BaseSalary: number | null;
+    p90BaseSalary: number | null;
+    sampleSizeEstimate: number;
+  };
+  sources: string[];
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+  warnings: string[];
+}
+
 export default function CompensationBenchmarkModal({ isOpen, onClose, benchmark, filters }: Props) {
   const [loading, setLoading] = useState(false);
+  const [researching, setResearching] = useState(false);
+  const [aiResult, setAiResult] = useState<AIResearchResult | null>(null);
   const [formData, setFormData] = useState({
     roleFamily: '',
     standardizedTitle: '',
@@ -117,6 +139,70 @@ export default function CompensationBenchmarkModal({ isOpen, onClose, benchmark,
   }, [benchmark]);
 
   if (!isOpen) return null;
+
+  const handleAIResearch = async () => {
+    // Validation
+    if (!formData.roleFamily || !formData.standardizedTitle || !formData.seniorityLevel ||
+        !formData.industry || !formData.region || !formData.companySize) {
+      toast.error('Please fill in role and market segmentation fields before researching');
+      return;
+    }
+
+    setResearching(true);
+    setAiResult(null);
+
+    try {
+      const response = await fetch('/api/admin/benchmarks/compensation/research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roleFamily: formData.roleFamily,
+          standardizedTitle: formData.standardizedTitle,
+          seniorityLevel: formData.seniorityLevel,
+          industry: formData.industry,
+          region: formData.region,
+          companySize: formData.companySize,
+          currency: formData.currency,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || 'Research failed');
+      }
+
+      const result = await response.json();
+      setAiResult(result);
+      toast.success('AI research completed! Review the suggested values below.');
+    } catch (error: any) {
+      console.error('Error researching compensation:', error);
+      toast.error(error.message || 'Failed to research compensation data');
+    } finally {
+      setResearching(false);
+    }
+  };
+
+  const handleApplySuggestions = () => {
+    if (!aiResult) return;
+
+    setFormData({
+      ...formData,
+      p10TotalComp: aiResult.suggested.p10TotalComp?.toString() || '',
+      p25TotalComp: aiResult.suggested.p25TotalComp?.toString() || '',
+      p50TotalComp: aiResult.suggested.p50TotalComp?.toString() || '',
+      p75TotalComp: aiResult.suggested.p75TotalComp?.toString() || '',
+      p90TotalComp: aiResult.suggested.p90TotalComp?.toString() || '',
+      p10BaseSalary: aiResult.suggested.p10BaseSalary?.toString() || '',
+      p25BaseSalary: aiResult.suggested.p25BaseSalary?.toString() || '',
+      p50BaseSalary: aiResult.suggested.p50BaseSalary?.toString() || '',
+      p75BaseSalary: aiResult.suggested.p75BaseSalary?.toString() || '',
+      p90BaseSalary: aiResult.suggested.p90BaseSalary?.toString() || '',
+      sampleSize: aiResult.suggested.sampleSizeEstimate.toString(),
+      dataSource: 'ai_suggested',
+    });
+
+    toast.success('AI suggestions applied! You can adjust values before saving.');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,6 +409,145 @@ export default function CompensationBenchmarkModal({ isOpen, onClose, benchmark,
               </div>
             </div>
 
+            {/* AI Research Section */}
+            <div className="rounded-lg border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50 p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-5 w-5 text-purple-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">AI Compensation Research</h3>
+                    <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
+                      Beta
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Let AI research current market compensation data for this role using web search.
+                    Review and adjust the suggestions before saving.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={handleAIResearch}
+                    disabled={researching || !formData.roleFamily || !formData.seniorityLevel}
+                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-2.5 font-semibold text-white hover:from-purple-700 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {researching ? (
+                      <>
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Researching...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Research with AI
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* AI Research Results */}
+              {aiResult && (
+                <div className="mt-6 space-y-4">
+                  <div className="rounded-lg border border-purple-200 bg-white p-4">
+                    {/* Confidence Badge */}
+                    <div className="mb-3 flex items-center gap-2">
+                      {aiResult.confidence === 'high' && (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      )}
+                      {aiResult.confidence === 'medium' && (
+                        <Info className="h-5 w-5 text-yellow-600" />
+                      )}
+                      {aiResult.confidence === 'low' && (
+                        <AlertTriangle className="h-5 w-5 text-orange-600" />
+                      )}
+                      <span className="font-semibold text-gray-900">
+                        AI Research Results
+                      </span>
+                      <span className={`ml-auto rounded-full px-2 py-1 text-xs font-semibold ${
+                        aiResult.confidence === 'high' ? 'bg-green-100 text-green-700' :
+                        aiResult.confidence === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-orange-100 text-orange-700'
+                      }`}>
+                        {aiResult.confidence.toUpperCase()} Confidence
+                      </span>
+                    </div>
+
+                    {/* Suggested Values Preview */}
+                    <div className="mb-3 rounded border border-gray-200 bg-gray-50 p-3">
+                      <div className="text-sm font-medium text-gray-700 mb-2">Suggested Compensation (Annual {formData.currency})</div>
+                      <div className="grid grid-cols-5 gap-2 text-xs">
+                        <div>
+                          <div className="text-gray-500">p10</div>
+                          <div className="font-semibold">{aiResult.suggested.p10TotalComp?.toLocaleString() || 'N/A'}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">p25</div>
+                          <div className="font-semibold">{aiResult.suggested.p25TotalComp?.toLocaleString() || 'N/A'}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">p50</div>
+                          <div className="font-semibold text-purple-600">{aiResult.suggested.p50TotalComp?.toLocaleString() || 'N/A'}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">p75</div>
+                          <div className="font-semibold">{aiResult.suggested.p75TotalComp?.toLocaleString() || 'N/A'}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">p90</div>
+                          <div className="font-semibold">{aiResult.suggested.p90TotalComp?.toLocaleString() || 'N/A'}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Reasoning */}
+                    <div className="mb-3 text-sm text-gray-600">
+                      <span className="font-medium text-gray-700">Reasoning:</span> {aiResult.reasoning}
+                    </div>
+
+                    {/* Sources */}
+                    <div className="mb-3">
+                      <div className="text-sm font-medium text-gray-700 mb-1">Sources:</div>
+                      <ul className="space-y-1">
+                        {aiResult.sources.map((source, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-xs text-gray-600">
+                            <ExternalLink className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                            <span>{source}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Warnings */}
+                    {aiResult.warnings.length > 0 && (
+                      <div className="mb-3 rounded-md bg-yellow-50 border border-yellow-200 p-3">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+                          <div className="text-xs text-yellow-800">
+                            <div className="font-medium mb-1">Caveats:</div>
+                            <ul className="list-disc list-inside space-y-0.5">
+                              {aiResult.warnings.map((warning, idx) => (
+                                <li key={idx}>{warning}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Apply Button */}
+                    <button
+                      type="button"
+                      onClick={handleApplySuggestions}
+                      className="w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700"
+                    >
+                      Apply AI Suggestions to Form
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Total Compensation Percentiles */}
             <div>
               <div className="mb-4 flex items-center justify-between">
@@ -430,11 +655,17 @@ export default function CompensationBenchmarkModal({ isOpen, onClose, benchmark,
                     className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   >
                     <option value="manual">Manual Entry</option>
+                    <option value="ai_suggested">AI Suggested ✨</option>
                     <option value="customer_crowdsourced">Customer Crowdsourced</option>
                     <option value="pave">Pave</option>
                     <option value="radford">Radford</option>
                     <option value="opencomp">OpenComp</option>
                   </select>
+                  {formData.dataSource === 'ai_suggested' && (
+                    <p className="mt-1 text-xs text-purple-600">
+                      This benchmark was researched by AI. Review and verify before using.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

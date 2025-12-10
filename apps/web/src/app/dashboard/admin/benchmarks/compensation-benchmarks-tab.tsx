@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Filter, X, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { Plus, Edit2, Trash2, Filter, X, DollarSign, Users, TrendingUp, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import CompensationBenchmarkModal from './compensation-benchmark-modal';
 
@@ -359,7 +359,15 @@ export default function CompensationBenchmarksTab() {
                 <tr key={benchmark.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div>
-                      <div className="font-medium text-gray-900">{benchmark.roleFamily}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">{benchmark.roleFamily}</span>
+                        {benchmark.dataSource === 'ai_suggested' && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700" title="AI Researched">
+                            <Sparkles className="h-3 w-3" />
+                            AI
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs text-gray-500">{benchmark.standardizedTitle}</div>
                     </div>
                   </td>
