@@ -20,6 +20,7 @@ interface Employee {
   fteFactor: number;
   startDate: Date | null;
   location: string | null;
+  gender: string | null;
   managerId: string | null;
   costCenter: string | null;
 }
@@ -49,6 +50,7 @@ const emptyEmployee = {
   fteFactor: 1,
   startDate: null,
   location: '',
+  gender: null,
   managerId: null,
   costCenter: '',
 };
@@ -103,6 +105,7 @@ export default function EmployeeDetailModal({
       ? new Date(currentEmployee.startDate).toISOString().split('T')[0]
       : '',
     location: currentEmployee.location || '',
+    gender: currentEmployee.gender || '',
     managerId: currentEmployee.managerId || '',
     costCenter: currentEmployee.costCenter || '',
   });
@@ -127,6 +130,7 @@ export default function EmployeeDetailModal({
           ? new Date(emp.startDate).toISOString().split('T')[0]
           : '',
         location: emp.location || '',
+        gender: emp.gender || '',
         managerId: emp.managerId || '',
         costCenter: emp.costCenter || '',
       });
@@ -467,6 +471,36 @@ export default function EmployeeDetailModal({
                         {currentEmployee.location || 'N/A'}
                       </p>
                     )}
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Gender
+                    </label>
+                    {isEditing ? (
+                      <select
+                        value={formData.gender}
+                        onChange={(e) =>
+                          setFormData({ ...formData, gender: e.target.value })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      >
+                        <option value="">Prefer not to say</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="DIVERSE">Diverse</option>
+                      </select>
+                    ) : (
+                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                        {currentEmployee.gender === 'MALE' ? 'Male' :
+                         currentEmployee.gender === 'FEMALE' ? 'Female' :
+                         currentEmployee.gender === 'DIVERSE' ? 'Diverse' :
+                         'Prefer not to say'}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Optional: Used for pay gap analysis and diversity reporting
+                    </p>
                   </div>
                 </div>
               </div>

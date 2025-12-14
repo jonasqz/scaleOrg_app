@@ -66,6 +66,7 @@ export async function PATCH(
         totalCompensation: body.totalCompensation,
         startDate: body.startDate ? new Date(body.startDate) : null,
         location: body.location || null,
+        gender: body.gender && body.gender !== '' ? body.gender : null,
         managerId: body.managerId || null,
         costCenter: body.costCenter || null,
       },

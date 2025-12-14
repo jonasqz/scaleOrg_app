@@ -50,6 +50,7 @@ export async function POST(
       totalCompensation,
       startDate,
       location,
+      gender,
       managerId,
       costCenter,
     } = body;
@@ -79,6 +80,7 @@ export async function POST(
         totalCompensation,
         startDate: startDate ? new Date(startDate) : null,
         location: location || null,
+        gender: gender && gender !== '' ? gender : null,
         managerId: managerId || null,
         costCenter: costCenter || null,
       },
