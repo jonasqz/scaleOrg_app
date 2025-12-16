@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import {
   flexRender,
   getCoreRowModel,
@@ -27,7 +28,6 @@ import {
   X,
   Filter,
 } from 'lucide-react';
-import EmployeeDetailModal from './employee-detail-modal';
 
 interface Employee {
   id: string;
@@ -59,7 +59,6 @@ export default function EmployeeTableEnhanced({
   datasetId,
   currency,
 }: EmployeeTableEnhancedProps) {
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [grouping, setGrouping] = useState<GroupingState>([]);
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -88,12 +87,12 @@ export default function EmployeeTableEnhanced({
         accessorKey: 'employeeName',
         header: 'Name',
         cell: ({ row, getValue }) => (
-          <button
-            onClick={() => setSelectedEmployee(row.original)}
+          <Link
+            href={`/dashboard/datasets/${datasetId}/employees/${row.original.id}`}
             className="text-left font-medium text-blue-600 hover:text-blue-800 hover:underline"
           >
             {getValue() as string || 'N/A'}
-          </button>
+          </Link>
         ),
         enableGrouping: false,
       },
@@ -551,18 +550,6 @@ export default function EmployeeTableEnhanced({
       <div className="mt-4 text-sm text-gray-600">
         Showing {table.getRowModel().rows.length} of {employees.length} employees
       </div>
-
-      {/* Employee Detail Modal */}
-      {selectedEmployee && (
-        <EmployeeDetailModal
-          employee={selectedEmployee}
-          datasetId={datasetId}
-          currency={currency}
-          isOpen={true}
-          onClose={() => setSelectedEmployee(null)}
-          allEmployees={employees}
-        />
-      )}
     </>
   );
 }
