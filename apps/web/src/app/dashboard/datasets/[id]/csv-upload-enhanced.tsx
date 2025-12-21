@@ -257,9 +257,9 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-white px-6 py-3 font-semibold text-blue-600 hover:bg-blue-50"
+        className="inline-flex items-center gap-2 rounded-md border border-orange-600 bg-white px-4 py-2 text-xs font-medium text-orange-600 hover:bg-orange-50 transition-colors"
       >
-        <Upload className="h-5 w-5" />
+        <Upload className="h-3.5 w-3.5" />
         Import from CSV
       </button>
     );
@@ -267,28 +267,28 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative mx-4 w-full max-w-6xl rounded-2xl bg-white p-8 shadow-2xl">
+      <div className="relative mx-4 w-full max-w-6xl rounded-xl bg-white p-6 shadow-2xl">
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute right-4 top-4 rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          className="absolute right-4 top-4 rounded-md p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
         {/* Step indicator */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between">
           {/* Step 1 */}
           <div className="flex items-center">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-full ${
-              step === 'upload' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'
+            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium ${
+              step === 'upload' ? 'bg-orange-600 text-white' : 'bg-green-600 text-white'
             }`}>
-              {step === 'upload' ? '1' : <Check className="h-6 w-6" />}
+              {step === 'upload' ? '1' : <Check className="h-4 w-4" />}
             </div>
-            <span className="ml-3 text-sm font-medium text-gray-700">Upload file</span>
+            <span className="ml-2 text-xs font-medium text-stone-700">Upload file</span>
           </div>
 
-          <div className={`h-1 w-32 ${step !== 'upload' ? 'bg-green-600' : 'bg-gray-200'}`}></div>
+          <div className={`h-0.5 w-32 ${step !== 'upload' ? 'bg-green-600' : 'bg-stone-200'}`}></div>
 
           {/* Step 2 - Skip header row (we'll auto-detect) */}
           {/* <div className="flex items-center">
@@ -304,44 +304,44 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
 
           {/* Step 3 */}
           <div className="flex items-center">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-full ${
-              step === 'upload' ? 'bg-gray-200 text-gray-500' : step === 'match' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'
+            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium ${
+              step === 'upload' ? 'bg-stone-200 text-stone-500' : step === 'match' ? 'bg-orange-600 text-white' : 'bg-green-600 text-white'
             }`}>
-              {step === 'upload' || step === 'match' ? '2' : <Check className="h-6 w-6" />}
+              {step === 'upload' || step === 'match' ? '2' : <Check className="h-4 w-4" />}
             </div>
-            <span className="ml-3 text-sm font-medium text-gray-700">Match Columns</span>
+            <span className="ml-2 text-xs font-medium text-stone-700">Match Columns</span>
           </div>
 
-          <div className={`h-1 w-32 ${step === 'validate' || step === 'importing' ? 'bg-green-600' : 'bg-gray-200'}`}></div>
+          <div className={`h-0.5 w-32 ${step === 'validate' || step === 'importing' ? 'bg-green-600' : 'bg-stone-200'}`}></div>
 
           {/* Step 4 */}
           <div className="flex items-center">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-full ${
-              step === 'validate' || step === 'importing' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium ${
+              step === 'validate' || step === 'importing' ? 'bg-orange-600 text-white' : 'bg-stone-200 text-stone-500'
             }`}>
               3
             </div>
-            <span className="ml-3 text-sm font-medium text-gray-700">Validate data</span>
+            <span className="ml-2 text-xs font-medium text-stone-700">Validate data</span>
           </div>
         </div>
 
         {/* Step: Upload */}
         {step === 'upload' && (
           <div>
-            <h2 className="mb-4 text-2xl font-bold text-gray-900">Upload file</h2>
+            <h2 className="mb-3 text-lg font-semibold text-stone-900">Upload file</h2>
 
-            <div className="mb-6">
-              <h3 className="mb-2 font-semibold text-gray-900">Data that we expect:</h3>
-              <p className="text-sm text-gray-500">(You will have a chance to rename or remove columns in next steps)</p>
+            <div className="mb-4">
+              <h3 className="mb-1 text-sm font-semibold text-stone-900">Data that we expect:</h3>
+              <p className="text-xs text-stone-500">(You will have a chance to rename or remove columns in next steps)</p>
 
-              <div className="mt-4 grid grid-cols-5 gap-4 text-sm">
+              <div className="mt-3 grid grid-cols-5 gap-3 text-xs">
                 {FIELD_OPTIONS.filter(f => f.value).slice(0, 5).map(field => (
-                  <div key={field.value} className="font-medium text-gray-700">
+                  <div key={field.value} className="font-medium text-stone-700">
                     {field.label.toUpperCase()}
                   </div>
                 ))}
               </div>
-              <div className="mt-2 grid grid-cols-5 gap-4 text-sm text-gray-500">
+              <div className="mt-2 grid grid-cols-5 gap-3 text-xs text-stone-500">
                 <div>John Doe</div>
                 <div>john@example.com</div>
                 <div>Engineering</div>
@@ -358,10 +358,10 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
               }}
               onDragOver={(e) => e.preventDefault()}
               onClick={() => fileInputRef.current?.click()}
-              className="cursor-pointer rounded-lg border-2 border-dashed border-blue-400 bg-blue-50/30 p-24 text-center transition hover:bg-blue-50"
+              className="cursor-pointer rounded-lg border-2 border-dashed border-orange-300 bg-orange-50/30 p-16 text-center transition hover:bg-orange-50/50"
             >
-              <p className="text-gray-600">Upload .xlsx, .xls or .csv file</p>
-              <button className="mt-4 rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white hover:bg-blue-700">
+              <p className="text-xs text-stone-600">Upload .xlsx, .xls or .csv file</p>
+              <button className="mt-3 rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-700">
                 Select file
               </button>
               <input
@@ -381,29 +381,29 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
         {/* Step: Match Columns */}
         {step === 'match' && (
           <div>
-            <h2 className="mb-6 text-2xl font-bold text-gray-900">Match Columns</h2>
-            <p className="mb-6 text-sm text-gray-600">
+            <h2 className="mb-4 text-lg font-semibold text-stone-900">Match Columns</h2>
+            <p className="mb-4 text-xs text-stone-600">
               Map your CSV columns to our system fields. Columns marked with <span className="text-red-600">*</span> are required.
             </p>
 
-            <div className="mb-6 max-h-96 overflow-y-auto rounded-lg border bg-gray-50 p-4">
-              <div className="space-y-3">
+            <div className="mb-4 max-h-96 overflow-y-auto rounded-lg border border-stone-200 bg-stone-50 p-3">
+              <div className="space-y-2">
                 {columns.map(col => (
-                  <div key={col} className="flex items-center gap-4">
+                  <div key={col} className="flex items-center gap-3">
                     {/* CSV Column Name */}
-                    <div className="w-1/2 flex items-center rounded-lg border bg-white px-4 py-2">
-                      <span className="text-sm font-medium text-gray-900">{col}</span>
+                    <div className="w-1/2 flex items-center rounded-md border border-stone-200 bg-white px-3 py-2">
+                      <span className="text-xs font-medium text-stone-900">{col}</span>
                     </div>
 
                     {/* Arrow */}
-                    <div className="text-gray-400">→</div>
+                    <div className="text-stone-400">→</div>
 
                     {/* Field Mapping Dropdown */}
                     <div className="w-1/2">
                       <select
                         value={columnMapping[col] || ''}
                         onChange={(e) => setColumnMapping({ ...columnMapping, [col]: e.target.value || null })}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       >
                         {FIELD_OPTIONS.map(option => (
                           <option key={option.value} value={option.value}>
@@ -417,8 +417,8 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
               </div>
             </div>
 
-            <div className="mb-6 rounded-lg bg-blue-50 p-4">
-              <p className="text-sm text-blue-700">
+            <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 p-3">
+              <p className="text-xs text-orange-700">
                 <strong>Found {columns.length} columns</strong> in your CSV.
                 {Object.values(columnMapping).filter(v => v && v !== '').length > 0 && (
                   <> Auto-mapped {Object.values(columnMapping).filter(v => v && v !== '').length} columns.</>
@@ -428,7 +428,7 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
 
             <button
               onClick={validateData}
-              className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700"
+              className="w-full rounded-md bg-orange-600 py-2.5 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
             >
               Next
             </button>
@@ -438,69 +438,69 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
         {/* Step: Validate */}
         {step === 'validate' && (
           <div>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Validate data</h2>
-              <div className="flex items-center gap-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-stone-900">Validate data</h2>
+              <div className="flex items-center gap-3">
                 {selectedRows.size > 0 && (
                   <button
                     onClick={discardSelectedRows}
-                    className="rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50"
+                    className="rounded-md border border-orange-600 px-3 py-1.5 text-xs font-medium text-orange-600 hover:bg-orange-50 transition-colors"
                   >
                     Discard selected rows
                   </button>
                 )}
-                <label className="flex items-center gap-2 text-sm">
+                <label className="flex items-center gap-2 text-xs">
                   <input
                     type="checkbox"
                     checked={showOnlyErrors}
                     onChange={(e) => setShowOnlyErrors(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-3.5 w-3.5 rounded border-stone-300 text-orange-600 focus:ring-orange-500"
                   />
-                  <span className="text-gray-700">Show only rows with errors</span>
+                  <span className="text-stone-700">Show only rows with errors</span>
                 </label>
               </div>
             </div>
 
-            <div className="mb-6 max-h-96 overflow-auto rounded-lg border">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-gray-50">
+            <div className="mb-4 max-h-96 overflow-auto rounded-lg border border-stone-200">
+              <table className="w-full text-xs">
+                <thead className="sticky top-0 bg-stone-50">
                   <tr>
-                    <th className="px-4 py-3 text-left">
-                      <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                    <th className="px-3 py-2 text-left">
+                      <input type="checkbox" className="h-3.5 w-3.5 rounded border-stone-300" />
                     </th>
                     {Object.values(columnMapping).filter(v => v).map(fieldName => {
                       const field = FIELD_OPTIONS.find(f => f.value === fieldName);
                       return (
-                        <th key={fieldName} className="px-4 py-3 text-left font-semibold text-gray-900">
+                        <th key={fieldName} className="px-3 py-2 text-left font-semibold text-stone-900">
                           {field?.label || fieldName}
                         </th>
                       );
                     })}
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-stone-200">
                   {filteredRows.map((validation, idx) => {
                     const hasError = validation.errors.length > 0;
                     return (
                       <tr key={validation.index} className={hasError ? 'bg-red-50' : ''}>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-2">
                           <input
                             type="checkbox"
                             checked={selectedRows.has(validation.index)}
                             onChange={() => toggleRowSelection(validation.index)}
-                            className="h-4 w-4 rounded border-gray-300"
+                            className="h-3.5 w-3.5 rounded border-stone-300"
                           />
                         </td>
                         {Object.entries(columnMapping).filter(([, v]) => v).map(([csvCol, fieldName]) => {
                           const error = validation.errors.find(e => e.field === fieldName);
                           return (
-                            <td key={csvCol} className="px-4 py-3">
+                            <td key={csvCol} className="px-3 py-2">
                               <div>
-                                <div className={error ? 'text-red-600' : 'text-gray-900'}>
+                                <div className={error ? 'text-red-600' : 'text-stone-900'}>
                                   {validation.data[fieldName!] || '-'}
                                 </div>
                                 {error && (
-                                  <div className="mt-1 text-xs text-red-600">{error.message}</div>
+                                  <div className="mt-0.5 text-[10px] text-red-600">{error.message}</div>
                                 )}
                               </div>
                             </td>
@@ -516,7 +516,7 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
             <button
               onClick={handleImport}
               disabled={validatedRows.filter(v => v.errors.length === 0).length === 0}
-              className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:bg-gray-300"
+              className="w-full rounded-md bg-orange-600 py-2.5 text-xs font-medium text-white hover:bg-orange-700 disabled:bg-stone-300 transition-colors"
             >
               Confirm
             </button>
@@ -525,9 +525,9 @@ export default function CSVUploadEnhanced({ datasetId }: CSVUploadProps) {
 
         {/* Step: Importing */}
         {step === 'importing' && (
-          <div className="py-12 text-center">
-            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-            <p className="text-lg font-semibold text-gray-900">Importing employees...</p>
+          <div className="py-10 text-center">
+            <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-4 border-orange-600 border-t-transparent"></div>
+            <p className="text-sm font-semibold text-stone-900">Importing employees...</p>
           </div>
         )}
       </div>

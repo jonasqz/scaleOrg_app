@@ -65,6 +65,7 @@ export async function PATCH(
         annualSalary: body.annualSalary || null,
         totalCompensation: body.totalCompensation,
         startDate: body.startDate ? new Date(body.startDate) : null,
+        endDate: body.endDate ? new Date(body.endDate) : null,
         location: body.location || null,
         gender: body.gender && body.gender !== '' ? body.gender : null,
         managerId: body.managerId || null,

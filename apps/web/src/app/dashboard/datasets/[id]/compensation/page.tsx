@@ -1,9 +1,9 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@scleorg/database';
-import CompensationTrackingClient from './compensation-tracking-client';
+import CompensationPlanningClient from './compensation-planning-client';
 
-export default async function CompensationTrackingPage({
+export default async function CompensationPage({
   params,
 }: {
   params: { id: string };
@@ -32,10 +32,25 @@ export default async function CompensationTrackingPage({
         where: {
           endDate: null, // Only active employees
         },
+        include: {
+          compensationTargets: true,
+          monthlyPlannedCompensation: {
+            orderBy: { period: 'asc' },
+          },
+        },
         orderBy: [
           { department: 'asc' },
           { employeeName: 'asc' },
         ],
+      },
+      compensationScenarios: {
+        where: {
+          isActive: true,
+        },
+        include: {
+          targets: true,
+        },
+        orderBy: { createdAt: 'desc' },
       },
       settings: true,
     },
@@ -45,21 +60,37 @@ export default async function CompensationTrackingPage({
     notFound();
   }
 
+  // Get or create baseline scenario
+  let baselineScenario = dataset.compensationScenarios.find(s => s.isBaseline);
+  if (!baselineScenario) {
+    baselineScenario = await prisma.compensationScenario.create({
+      data: {
+        datasetId: dataset.id,
+        name: 'Baseline',
+        description: 'Current compensation baseline',
+        isBaseline: true,
+        status: 'APPROVED',
+      },
+      include: {
+        targets: true,
+      },
+    });
+  }
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Compensation Tracking</h1>
-        <p className="mt-2 text-gray-600">
-          Track planned vs. actual compensation, analyze burn rate, and forecast runway
+      <div className="pb-4 border-b border-stone-200">
+        <h1 className="text-xl font-semibold tracking-tight text-stone-900">Employee Compensation</h1>
+        <p className="mt-1 text-xs text-stone-500">
+          View current compensation (IS), target benchmarks (SHOULD), and forecasted adjustments (FORECAST)
         </p>
       </div>
 
       {/* Main Component */}
-      <CompensationTrackingClient
+      <CompensationPlanningClient
         datasetId={dataset.id}
         currency={dataset.currency}
-        currentCashBalance={dataset.currentCashBalance ? Number(dataset.currentCashBalance) : null}
         employees={dataset.employees.map(emp => ({
           ...emp,
           totalCompensation: Number(emp.totalCompensation),
@@ -67,8 +98,24 @@ export default async function CompensationTrackingPage({
           bonus: emp.bonus ? Number(emp.bonus) : null,
           equityValue: emp.equityValue ? Number(emp.equityValue) : null,
           fteFactor: Number(emp.fteFactor),
+          compensationTargets: emp.compensationTargets.map(target => ({
+            ...target,
+            targetAnnualComp: Number(target.targetAnnualComp),
+          })),
+          monthlyPlannedCompensation: emp.monthlyPlannedCompensation.map(mpc => ({
+            ...mpc,
+            plannedTotalEmployerCost: Number(mpc.plannedTotalEmployerCost),
+            plannedGrossTotal: Number(mpc.plannedGrossTotal),
+          })),
         }))}
-        departmentCategories={dataset.settings?.departmentCategories as Record<string, string> | undefined}
+        scenarios={dataset.compensationScenarios.map(scenario => ({
+          ...scenario,
+          targets: scenario.targets.map(target => ({
+            ...target,
+            targetAnnualComp: Number(target.targetAnnualComp),
+          })),
+        }))}
+        baselineScenarioId={baselineScenario.id}
       />
     </div>
   );

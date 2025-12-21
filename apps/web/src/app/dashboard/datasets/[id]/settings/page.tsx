@@ -37,11 +37,11 @@ export default async function SettingsPage({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dataset Settings</h1>
-        <p className="mt-2 text-gray-600">
+      <div className="pb-4 border-b border-stone-200">
+        <h1 className="text-xl font-semibold tracking-tight text-stone-900">Company Settings</h1>
+        <p className="mt-1 text-xs text-stone-500">
           Configure general settings, benchmarking, and department categorization
         </p>
       </div>

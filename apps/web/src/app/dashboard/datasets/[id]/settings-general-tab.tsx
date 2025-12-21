@@ -54,7 +54,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
       });
 
       if (!datasetRes.ok) {
-        throw new Error('Failed to save dataset settings');
+        throw new Error('Failed to save company settings');
       }
 
       // Update cash balance separately (uses PUT endpoint)
@@ -99,29 +99,29 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Message */}
       {message && (
         <div
-          className={`rounded-lg p-4 ${
+          className={`rounded-lg p-3 ${
             message.type === 'success'
               ? 'bg-green-50 text-green-900'
               : 'bg-red-50 text-red-900'
           }`}
         >
-          {message.text}
+          <p className="text-xs">{message.text}</p>
         </div>
       )}
 
       {/* Basic Information */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Basic Information</h3>
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-stone-900">Basic Information</h3>
 
-        <div className="space-y-4">
-          {/* Dataset Name */}
+        <div className="space-y-3">
+          {/* Company Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Dataset Name <span className="text-red-500">*</span>
+            <label htmlFor="name" className="block text-xs font-medium text-stone-700">
+              Company Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -130,14 +130,14 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
               value={formData.name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="Q4 2024 Workforce Data"
+              className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              placeholder="Acme Corp - Q4 2024"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-xs font-medium text-stone-700">
               Description
             </label>
             <textarea
@@ -146,21 +146,21 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="Optional description of this dataset"
+              className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              placeholder="Optional description of this company"
             />
           </div>
         </div>
       </div>
 
       {/* Company Information */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Company Information</h3>
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-stone-900">Company Information</h3>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Company Name */}
           <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="companyName" className="block text-xs font-medium text-stone-700">
               Company Name
             </label>
             <input
@@ -169,15 +169,15 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
               name="companyName"
               value={formData.companyName}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               placeholder="Acme Corp"
             />
           </div>
 
           {/* Financial Metrics */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2">
             <div>
-              <label htmlFor="totalRevenue" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="totalRevenue" className="block text-xs font-medium text-stone-700">
                 Annual Revenue
               </label>
               <input
@@ -188,16 +188,16 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 onChange={handleChange}
                 step="0.01"
                 min="0"
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                 placeholder="10000000"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-[10px] text-stone-500">
                 Used for revenue per FTE calculations
               </p>
             </div>
 
             <div>
-              <label htmlFor="currentCashBalance" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="currentCashBalance" className="block text-xs font-medium text-stone-700">
                 Current Cash Balance
               </label>
               <input
@@ -208,10 +208,10 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 onChange={handleChange}
                 step="0.01"
                 min="0"
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                 placeholder="500000"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-[10px] text-stone-500">
                 Used for runway calculations in Compensation Tracking
               </p>
             </div>
@@ -219,7 +219,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
 
           {/* Currency */}
           <div>
-            <label htmlFor="currency" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="currency" className="block text-xs font-medium text-stone-700">
               Currency
             </label>
             <select
@@ -227,21 +227,21 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
               name="currency"
               value={formData.currency}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             >
               <option value="EUR">EUR (€)</option>
               <option value="USD">USD ($)</option>
               <option value="GBP">GBP (£)</option>
               <option value="CHF">CHF (Fr)</option>
             </select>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-[10px] text-stone-500">
               All monetary values will be displayed in this currency
             </p>
           </div>
 
           {/* Fiscal Year Start */}
           <div>
-            <label htmlFor="fiscalYearStart" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="fiscalYearStart" className="block text-xs font-medium text-stone-700">
               Fiscal Year Start Date
             </label>
             <input
@@ -250,9 +250,9 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
               name="fiscalYearStart"
               value={formData.fiscalYearStart}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-[10px] text-stone-500">
               Optional: Used for fiscal year reporting and projections
             </p>
           </div>
@@ -260,18 +260,18 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
       </div>
 
       {/* Benchmarking Settings */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Benchmarking Settings</h3>
-        <p className="mb-4 text-sm text-gray-600">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-stone-900">Benchmarking Settings</h3>
+        <p className="mb-3 text-xs text-stone-600">
           Configure these settings to get more accurate benchmark comparisons for your organization.
           These are optional - if not set, we'll use your account-level settings.
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Industry, Region, Growth Stage in a grid */}
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-3">
             <div>
-              <label htmlFor="industry" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="industry" className="block text-xs font-medium text-stone-700">
                 Industry
               </label>
               <select
@@ -279,7 +279,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 name="industry"
                 value={formData.industry}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               >
                 <option value="">Use account default</option>
                 <option value="SaaS">SaaS</option>
@@ -294,13 +294,13 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 <option value="Marketplace">Marketplace</option>
                 <option value="Other">Other</option>
               </select>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-[10px] text-stone-500">
                 Industry vertical for benchmarking
               </p>
             </div>
 
             <div>
-              <label htmlFor="region" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="region" className="block text-xs font-medium text-stone-700">
                 Region
               </label>
               <select
@@ -308,7 +308,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 name="region"
                 value={formData.region}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               >
                 <option value="">Global (default)</option>
                 <option value="DACH">DACH (Germany, Austria, Switzerland)</option>
@@ -319,13 +319,13 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 <option value="LATAM">Latin America</option>
                 <option value="MEA">Middle East & Africa</option>
               </select>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-[10px] text-stone-500">
                 Geographic region for comparison
               </p>
             </div>
 
             <div>
-              <label htmlFor="growthStage" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="growthStage" className="block text-xs font-medium text-stone-700">
                 Growth Stage
               </label>
               <select
@@ -333,7 +333,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 name="growthStage"
                 value={formData.growthStage}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-stone-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               >
                 <option value="">Any stage</option>
                 <option value="Seed">Seed</option>
@@ -343,7 +343,7 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
                 <option value="Growth">Growth</option>
                 <option value="Public">Public</option>
               </select>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-[10px] text-stone-500">
                 Company maturity stage
               </p>
             </div>
@@ -352,10 +352,10 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
       </div>
 
       {/* Info Banner */}
-      <div className="rounded-lg border bg-blue-50 p-6">
-        <h4 className="font-medium text-blue-900">About These Settings</h4>
-        <ul className="mt-2 space-y-1 text-sm text-blue-800">
-          <li>• <strong>Dataset Name:</strong> Helps you identify this dataset in your dashboard</li>
+      <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
+        <h4 className="text-xs font-medium text-orange-900">About These Settings</h4>
+        <ul className="mt-2 space-y-0.5 text-[11px] text-orange-800">
+          <li>• <strong>Company Name:</strong> Helps you identify this company in your dashboard</li>
           <li>• <strong>Annual Revenue:</strong> Enables revenue per FTE and productivity metrics</li>
           <li>• <strong>Current Cash Balance:</strong> Used to calculate runway (months until cash runs out) in Compensation Tracking</li>
           <li>• <strong>Currency:</strong> All monetary values will be displayed in this currency</li>
@@ -369,16 +369,16 @@ export default function SettingsGeneralTab({ datasetId, dataset }: SettingsGener
         <button
           type="submit"
           disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-700 disabled:opacity-50 transition-colors"
         >
           {saving ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
               Saving...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4" />
+              <Save className="h-3.5 w-3.5" />
               Save General Settings
             </>
           )}

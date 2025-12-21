@@ -86,12 +86,12 @@ export default function AnalyticsBenchmarkingTab({
     rdToGTMBgColor = 'bg-orange-50';
   } else if (rdToGTM > 2) {
     rdToGTMRating = 'R&D Heavy';
-    rdToGTMColor = 'text-blue-600';
-    rdToGTMBgColor = 'bg-blue-50';
+    rdToGTMColor = 'text-orange-600';
+    rdToGTMBgColor = 'bg-orange-50';
   } else if (rdToGTM < 1) {
     rdToGTMRating = 'GTM Heavy';
-    rdToGTMColor = 'text-purple-600';
-    rdToGTMBgColor = 'bg-purple-50';
+    rdToGTMColor = 'text-orange-500';
+    rdToGTMBgColor = 'bg-orange-50';
   }
 
   // Group employees by role for role analysis
@@ -145,13 +145,13 @@ export default function AnalyticsBenchmarkingTab({
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin"></div>
         </div>
         <div className="text-center space-y-2">
-          <p className="text-lg font-semibold text-gray-900 animate-pulse">
+          <p className="text-sm font-semibold text-stone-900 animate-pulse">
             {loadingMessages[loadingMessageIndex]}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-stone-500">
             Fetching benchmark data for your organization
           </p>
         </div>
@@ -160,29 +160,29 @@ export default function AnalyticsBenchmarkingTab({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* R&D to GTM Ratio Rating */}
-      <div className={`rounded-lg border p-6 ${rdToGTMBgColor}`}>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <div className={`rounded-lg border border-stone-200 p-4 ${rdToGTMBgColor}`}>
+        <h3 className="text-sm font-semibold text-stone-900 mb-1.5">
           R&D to GTM Ratio Analysis
         </h3>
         <div className="flex items-center gap-4">
           <div>
-            <p className="text-3xl font-bold text-gray-900">{rdToGTM.toFixed(2)}</p>
-            <p className="text-sm text-gray-600">Current Ratio</p>
+            <p className="text-xl font-bold text-stone-900">{rdToGTM.toFixed(2)}</p>
+            <p className="text-xs text-stone-600">Current Ratio</p>
           </div>
           <div className={`rounded-lg px-4 py-2 ${rdToGTMColor} font-semibold`}>
             {rdToGTMRating}
           </div>
         </div>
-        <p className="mt-4 text-sm text-gray-700">
+        <p className="mt-3 text-xs text-stone-700">
           {rdToGTM > 2
             ? 'Your organization is heavily invested in R&D relative to Go-to-Market. This is common for early-stage product companies or deep-tech businesses.'
             : rdToGTM < 1
             ? 'Your organization is heavily invested in Go-to-Market relative to R&D. This is common for sales-driven or service-oriented businesses.'
             : 'Your organization has a balanced investment between R&D and Go-to-Market teams.'}
         </p>
-        <div className="mt-4 flex items-center gap-2 text-xs text-gray-600">
+        <div className="mt-3 flex items-center gap-2 text-[10px] text-stone-600">
           <span className="rounded bg-white px-2 py-1">
             {benchmarkData?.benchmark?.metrics?.rdToGTMRatio
               ? `Industry Benchmark: ${benchmarkData.benchmark.metrics.rdToGTMRatio.p25.toFixed(1)} - ${benchmarkData.benchmark.metrics.rdToGTMRatio.p75.toFixed(1)} (${benchmarkData.benchmark.segment})`
@@ -198,22 +198,22 @@ export default function AnalyticsBenchmarkingTab({
       />
 
       {/* Department Benchmarking */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="text-sm font-semibold text-stone-900 mb-3">
           Department Headcount + Benchmarks
         </h3>
         <div className="space-y-3">
           {Object.entries(metrics.departments).map(([dept, data]: [string, any]) => (
-            <div key={dept} className="flex items-center justify-between rounded-lg bg-gray-50 p-4">
+            <div key={dept} className="flex items-center justify-between rounded-lg bg-stone-50 p-4">
               <div className="flex-1">
-                <p className="font-medium text-gray-900">{dept}</p>
-                <p className="text-sm text-gray-600">
+                <p className="font-medium text-stone-900">{dept}</p>
+                <p className="text-xs text-stone-600">
                   {data.fte.toFixed(1)} FTE · {data.employeeCount} employees
                 </p>
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-stone-900">
                     {data.percentage.toFixed(1)}% of total
                   </p>
                 </div>
@@ -224,21 +224,21 @@ export default function AnalyticsBenchmarkingTab({
       </div>
 
       {/* Role Analysis with Benchmarks */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="text-sm font-semibold text-stone-900 mb-3">
           Role Breakdown & Benchmarks
         </h3>
         <div className="space-y-3">
           {rolePercentages.slice(0, 10).map(({ role, count, percentage, avgComp }) => (
-            <div key={role} className="flex items-center justify-between rounded-lg bg-gray-50 p-4">
+            <div key={role} className="flex items-center justify-between rounded-lg bg-stone-50 p-4">
               <div className="flex-1">
-                <p className="font-medium text-gray-900">{role}</p>
-                <p className="text-sm text-gray-600">
+                <p className="font-medium text-stone-900">{role}</p>
+                <p className="text-xs text-stone-600">
                   {count} {count === 1 ? 'employee' : 'employees'} · {percentage.toFixed(1)}% of total
                 </p>
               </div>
               <div className="text-right">
-                <p className="font-semibold text-gray-900">
+                <p className="font-semibold text-stone-900">
                   {currency} {(avgComp / 1000).toFixed(0)}k avg
                 </p>
               </div>
@@ -248,8 +248,8 @@ export default function AnalyticsBenchmarkingTab({
       </div>
 
       {/* Salary Analysis */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="text-sm font-semibold text-stone-900 mb-3">
           Salary Analysis (€) – Cash Compensation (Base + Bonus)
         </h3>
         <div className="space-y-3">
@@ -257,27 +257,27 @@ export default function AnalyticsBenchmarkingTab({
             .filter(r => r.avgBaseSalary > 0)
             .slice(0, 10)
             .map(({ role, count, avgBaseSalary, avgBonus }) => (
-              <div key={role} className="rounded-lg bg-gray-50 p-4">
+              <div key={role} className="rounded-lg bg-stone-50 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium text-gray-900">{role}</p>
-                  <p className="text-sm text-gray-600">{count} {count === 1 ? 'employee' : 'employees'}</p>
+                  <p className="font-medium text-stone-900">{role}</p>
+                  <p className="text-xs text-stone-600">{count} {count === 1 ? 'employee' : 'employees'}</p>
                 </div>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-3 gap-4 text-xs">
                   <div>
-                    <p className="text-gray-600">Base Salary</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-stone-600">Base Salary</p>
+                    <p className="font-semibold text-stone-900">
                       {currency} {(avgBaseSalary / 1000).toFixed(0)}k
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Avg Bonus</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-stone-600">Avg Bonus</p>
+                    <p className="font-semibold text-stone-900">
                       {avgBonus > 0 ? `${currency} ${(avgBonus / 1000).toFixed(0)}k` : 'N/A'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Total Cash</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-stone-600">Total Cash</p>
+                    <p className="font-semibold text-stone-900">
                       {currency} {((avgBaseSalary + avgBonus) / 1000).toFixed(0)}k
                     </p>
                   </div>
@@ -288,8 +288,8 @@ export default function AnalyticsBenchmarkingTab({
       </div>
 
       {/* FTE Count per Level */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="text-sm font-semibold text-stone-900 mb-3">
           FTE Count per Level of Expertise
         </h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -299,10 +299,10 @@ export default function AnalyticsBenchmarkingTab({
               return (levelOrder[a[0]] || 99) - (levelOrder[b[0]] || 99);
             })
             .map(([level, count]: [string, any]) => (
-              <div key={level} className="rounded-lg bg-gray-50 p-4">
-                <p className="text-sm text-gray-600">{level === 'C_LEVEL' ? 'C-Level' : level}</p>
-                <p className="text-2xl font-bold text-gray-900">{count.toFixed(1)}</p>
-                <p className="text-xs text-gray-500">FTE</p>
+              <div key={level} className="rounded-lg bg-stone-50 p-4">
+                <p className="text-xs text-stone-600">{level === 'C_LEVEL' ? 'C-Level' : level}</p>
+                <p className="text-xl font-bold text-stone-900">{count.toFixed(1)}</p>
+                <p className="text-[10px] text-stone-500">FTE</p>
               </div>
             ))}
         </div>
@@ -315,11 +315,11 @@ export default function AnalyticsBenchmarkingTab({
       />
 
       {/* AI-Powered Insights for Benchmarking */}
-      <div className="rounded-lg border bg-blue-50 p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-2">
-          💡 Benchmarking Insights
+      <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
+        <h3 className="text-sm font-semibold text-orange-900 mb-1.5">
+          Benchmarking Insights
         </h3>
-        <ul className="space-y-2 text-sm text-blue-800">
+        <ul className="space-y-2 text-xs text-orange-800">
           <li>• Benchmark data will be populated as more companies use the platform</li>
           <li>• External benchmark data sources will be integrated in future updates</li>
           <li>• Your data contributes to anonymized industry benchmarks (opt-in)</li>

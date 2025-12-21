@@ -90,8 +90,8 @@ export default function AnalyticsCostsTab({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-sm text-gray-600">Loading employer cost data...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-600 border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-xs text-stone-600">Loading employer cost data...</p>
         </div>
       </div>
     );
@@ -99,13 +99,13 @@ export default function AnalyticsCostsTab({
 
   if (!summary || monthlyTrend.length === 0) {
     return (
-      <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-12 text-center">
-        <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-4 text-lg font-semibold text-gray-900">No employer cost data yet</h3>
-        <p className="mt-2 text-sm text-gray-600">
+      <div className="rounded-lg border-2 border-dashed border-stone-300 bg-stone-50 p-12 text-center">
+        <Calendar className="mx-auto h-12 w-12 text-stone-400" />
+        <h3 className="mt-4 text-sm font-semibold text-stone-900">No employer cost data yet</h3>
+        <p className="mt-2 text-xs text-stone-600">
           Import your monthly payroll reports to track employer costs over time
         </p>
-        <p className="mt-4 text-xs text-gray-500">
+        <p className="mt-3 text-[10px] text-stone-500">
           Upload gross-net statements from your payroll accounting to see trends, forecasts, and cost optimization insights
         </p>
       </div>
@@ -134,49 +134,49 @@ export default function AnalyticsCostsTab({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* KPI Cards - Row 1 */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Total Monthly Cost */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <DollarSign className="h-8 w-8 text-green-600" />
+            <DollarSign className="h-5 w-5 text-green-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {formatCurrency(summary.currentMonthCost)}
           </p>
-          <p className="text-sm text-gray-600">Total Monthly Cost</p>
+          <p className="text-xs text-stone-600">Total Monthly Cost</p>
           {summary.previousMonthCost > 0 && (
-            <p className={`mt-1 text-xs ${getChangeColor(summary.costGrowthRate)}`}>
+            <p className={`mt-1 text-[10px] ${getChangeColor(summary.costGrowthRate)}`}>
               {formatPercentChange(summary.costGrowthRate)} vs last month
             </p>
           )}
         </div>
 
         {/* Cost per Employee */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <Users className="h-8 w-8 text-blue-600" />
+            <Users className="h-5 w-5 text-orange-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {formatCurrency(summary.currentMonthCostPerEmployee)}
           </p>
-          <p className="text-sm text-gray-600">Cost per Employee</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Cost per Employee</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             Current month average
           </p>
         </div>
 
         {/* Employer Cost Ratio */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <Percent className="h-8 w-8 text-purple-600" />
+            <Percent className="h-5 w-5 text-orange-500" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {summary.currentMonthRatio.toFixed(2)}x
           </p>
-          <p className="text-sm text-gray-600">Employer Cost Ratio</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Employer Cost Ratio</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             {((summary.currentMonthRatio - 1) * 100).toFixed(0)}% overhead on gross compensation
           </p>
         </div>
@@ -185,51 +185,51 @@ export default function AnalyticsCostsTab({
       {/* KPI Cards - Row 2 */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* 12-Month Trend */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <TrendingUp className={`h-8 w-8 ${summary.avgMonthlyGrowthRate > 0 ? 'text-orange-600' : 'text-green-600'}`} />
+            <TrendingUp className={`h-5 w-5 ${summary.avgMonthlyGrowthRate > 0 ? 'text-orange-600' : 'text-green-600'}`} />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {summary.avgMonthlyGrowthRate > 0 ? '↗' : '↘'} {summary.avgMonthlyGrowthRate > 0 ? 'Growing' : 'Declining'}
           </p>
-          <p className="text-sm text-gray-600">{summary.monthsAvailable}-Month Trend</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">{summary.monthsAvailable}-Month Trend</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             {formatPercentChange(summary.avgMonthlyGrowthRate)} per month
           </p>
         </div>
 
         {/* Cost Growth Rate */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <TrendingUp className="h-8 w-8 text-indigo-600" />
+            <TrendingUp className="h-5 w-5 text-orange-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {formatPercentChange(summary.avgMonthlyGrowthRate)}
           </p>
-          <p className="text-sm text-gray-600">Avg Monthly Growth</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Avg Monthly Growth</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             {formatPercentChange(summary.avgMonthlyGrowthRate * 12)} annually
           </p>
         </div>
 
         {/* Projected Annual Cost */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <Target className="h-8 w-8 text-cyan-600" />
+            <Target className="h-5 w-5 text-orange-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {formatCurrency(summary.projectedAnnualCost)}
           </p>
-          <p className="text-sm text-gray-600">Projected Annual Cost</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Projected Annual Cost</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             Based on current trend
           </p>
         </div>
       </div>
 
       {/* Monthly Cost Trend Chart */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Monthly Cost Trend</h3>
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-stone-900">Monthly Cost Trend</h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={monthlyTrend}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -270,8 +270,8 @@ export default function AnalyticsCostsTab({
       </div>
 
       {/* Cost Breakdown by Category */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Cost Breakdown Over Time</h3>
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-stone-900">Cost Breakdown Over Time</h3>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={monthlyTrend}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -345,8 +345,8 @@ export default function AnalyticsCostsTab({
 
       {/* Department Cost Comparison */}
       {departmentCosts.length > 0 && (
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Cost by Department</h3>
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
+          <h3 className="mb-3 text-sm font-semibold text-stone-900">Cost by Department</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={departmentCosts}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -382,9 +382,9 @@ export default function AnalyticsCostsTab({
       )}
 
       {/* Cost Ratio Trend */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Employer Cost Ratio Trend</h3>
-        <p className="mb-4 text-sm text-gray-600">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-stone-900">Employer Cost Ratio Trend</h3>
+        <p className="mb-3 text-xs text-stone-600">
           Shows how employer costs compare to gross compensation over time (ratio of total cost to gross pay)
         </p>
         <ResponsiveContainer width="100%" height={300}>

@@ -246,20 +246,20 @@ export default function ScenarioBuilder({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-2 rounded-lg border border-purple-600 bg-white px-6 py-3 font-semibold text-purple-600 hover:bg-purple-50"
+        className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-orange-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-orange-700"
       >
-        <Play className="h-5 w-5" />
+        <Play className="h-3.5 w-3.5" />
         Run Scenario
       </button>
     );
   }
 
   return (
-    <div className="rounded-lg border bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-stone-200 bg-white p-4">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Scenario Modeling</h2>
-        <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
-          <X className="h-5 w-5" />
+        <h2 className="text-sm font-semibold text-stone-900">Scenario Modeling</h2>
+        <button onClick={handleClose} className="text-stone-400 transition-colors hover:text-stone-600">
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
 
@@ -267,13 +267,13 @@ export default function ScenarioBuilder({
         <div className="space-y-6">
           {/* Scenario Type Selector */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-xs font-medium text-stone-700">
               Scenario Type
             </label>
             <select
               value={scenarioType}
               onChange={(e) => setScenarioType(e.target.value as ScenarioType)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="w-full rounded-md border border-stone-200 px-4 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             >
               <option value="custom">Custom Adjustments</option>
               <option value="hiring_freeze">Hiring Freeze</option>
@@ -285,7 +285,7 @@ export default function ScenarioBuilder({
 
           {/* Scenario Name */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-xs font-medium text-stone-700">
               Scenario Name (optional)
             </label>
             <input
@@ -293,40 +293,40 @@ export default function ScenarioBuilder({
               value={scenarioName}
               onChange={(e) => setScenarioName(e.target.value)}
               placeholder={getDefaultScenarioName()}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="w-full rounded-md border border-stone-200 px-4 py-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
 
           {/* Current Cash Balance */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-xs font-medium text-stone-700">
               Current Cash Balance (optional - for runway analysis)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-500">{currency}</span>
+              <span className="absolute left-3 top-2.5 text-stone-500">{currency}</span>
               <input
                 type="number"
                 value={currentCash}
                 onChange={(e) => setCurrentCash(e.target.value)}
                 placeholder="e.g., 2500000"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 pl-12 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full rounded-md border border-stone-200 px-4 py-2 pl-12 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-[10px] text-stone-500">
               Enter your current cash balance to see runway projections
             </p>
           </div>
 
           {/* Revenue Projections */}
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
             <div className="mb-3 flex items-center justify-between">
-              <label className="text-sm font-medium text-blue-900">
+              <label className="text-xs font-medium text-orange-900">
                 Include Revenue Projections
               </label>
               <button
                 onClick={() => setIncludeRevenue(!includeRevenue)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  includeRevenue ? 'bg-blue-600' : 'bg-gray-300'
+                  includeRevenue ? 'bg-orange-600' : 'bg-stone-300'
                 }`}
               >
                 <span
@@ -338,7 +338,7 @@ export default function ScenarioBuilder({
             </div>
             {includeRevenue && (
               <div>
-                <label className="mb-2 block text-sm font-medium text-blue-900">
+                <label className="mb-2 block text-xs font-medium text-orange-900">
                   Monthly Revenue Growth Rate: {revenueGrowthRate > 0 ? '+' : ''}{revenueGrowthRate}%
                 </label>
                 <input
@@ -350,7 +350,7 @@ export default function ScenarioBuilder({
                   onChange={(e) => setRevenueGrowthRate(parseInt(e.target.value))}
                   className="w-full"
                 />
-                <p className="mt-1 text-xs text-blue-700">
+                <p className="mt-1 text-[10px] text-orange-700">
                   Project revenue growth or decline for more accurate runway calculations
                 </p>
               </div>
@@ -360,32 +360,32 @@ export default function ScenarioBuilder({
           {/* Custom Adjustments */}
           {scenarioType === 'custom' && (
             <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700">
+              <label className="mb-3 block text-xs font-medium text-stone-700">
                 Adjust Headcount by Department
               </label>
               <div className="space-y-3">
                 {Object.entries(departments).map(([dept, data]) => (
-                  <div key={dept} className="flex items-center justify-between rounded-lg border p-4">
+                  <div key={dept} className="flex items-center justify-between rounded-lg border border-stone-200 p-4">
                     <div>
-                      <p className="font-medium text-gray-900">{dept}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-medium text-stone-900">{dept}</p>
+                      <p className="text-xs text-stone-500">
                         Current: {data.employeeCount} employees ({data.fte.toFixed(1)} FTE)
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleDeptAdjustment(dept, -1)}
-                        className="rounded bg-red-100 px-3 py-1 text-red-700 hover:bg-red-200"
+                        className="rounded bg-red-100 px-3 py-1 text-red-700 transition-colors hover:bg-red-200"
                       >
                         -1
                       </button>
-                      <span className="min-w-[3rem] text-center font-semibold text-gray-900">
+                      <span className="min-w-[3rem] text-center font-semibold text-stone-900">
                         {deptAdjustments[dept] > 0 && '+'}
                         {deptAdjustments[dept] || 0}
                       </span>
                       <button
                         onClick={() => handleDeptAdjustment(dept, 1)}
-                        className="rounded bg-green-100 px-3 py-1 text-green-700 hover:bg-green-200"
+                        className="rounded bg-green-100 px-3 py-1 text-green-700 transition-colors hover:bg-green-200"
                       >
                         +1
                       </button>
@@ -400,7 +400,7 @@ export default function ScenarioBuilder({
           {scenarioType === 'cost_reduction' && (
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2 block text-xs font-medium text-stone-700">
                   Target Cost Reduction: {reductionPct}%
                 </label>
                 <input
@@ -412,12 +412,12 @@ export default function ScenarioBuilder({
                   onChange={(e) => setReductionPct(parseInt(e.target.value))}
                   className="w-full"
                 />
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-xs text-stone-500">
                   Estimated savings: {currency} {((currentMetrics.totalCost * reductionPct) / 100 / 1000000).toFixed(2)}M
                 </p>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2 block text-xs font-medium text-stone-700">
                   Target Departments (optional - leave empty for all)
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -431,10 +431,10 @@ export default function ScenarioBuilder({
                           setTargetDepartments([...targetDepartments, dept]);
                         }
                       }}
-                      className={`rounded-full px-4 py-2 text-sm font-medium ${
+                      className={`rounded-full px-4 py-2 text-xs font-medium transition-colors ${
                         targetDepartments.includes(dept)
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-orange-600 text-white'
+                          : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
                       }`}
                     >
                       {dept}
@@ -449,7 +449,7 @@ export default function ScenarioBuilder({
           {scenarioType === 'growth' && (
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2 block text-xs font-medium text-stone-700">
                   Additional FTE to Hire: {additionalFTE}
                 </label>
                 <input
@@ -462,15 +462,15 @@ export default function ScenarioBuilder({
                 />
               </div>
               <div>
-                <label className="mb-3 block text-sm font-medium text-gray-700">
+                <label className="mb-3 block text-xs font-medium text-stone-700">
                   Distribution by Department (% of {additionalFTE} FTE)
                 </label>
                 <div className="space-y-3">
                   {Object.keys(departments).map((dept) => (
                     <div key={dept}>
                       <div className="mb-1 flex items-center justify-between">
-                        <span className="text-sm text-gray-700">{dept}</span>
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-xs text-stone-700">{dept}</span>
+                        <span className="text-xs font-semibold text-stone-900">
                           {((growthDist[dept] || 0) * 100).toFixed(0)}% ({Math.round(additionalFTE * (growthDist[dept] || 0))} FTE)
                         </span>
                       </div>
@@ -490,7 +490,7 @@ export default function ScenarioBuilder({
                     </div>
                   ))}
                 </div>
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-xs text-stone-500">
                   Total: {(Object.values(growthDist).reduce((sum, v) => sum + v, 0) * 100).toFixed(0)}%
                   {Object.values(growthDist).reduce((sum, v) => sum + v, 0) !== 1.0 && (
                     <span className="ml-2 text-orange-600">(should equal 100%)</span>
@@ -503,7 +503,7 @@ export default function ScenarioBuilder({
           {/* Target Ratio */}
           {scenarioType === 'target_ratio' && (
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <label className="mb-2 block text-xs font-medium text-stone-700">
                 Target R&D to GTM Ratio: {targetRatio.toFixed(2)}:1
               </label>
               <input
@@ -515,7 +515,7 @@ export default function ScenarioBuilder({
                 onChange={(e) => setTargetRatio(parseFloat(e.target.value))}
                 className="w-full"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-xs text-stone-500">
                 Current ratio: {currentMetrics.rdToGTM.toFixed(2)}:1
               </p>
             </div>
@@ -523,12 +523,12 @@ export default function ScenarioBuilder({
 
           {/* Hiring Freeze - no additional inputs needed */}
           {scenarioType === 'hiring_freeze' && (
-            <div className="rounded-lg bg-blue-50 p-4">
+            <div className="rounded-lg bg-orange-50 p-4">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <AlertCircle className="h-3.5 w-3.5 text-orange-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-blue-900">Hiring Freeze Scenario</p>
-                  <p className="mt-1 text-sm text-blue-700">
+                  <p className="text-xs font-semibold text-orange-900">Hiring Freeze Scenario</p>
+                  <p className="mt-1 text-xs text-orange-700">
                     This scenario removes all open roles and shows the impact of not filling any positions.
                   </p>
                 </div>
@@ -540,7 +540,7 @@ export default function ScenarioBuilder({
           <button
             onClick={handleRunScenario}
             disabled={loading}
-            className="w-full rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-lg bg-orange-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Running Scenario...' : 'Run Scenario'}
           </button>
@@ -548,40 +548,40 @@ export default function ScenarioBuilder({
       ) : (
         /* Results View */
         <div className="space-y-6">
-          <div className="rounded-lg bg-purple-50 p-4">
-            <h3 className="font-semibold text-purple-900">
+          <div className="rounded-lg bg-orange-50 p-4">
+            <h3 className="font-semibold text-orange-900">
               {scenarioName || getDefaultScenarioName()}
             </h3>
-            <p className="mt-1 text-sm text-purple-700">Scenario analysis complete</p>
+            <p className="mt-1 text-xs text-orange-700">Scenario analysis complete</p>
           </div>
 
           {/* Comparison Grid */}
           <div className="grid gap-4 md:grid-cols-3">
             {/* Baseline */}
-            <div className="rounded-lg border bg-gray-50 p-4">
-              <p className="mb-3 text-sm font-semibold text-gray-600">Current (Baseline)</p>
+            <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+              <p className="mb-3 text-xs font-semibold text-stone-600">Current (Baseline)</p>
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-gray-500">Total FTE</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total FTE</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.baseline.totalFTE.toFixed(1)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Total Cost</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total Cost</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {currency} {(result.baseline.totalCost / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Cost per FTE</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Cost per FTE</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {currency} {(result.baseline.costPerFTE / 1000).toFixed(0)}k
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Employees</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Employees</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.baseline.employeeCount}
                   </p>
                 </div>
@@ -589,30 +589,30 @@ export default function ScenarioBuilder({
             </div>
 
             {/* Scenario */}
-            <div className="rounded-lg border bg-purple-50 p-4">
-              <p className="mb-3 text-sm font-semibold text-purple-600">Scenario</p>
+            <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
+              <p className="mb-3 text-xs font-semibold text-orange-600">Scenario</p>
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-gray-500">Total FTE</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total FTE</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.scenario.totalFTE.toFixed(1)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Total Cost</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total Cost</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {currency} {(result.scenario.totalCost / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Cost per FTE</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Cost per FTE</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {currency} {(result.scenario.costPerFTE / 1000).toFixed(0)}k
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Employees</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Employees</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.scenario.employeeCount}
                   </p>
                 </div>
@@ -620,25 +620,25 @@ export default function ScenarioBuilder({
             </div>
 
             {/* Delta */}
-            <div className="rounded-lg border bg-green-50 p-4">
-              <p className="mb-3 text-sm font-semibold text-green-600">Impact</p>
+            <div className="rounded-lg border border-stone-200 bg-green-50 p-4">
+              <p className="mb-3 text-xs font-semibold text-green-600">Impact</p>
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-gray-500">FTE Change</p>
-                  <p className={`text-lg font-bold ${result.delta.fteChange >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                  <p className="text-[10px] text-stone-500">FTE Change</p>
+                  <p className={`text-sm font-bold ${result.delta.fteChange >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                     {result.delta.fteChange > 0 && '+'}{result.delta.fteChange.toFixed(1)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Cost Savings</p>
-                  <p className={`text-lg font-bold ${result.delta.costSavings >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                  <p className="text-[10px] text-stone-500">Cost Savings</p>
+                  <p className={`text-sm font-bold ${result.delta.costSavings >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                     {result.delta.costSavings > 0 && '+'}
                     {currency} {(result.delta.costSavings / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Cost Change</p>
-                  <p className={`text-lg font-bold ${result.delta.costSavingsPct >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                  <p className="text-[10px] text-stone-500">Cost Change</p>
+                  <p className={`text-sm font-bold ${result.delta.costSavingsPct >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                     {result.delta.costSavingsPct > 0 && '+'}
                     {result.delta.costSavingsPct.toFixed(1)}%
                   </p>
@@ -661,20 +661,20 @@ export default function ScenarioBuilder({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setResult(null)}
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-stone-200 px-4 py-2 text-xs font-medium text-stone-700 transition-colors hover:bg-stone-50"
             >
               Run Another Scenario
             </button>
             <button
               onClick={handleSaveScenario}
               disabled={saving}
-              className="flex-1 rounded-lg border border-purple-600 bg-white px-4 py-2 font-medium text-purple-600 hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-lg border border-stone-200 bg-white px-4 py-2 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Scenario'}
             </button>
             <button
               onClick={handleClose}
-              className="flex-1 rounded-lg bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700"
+              className="flex-1 rounded-lg bg-orange-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-orange-700"
             >
               Done
             </button>

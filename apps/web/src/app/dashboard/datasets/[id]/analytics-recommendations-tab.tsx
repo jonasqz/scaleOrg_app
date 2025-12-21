@@ -299,68 +299,68 @@ export default function AnalyticsRecommendationsTab({
       case 'high':
       case 'medium':
       case 'low':
-        return <AlertTriangle className="h-5 w-5" />;
+        return <AlertTriangle className="h-4 w-4" />;
       case 'positive':
-        return <CheckCircle className="h-5 w-5" />;
+        return <CheckCircle className="h-4 w-4" />;
     }
   };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'cost':
-        return <DollarSign className="h-5 w-5 text-green-600" />;
+        return <DollarSign className="h-4 w-4 text-green-600" />;
       case 'structure':
-        return <Users className="h-5 w-5 text-blue-600" />;
+        return <Users className="h-4 w-4 text-orange-600" />;
       case 'efficiency':
-        return <TrendingUp className="h-5 w-5 text-purple-600" />;
+        return <TrendingUp className="h-4 w-4 text-orange-500" />;
       case 'growth':
-        return <TrendingUp className="h-5 w-5 text-indigo-600" />;
+        return <TrendingUp className="h-4 w-4 text-orange-600" />;
       case 'retention':
-        return <Users className="h-5 w-5 text-pink-600" />;
+        return <Users className="h-4 w-4 text-orange-500" />;
       default:
-        return <Lightbulb className="h-5 w-5 text-yellow-600" />;
+        return <Lightbulb className="h-4 w-4 text-yellow-600" />;
     }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border bg-red-50 p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-red-50 p-4">
           <div className="flex items-center justify-between">
-            <AlertTriangle className="h-8 w-8 text-red-600" />
+            <AlertTriangle className="h-5 w-5 text-red-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {criticalCount + highCount}
           </p>
-          <p className="text-sm text-gray-600">Critical & High Priority</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Critical & High Priority</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             Require immediate attention
           </p>
         </div>
 
-        <div className="rounded-lg border bg-blue-50 p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
           <div className="flex items-center justify-between">
-            <Lightbulb className="h-8 w-8 text-blue-600" />
+            <Lightbulb className="h-5 w-5 text-orange-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {recommendations.length}
           </p>
-          <p className="text-sm text-gray-600">Total Recommendations</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Total Recommendations</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             AI-powered insights
           </p>
         </div>
 
-        <div className="rounded-lg border bg-green-50 p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-green-50 p-4">
           <div className="flex items-center justify-between">
-            <CheckCircle className="h-8 w-8 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-green-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {positiveCount}
           </p>
-          <p className="text-sm text-gray-600">Positive Indicators</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Positive Indicators</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             Areas performing well
           </p>
         </div>
@@ -368,28 +368,28 @@ export default function AnalyticsRecommendationsTab({
 
       {/* Recommendations List */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-sm font-semibold text-stone-900">
           Detailed Recommendations
         </h3>
 
         {sortedRecommendations.map((rec) => (
           <div
             key={rec.id}
-            className={`rounded-lg border-2 p-6 ${
+            className={`rounded-lg border-2 p-4 ${
               rec.priority === 'positive'
                 ? 'bg-green-50 border-green-200'
-                : 'bg-white'
+                : 'bg-white border-stone-200'
             }`}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   {getCategoryIcon(rec.category)}
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-sm font-semibold text-stone-900">
                     {rec.title}
                   </h4>
                   <span
-                    className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${getPriorityBadge(
+                    className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase ${getPriorityBadge(
                       rec.priority
                     )}`}
                   >
@@ -397,20 +397,20 @@ export default function AnalyticsRecommendationsTab({
                   </span>
                 </div>
 
-                <p className="text-gray-700 mb-3">{rec.description}</p>
+                <p className="text-xs text-stone-700 mb-2">{rec.description}</p>
 
-                <div className="rounded-lg bg-blue-50 p-3 mb-3">
-                  <p className="text-sm font-medium text-blue-900">
-                    💡 Impact
+                <div className="rounded-lg bg-orange-50 p-3 mb-2">
+                  <p className="text-xs font-medium text-orange-900">
+                    Impact
                   </p>
-                  <p className="text-sm text-blue-800 mt-1">{rec.impact}</p>
+                  <p className="text-xs text-orange-800 mt-1">{rec.impact}</p>
                 </div>
 
-                <div className="rounded-lg bg-purple-50 p-3">
-                  <p className="text-sm font-medium text-purple-900">
-                    ✓ Recommended Action
+                <div className="rounded-lg bg-orange-50 p-3">
+                  <p className="text-xs font-medium text-orange-900">
+                    Recommended Action
                   </p>
-                  <p className="text-sm text-purple-800 mt-1">{rec.action}</p>
+                  <p className="text-xs text-orange-800 mt-1">{rec.action}</p>
                 </div>
               </div>
 
@@ -423,11 +423,11 @@ export default function AnalyticsRecommendationsTab({
       </div>
 
       {/* Footer */}
-      <div className="rounded-lg border bg-gray-50 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+        <h3 className="text-sm font-semibold text-stone-900 mb-1.5">
           About These Recommendations
         </h3>
-        <ul className="space-y-2 text-sm text-gray-700">
+        <ul className="space-y-2 text-xs text-stone-700">
           <li>• Recommendations are generated based on your workforce data and industry benchmarks</li>
           <li>• Priority levels indicate urgency: Critical (immediate action), High (within 1 month), Medium (within 3 months), Low (monitor)</li>
           <li>• Positive indicators show areas where your organization is performing well</li>

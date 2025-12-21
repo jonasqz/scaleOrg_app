@@ -311,13 +311,13 @@ export default function ScenarioEditorClient({
   return (
     <div className="space-y-6">
       {/* Scenario Info */}
-      <div className="rounded-lg border bg-white p-6">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Scenario Information</h2>
+          <h2 className="text-sm font-semibold text-stone-900">Scenario Information</h2>
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+              className="rounded-lg bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
             >
               Edit Scenario
             </button>
@@ -326,7 +326,7 @@ export default function ScenarioEditorClient({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-stone-700 mb-1">
               Scenario Name *
             </label>
             <input
@@ -334,11 +334,11 @@ export default function ScenarioEditorClient({
               value={scenarioName}
               onChange={(e) => setScenarioName(e.target.value)}
               disabled={!isEditing}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:bg-gray-50 disabled:text-gray-600"
+              className="w-full rounded-lg border border-stone-200 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 disabled:bg-stone-50 disabled:text-stone-600"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-stone-700 mb-1">
               Description (optional)
             </label>
             <textarea
@@ -346,21 +346,21 @@ export default function ScenarioEditorClient({
               onChange={(e) => setDescription(e.target.value)}
               disabled={!isEditing}
               rows={2}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:bg-gray-50 disabled:text-gray-600"
+              className="w-full rounded-lg border border-stone-200 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 disabled:bg-stone-50 disabled:text-stone-600"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-stone-700 mb-1">
               Current Cash Balance (optional - for runway analysis)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-500">{currency}</span>
+              <span className="absolute left-3 top-2.5 text-xs text-stone-500">{currency}</span>
               <input
                 type="number"
                 value={currentCash}
                 onChange={(e) => setCurrentCash(e.target.value)}
                 disabled={!isEditing}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 pl-12 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:bg-gray-50 disabled:text-gray-600"
+                className="w-full rounded-lg border border-stone-200 px-4 py-2 pl-12 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 disabled:bg-stone-50 disabled:text-stone-600"
               />
             </div>
           </div>
@@ -369,18 +369,18 @@ export default function ScenarioEditorClient({
 
       {/* Summary Bar */}
       {isEditing && (
-        <div className="rounded-lg border bg-purple-50 p-4">
+        <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <UserMinus className="h-5 w-5 text-red-600" />
-                <span className="text-sm font-medium text-gray-700">
+                <UserMinus className="h-4 w-4 text-red-600" />
+                <span className="text-xs font-medium text-stone-700">
                   {totalRemovals} to remove
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <UserPlus className="h-5 w-5 text-green-600" />
-                <span className="text-sm font-medium text-gray-700">
+                <UserPlus className="h-4 w-4 text-green-600" />
+                <span className="text-xs font-medium text-stone-700">
                   {totalAdditions} to add
                 </span>
               </div>
@@ -388,25 +388,25 @@ export default function ScenarioEditorClient({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsEditing(false)}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-lg border border-stone-200 bg-white px-4 py-2 text-xs font-medium text-stone-700 hover:bg-stone-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleRunScenario}
                 disabled={loading || (totalRemovals === 0 && totalAdditions === 0)}
-                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
               >
-                <Play className="h-4 w-4" />
+                <Play className="h-3.5 w-3.5" />
                 {loading ? 'Running...' : 'Re-run Scenario'}
               </button>
               {result && (
                 <button
                   onClick={handleUpdate}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 rounded-lg border border-purple-600 bg-white px-4 py-2 text-sm font-medium text-purple-600 hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-xs font-medium text-orange-600 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                 >
-                  <Save className="h-4 w-4" />
+                  <Save className="h-3.5 w-3.5" />
                   {saving ? 'Saving...' : 'Update Scenario'}
                 </button>
               )}
@@ -417,14 +417,14 @@ export default function ScenarioEditorClient({
 
       {/* Employee Selection - only in edit mode */}
       {isEditing && !result && (
-        <div className="rounded-lg border bg-white p-6">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Select Employees</h2>
+            <h2 className="text-sm font-semibold text-stone-900">Select Employees</h2>
             <button
               onClick={addNewHire}
-              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-xs font-medium text-white hover:bg-green-700 transition-colors"
             >
-              <UserPlus className="h-4 w-4" />
+              <UserPlus className="h-3.5 w-3.5" />
               Add New Hire
             </button>
           </div>
@@ -432,19 +432,19 @@ export default function ScenarioEditorClient({
           {/* Filters */}
           <div className="mb-4 flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-stone-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search employees..."
-                className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full rounded-lg border border-stone-200 py-2 pl-10 pr-4 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="rounded-lg border border-stone-200 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             >
               {departments.map((dept) => (
                 <option key={dept} value={dept}>
@@ -457,7 +457,7 @@ export default function ScenarioEditorClient({
           {/* New Hires List */}
           {newHires.length > 0 && (
             <div className="mb-6">
-              <h3 className="mb-3 text-sm font-semibold text-green-700">
+              <h3 className="mb-3 text-xs font-semibold text-green-700">
                 New Hires ({newHires.length})
               </h3>
               <div className="space-y-3">
@@ -468,36 +468,36 @@ export default function ScenarioEditorClient({
                   >
                     <div className="mb-3 flex items-start justify-between">
                       <div className="flex items-center gap-2">
-                        <UserPlus className="h-4 w-4 text-green-600" />
-                        <span className="rounded bg-green-600 px-2 py-0.5 text-xs text-white">
+                        <UserPlus className="h-3.5 w-3.5 text-green-600" />
+                        <span className="rounded bg-green-600 px-2 py-0.5 text-[10px] text-white">
                           New Hire
                         </span>
                       </div>
                       <button
                         onClick={() => removeNewHire(hire.id)}
-                        className="rounded p-1 text-red-600 hover:bg-red-50"
+                        className="rounded p-1 text-red-600 hover:bg-red-50 transition-colors"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3.5 w-3.5" />
                       </button>
                     </div>
 
                     <div className="grid gap-3 md:grid-cols-4">
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Name</label>
+                        <label className="block text-[10px] text-stone-600 mb-1">Name</label>
                         <input
                           type="text"
                           value={hire.employeeName || ''}
                           onChange={(e) => updateNewHire(hire.id, 'employeeName', e.target.value)}
                           placeholder="Employee name"
-                          className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                          className="w-full rounded border border-stone-200 px-2 py-1 text-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Department</label>
+                        <label className="block text-[10px] text-stone-600 mb-1">Department</label>
                         <select
                           value={hire.department}
                           onChange={(e) => updateNewHire(hire.id, 'department', e.target.value)}
-                          className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                          className="w-full rounded border border-stone-200 px-2 py-1 text-xs"
                         >
                           {departments.filter((d) => d !== 'all').map((dept) => (
                             <option key={dept} value={dept}>
@@ -507,37 +507,37 @@ export default function ScenarioEditorClient({
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Role</label>
+                        <label className="block text-[10px] text-stone-600 mb-1">Role</label>
                         <input
                           type="text"
                           value={hire.role || ''}
                           onChange={(e) => updateNewHire(hire.id, 'role', e.target.value)}
                           placeholder="Role"
-                          className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                          className="w-full rounded border border-stone-200 px-2 py-1 text-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Compensation</label>
+                        <label className="block text-[10px] text-stone-600 mb-1">Compensation</label>
                         <input
                           type="number"
                           value={hire.totalCompensation}
                           onChange={(e) =>
                             updateNewHire(hire.id, 'totalCompensation', parseFloat(e.target.value))
                           }
-                          className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                          className="w-full rounded border border-stone-200 px-2 py-1 text-xs"
                         />
                       </div>
                     </div>
 
                     <div className="mt-3">
-                      <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+                      <label className="block text-[10px] text-stone-600 mb-1">Start Date</label>
                       <input
                         type="date"
                         value={hire.effectiveDate?.toISOString().split('T')[0] || ''}
                         onChange={(e) =>
                           updateEffectiveDate(hire.id, new Date(e.target.value), true)
                         }
-                        className="rounded border border-gray-300 px-2 py-1 text-sm"
+                        className="rounded border border-stone-200 px-2 py-1 text-xs"
                       />
                     </div>
                   </div>
@@ -548,7 +548,7 @@ export default function ScenarioEditorClient({
 
           {/* Current Employees */}
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-gray-700">
+            <h3 className="mb-3 text-xs font-semibold text-stone-700">
               Current Employees ({filteredEmployees.length})
             </h3>
             <div className="max-h-96 space-y-2 overflow-y-auto">
@@ -562,22 +562,22 @@ export default function ScenarioEditorClient({
                     className={`rounded-lg border p-3 transition-all ${
                       markedForRemoval
                         ? 'border-red-300 bg-red-50 opacity-75'
-                        : 'border-gray-200 bg-white hover:border-purple-300'
+                        : 'border-stone-200 bg-white hover:border-orange-300'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900">
+                          <p className="text-xs font-medium text-stone-900">
                             {emp.employeeName || 'Unnamed Employee'}
                           </p>
                           {markedForRemoval && (
-                            <span className="rounded bg-red-600 px-2 py-0.5 text-xs text-white">
+                            <span className="rounded bg-red-600 px-2 py-0.5 text-[10px] text-white">
                               To Remove
                             </span>
                           )}
                         </div>
-                        <div className="mt-1 flex items-center gap-3 text-sm text-gray-600">
+                        <div className="mt-1 flex items-center gap-3 text-xs text-stone-600">
                           <span>{emp.department}</span>
                           {emp.role && <span>· {emp.role}</span>}
                           <span>
@@ -587,7 +587,7 @@ export default function ScenarioEditorClient({
 
                         {markedForRemoval && change && (
                           <div className="mt-2">
-                            <label className="block text-xs text-gray-600 mb-1">
+                            <label className="block text-[10px] text-stone-600 mb-1">
                               Removal Date
                             </label>
                             <input
@@ -596,7 +596,7 @@ export default function ScenarioEditorClient({
                               onChange={(e) =>
                                 updateEffectiveDate(change.id, new Date(e.target.value))
                               }
-                              className="rounded border border-gray-300 px-2 py-1 text-sm"
+                              className="rounded border border-stone-200 px-2 py-1 text-xs"
                             />
                           </div>
                         )}
@@ -604,9 +604,9 @@ export default function ScenarioEditorClient({
 
                       <button
                         onClick={() => toggleEmployeeRemoval(emp)}
-                        className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+                        className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                           markedForRemoval
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-stone-100 text-stone-700 hover:bg-stone-200'
                             : 'bg-red-100 text-red-700 hover:bg-red-200'
                         }`}
                       >
@@ -625,9 +625,9 @@ export default function ScenarioEditorClient({
       {result && (
         <div className="space-y-6">
           {isEditing && (
-            <div className="rounded-lg bg-purple-50 p-4">
-              <h3 className="font-semibold text-purple-900">Updated Results</h3>
-              <p className="mt-1 text-sm text-purple-700">
+            <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
+              <h3 className="text-xs font-semibold text-orange-900">Updated Results</h3>
+              <p className="mt-1 text-[10px] text-orange-700">
                 Review the updated analysis and save changes
               </p>
             </div>
@@ -635,61 +635,61 @@ export default function ScenarioEditorClient({
 
           {/* Comparison Grid */}
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border bg-gray-50 p-4">
-              <p className="mb-3 text-sm font-semibold text-gray-600">Current (Baseline)</p>
+            <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+              <p className="mb-3 text-xs font-semibold text-stone-600">Current (Baseline)</p>
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-gray-500">Total FTE</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total FTE</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.baseline.totalFTE.toFixed(1)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Total Cost</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total Cost</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {currency} {(result.baseline.totalCost / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Employees</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Employees</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.baseline.employeeCount}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-lg border bg-purple-50 p-4">
-              <p className="mb-3 text-sm font-semibold text-purple-600">Scenario</p>
+            <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
+              <p className="mb-3 text-xs font-semibold text-orange-600">Scenario</p>
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-gray-500">Total FTE</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total FTE</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.scenario.totalFTE.toFixed(1)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Total Cost</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Total Cost</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {currency} {(result.scenario.totalCost / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Employees</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-[10px] text-stone-500">Employees</p>
+                  <p className="text-sm font-bold text-stone-900">
                     {result.scenario.employeeCount}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-lg border bg-green-50 p-4">
-              <p className="mb-3 text-sm font-semibold text-green-600">Impact</p>
+            <div className="rounded-lg border border-stone-200 bg-green-50 p-4">
+              <p className="mb-3 text-xs font-semibold text-green-600">Impact</p>
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-gray-500">FTE Change</p>
+                  <p className="text-[10px] text-stone-500">FTE Change</p>
                   <p
-                    className={`text-lg font-bold ${
+                    className={`text-sm font-bold ${
                       result.delta.fteChange >= 0 ? 'text-green-700' : 'text-red-700'
                     }`}
                   >
@@ -698,9 +698,9 @@ export default function ScenarioEditorClient({
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Cost Savings</p>
+                  <p className="text-[10px] text-stone-500">Cost Savings</p>
                   <p
-                    className={`text-lg font-bold ${
+                    className={`text-sm font-bold ${
                       result.delta.costSavings >= 0 ? 'text-green-700' : 'text-red-700'
                     }`}
                   >
@@ -709,9 +709,9 @@ export default function ScenarioEditorClient({
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Cost Change</p>
+                  <p className="text-[10px] text-stone-500">Cost Change</p>
                   <p
-                    className={`text-lg font-bold ${
+                    className={`text-sm font-bold ${
                       result.delta.costSavingsPct >= 0 ? 'text-green-700' : 'text-red-700'
                     }`}
                   >
@@ -738,14 +738,14 @@ export default function ScenarioEditorClient({
                   setResult(null);
                   setIsEditing(true);
                 }}
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 hover:bg-gray-50"
+                className="flex-1 rounded-lg border border-stone-200 px-4 py-2 text-xs font-medium text-stone-700 hover:bg-stone-50 transition-colors"
               >
                 Modify Scenario
               </button>
               <button
                 onClick={handleUpdate}
                 disabled={saving}
-                className="flex-1 rounded-lg bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex-1 rounded-lg bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
               >
                 {saving ? 'Saving...' : 'Update Scenario'}
               </button>

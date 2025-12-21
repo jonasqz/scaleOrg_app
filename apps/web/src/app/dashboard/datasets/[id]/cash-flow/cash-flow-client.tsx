@@ -197,10 +197,10 @@ export default function CashFlowClient({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-10">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-sm text-gray-600">Loading cash flow data...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-600 border-t-transparent mx-auto"></div>
+          <p className="mt-3 text-xs text-stone-600">Loading cash flow data...</p>
         </div>
       </div>
     );
@@ -209,15 +209,15 @@ export default function CashFlowClient({
   // Check if cash balance is set
   if (currentCashBalance === null) {
     return (
-      <div className="rounded-lg border-2 border-dashed border-yellow-300 bg-yellow-50 p-12 text-center">
-        <DollarSign className="mx-auto h-12 w-12 text-yellow-600" />
-        <h3 className="mt-4 text-lg font-semibold text-gray-900">Cash Balance Not Set</h3>
-        <p className="mt-2 text-sm text-gray-600">
+      <div className="rounded-lg border-2 border-dashed border-yellow-200 bg-yellow-50 p-10 text-center">
+        <DollarSign className="mx-auto h-10 w-10 text-yellow-600" />
+        <h3 className="mt-3 text-sm font-semibold text-stone-900">Cash Balance Not Set</h3>
+        <p className="mt-1 text-xs text-stone-600">
           Please set your current cash balance in Settings to use Cash Flow tracking
         </p>
         <Link
           href={`/dashboard/datasets/${datasetId}/settings`}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+          className="mt-3 inline-flex items-center gap-2 rounded-md bg-orange-600 px-3 py-2 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
         >
           Go to Settings
         </Link>
@@ -230,68 +230,68 @@ export default function CashFlowClient({
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Current Cash */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <DollarSign className="h-8 w-8 text-green-600" />
+            <DollarSign className="h-5 w-5 text-green-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-2xl font-bold text-stone-900">
             {formatCurrency(summary?.currentCash || currentCashBalance)}
           </p>
-          <p className="text-sm text-gray-600">Current Cash Balance</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-[11px] font-medium text-stone-500">Current Cash Balance</p>
+          <p className="mt-0.5 text-[10px] text-stone-400">
             As of {new Date().toLocaleDateString()}
           </p>
         </div>
 
         {/* Monthly Burn */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <TrendingDown className="h-8 w-8 text-red-600" />
+            <TrendingDown className="h-5 w-5 text-red-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-2xl font-bold text-stone-900">
             {formatCurrency(summary?.avgMonthlyBurn || 0)}
           </p>
-          <p className="text-sm text-gray-600">Avg Monthly Burn</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-[11px] font-medium text-stone-500">Avg Monthly Burn</p>
+          <p className="mt-0.5 text-[10px] text-stone-400">
             From compensation costs
           </p>
         </div>
 
         {/* Monthly Revenue */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <TrendingUp className="h-8 w-8 text-blue-600" />
+            <TrendingUp className="h-5 w-5 text-blue-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-2xl font-bold text-stone-900">
             {formatCurrency(summary?.avgMonthlyRevenue || 0)}
           </p>
-          <p className="text-sm text-gray-600">Avg Monthly Revenue</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-[11px] font-medium text-stone-500">Avg Monthly Revenue</p>
+          <p className="mt-0.5 text-[10px] text-stone-400">
             Last 6 months actual
           </p>
         </div>
 
         {/* Runway */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <Calendar className="h-8 w-8 text-purple-600" />
+            <Calendar className={`h-5 w-5 ${summary?.runway && summary.runway < 6 ? 'text-orange-600' : 'text-purple-600'}`} />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className={`mt-3 text-2xl font-bold ${summary?.runway && summary.runway < 6 ? 'text-orange-600' : 'text-stone-900'}`}>
             {summary?.runway !== null ? `${formatNumber(summary?.runway)} mo` : 'N/A'}
           </p>
-          <p className="text-sm text-gray-600">Cash Runway</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-[11px] font-medium text-stone-500">Cash Runway</p>
+          <p className="mt-0.5 text-[10px] text-stone-400">
             {summary?.runwayDate || 'Update revenue forecast'}
           </p>
         </div>
       </div>
 
       {/* Cash Balance Projection Chart */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Cash Balance Projection</h2>
-            <p className="text-sm text-gray-600">24-month cash flow forecast</p>
+            <h2 className="text-sm font-semibold text-stone-900">Cash Balance Projection</h2>
+            <p className="text-xs text-stone-500">24-month cash flow forecast</p>
           </div>
         </div>
 
@@ -319,10 +319,10 @@ export default function CashFlowClient({
       </div>
 
       {/* Revenue vs Burn Chart */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Revenue vs Burn Rate</h2>
-          <p className="text-sm text-gray-600">Monthly comparison</p>
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <div className="mb-3">
+          <h2 className="text-sm font-semibold text-stone-900">Revenue vs Burn Rate</h2>
+          <p className="text-xs text-stone-500">Monthly comparison</p>
         </div>
 
         <ResponsiveContainer width="100%" height={300}>
@@ -354,45 +354,45 @@ export default function CashFlowClient({
       </div>
 
       {/* Monthly Data Table */}
-      <div className="rounded-lg border bg-white shadow-sm">
-        <div className="border-b p-4 flex items-center justify-between">
+      <div className="rounded-lg border border-stone-200 bg-white">
+        <div className="border-b border-stone-200 p-3 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Monthly Cash Flow</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-sm font-semibold text-stone-900">Monthly Cash Flow</h2>
+            <p className="text-xs text-stone-500">
               Revenue, burn rate, and cash balance projections
             </p>
           </div>
           <button
             onClick={() => setShowGrowthModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+            className="flex items-center gap-2 rounded-md bg-orange-600 px-3 py-2 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
           >
-            <TrendingUp className="h-4 w-4" />
+            <TrendingUp className="h-3.5 w-3.5" />
             Apply Growth Rate
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-stone-200">
+            <thead className="bg-stone-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-3 py-2 text-left text-[10px] font-medium text-stone-500 uppercase">
                   Month
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                <th className="px-3 py-2 text-right text-[10px] font-medium text-stone-500 uppercase">
                   Revenue
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                <th className="px-3 py-2 text-right text-[10px] font-medium text-stone-500 uppercase">
                   Burn
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                <th className="px-3 py-2 text-right text-[10px] font-medium text-stone-500 uppercase">
                   Net Cash Flow
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                <th className="px-3 py-2 text-right text-[10px] font-medium text-stone-500 uppercase">
                   Ending Cash
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-stone-200 bg-white">
               {monthlyData.map((month) => {
                 const isEditing = editingMonth === month.month;
                 const isNegativeCash = month.endingCash !== null && month.endingCash < 0;
@@ -401,17 +401,17 @@ export default function CashFlowClient({
                 return (
                   <tr
                     key={month.month}
-                    className={`${month.isCurrent ? 'bg-blue-50' : ''} ${
+                    className={`${month.isCurrent ? 'bg-orange-50' : ''} ${
                       isNegativeCash ? 'bg-red-50' : isLowCash ? 'bg-yellow-50' : ''
                     }`}
                   >
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-stone-900">
                       {month.label}
                       {month.isCurrent && (
-                        <span className="ml-2 text-xs text-blue-600">(Current)</span>
+                        <span className="ml-2 text-[10px] text-orange-600">(Current)</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
+                    <td className="px-3 py-2 whitespace-nowrap text-right text-xs">
                       {isEditing ? (
                         <div className="flex items-center justify-end gap-2">
                           <input
@@ -422,18 +422,18 @@ export default function CashFlowClient({
                               if (e.key === 'Enter') saveEdit();
                               if (e.key === 'Escape') cancelEdit();
                             }}
-                            className="w-24 rounded border px-2 py-1 text-sm"
+                            className="w-20 rounded border border-stone-300 px-2 py-1 text-xs"
                             autoFocus
                           />
                           <button onClick={saveEdit} className="text-green-600 hover:text-green-700">
-                            <Save className="h-4 w-4" />
+                            <Save className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       ) : (
                         <button
                           onClick={() => startEdit(month.month, month.revenue)}
                           disabled={!month.isRevenueEditable}
-                          className={`text-gray-900 hover:text-blue-600 ${
+                          className={`text-stone-900 hover:text-orange-600 ${
                             month.isRevenueEditable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
                           }`}
                         >
@@ -441,18 +441,18 @@ export default function CashFlowClient({
                         </button>
                       )}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right text-sm text-red-600">
+                    <td className="px-3 py-2 whitespace-nowrap text-right text-xs text-red-600">
                       {formatCurrency(month.burn)}
                     </td>
-                    <td className={`px-4 py-3 whitespace-nowrap text-right text-sm font-medium ${
+                    <td className={`px-3 py-2 whitespace-nowrap text-right text-xs font-medium ${
                       month.netCashFlow !== null && month.netCashFlow > 0
                         ? 'text-green-600'
                         : 'text-red-600'
                     }`}>
                       {formatCurrency(month.netCashFlow)}
                     </td>
-                    <td className={`px-4 py-3 whitespace-nowrap text-right text-sm font-bold ${
-                      isNegativeCash ? 'text-red-600' : isLowCash ? 'text-yellow-600' : 'text-gray-900'
+                    <td className={`px-3 py-2 whitespace-nowrap text-right text-xs font-bold ${
+                      isNegativeCash ? 'text-red-600' : isLowCash ? 'text-yellow-600' : 'text-stone-900'
                     }`}>
                       {formatCurrency(month.endingCash)}
                     </td>
@@ -465,15 +465,15 @@ export default function CashFlowClient({
       </div>
 
       {/* Scenario Planning Suggestion */}
-      <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-6">
-        <div className="flex items-start gap-4">
-          <GitBranch className="h-8 w-8 text-blue-600 flex-shrink-0" />
+      <div className="rounded-lg border-2 border-orange-200 bg-orange-50 p-4">
+        <div className="flex items-start gap-3">
+          <GitBranch className="h-6 w-6 text-orange-600 flex-shrink-0" />
           <div className="flex-1">
-            <h3 className="font-semibold text-blue-900">Ready for Scenario Planning?</h3>
-            <p className="mt-2 text-sm text-blue-800">
+            <h3 className="text-sm font-semibold text-orange-900">Ready for Scenario Planning?</h3>
+            <p className="mt-1 text-xs text-orange-800">
               Use your cash flow projections to model different scenarios:
             </p>
-            <ul className="mt-2 space-y-1 text-sm text-blue-800">
+            <ul className="mt-2 space-y-0.5 text-xs text-orange-800">
               <li>• <strong>Best Case:</strong> Revenue grows faster than expected</li>
               <li>• <strong>Base Case:</strong> Current trajectory continues</li>
               <li>• <strong>Worst Case:</strong> Revenue drops, burn stays constant</li>
@@ -481,9 +481,9 @@ export default function CashFlowClient({
             </ul>
             <Link
               href={`/dashboard/datasets/${datasetId}/scenarios`}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+              className="mt-3 inline-flex items-center gap-2 rounded-md bg-orange-600 px-3 py-2 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
             >
-              <GitBranch className="h-4 w-4" />
+              <GitBranch className="h-3.5 w-3.5" />
               Create Scenarios
             </Link>
           </div>
@@ -493,46 +493,46 @@ export default function CashFlowClient({
       {/* Growth Rate Modal */}
       {showGrowthModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900">Apply Growth Rate</h3>
-            <p className="mt-2 text-sm text-gray-600">
+          <div className="max-w-md rounded-lg bg-white p-5 shadow-xl">
+            <h3 className="text-sm font-semibold text-stone-900">Apply Growth Rate</h3>
+            <p className="mt-1 text-xs text-stone-600">
               Project future revenue based on a monthly growth rate
             </p>
 
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700">
+            <div className="mt-3">
+              <label className="block text-xs font-medium text-stone-700">
                 Monthly Growth Rate (%)
               </label>
               <div className="mt-2 flex items-center gap-2">
                 <button
                   onClick={() => setGrowthRate((parseFloat(growthRate) - 5).toString())}
-                  className="rounded-lg border p-2 hover:bg-gray-50"
+                  className="rounded-md border border-stone-300 p-1.5 hover:bg-stone-50"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3.5 w-3.5" />
                 </button>
                 <input
                   type="number"
                   value={growthRate}
                   onChange={(e) => setGrowthRate(e.target.value)}
                   step="1"
-                  className="flex-1 rounded-lg border px-4 py-2 text-center"
+                  className="flex-1 rounded-md border border-stone-300 px-3 py-2 text-center text-xs focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
                 <button
                   onClick={() => setGrowthRate((parseFloat(growthRate) + 5).toString())}
-                  className="rounded-lg border p-2 hover:bg-gray-50"
+                  className="rounded-md border border-stone-300 p-1.5 hover:bg-stone-50"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-1.5 text-[10px] text-stone-500">
                 Positive % = growth, Negative % = decline
               </p>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => setShowGrowthModal(false)}
-                className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                className="rounded-md border border-stone-300 px-3 py-2 text-xs font-medium hover:bg-stone-50 transition-colors"
                 disabled={saving}
               >
                 Cancel
@@ -540,16 +540,16 @@ export default function CashFlowClient({
               <button
                 onClick={applyGrowthRate}
                 disabled={saving}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-orange-600 px-3 py-2 text-xs font-medium text-white hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
                 {saving ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     Applying...
                   </>
                 ) : (
                   <>
-                    <TrendingUp className="h-4 w-4" />
+                    <TrendingUp className="h-3.5 w-3.5" />
                     Apply
                   </>
                 )}

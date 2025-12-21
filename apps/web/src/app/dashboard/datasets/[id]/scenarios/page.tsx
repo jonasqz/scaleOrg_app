@@ -54,9 +54,9 @@ export default async function ScenariosPage({
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Scenarios</h1>
-        <p className="mt-2 text-gray-600">
+      <div className="pb-4 border-b border-stone-200">
+        <h1 className="text-xl font-semibold tracking-tight text-stone-900">Scenarios</h1>
+        <p className="mt-1 text-xs text-stone-500">
           Run what-if analyses to understand the impact of workforce changes
         </p>
       </div>
@@ -66,11 +66,11 @@ export default async function ScenariosPage({
         <>
           {/* Info Banner */}
           <div className="flex items-start justify-between gap-4">
-            <div className="rounded-lg border bg-purple-50 p-6 flex-1">
-              <h2 className="mb-2 text-lg font-semibold text-purple-900">
+            <div className="rounded-lg border border-stone-200 bg-orange-50 p-4 flex-1">
+              <h2 className="mb-2 text-sm font-semibold text-orange-900">
                 Scenario Modeling
               </h2>
-              <p className="text-sm text-purple-700">
+              <p className="text-xs text-orange-700">
                 Run what-if analyses to understand the impact of workforce changes on your
                 metrics. Model hiring freezes, cost reductions, growth plans, and more.
               </p>
@@ -78,16 +78,16 @@ export default async function ScenariosPage({
             <div className="flex gap-3">
               <Link
                 href={`/dashboard/datasets/${dataset.id}/scenarios/compare`}
-                className="inline-flex items-center gap-2 rounded-lg border border-purple-600 bg-white px-6 py-3 font-semibold text-purple-600 hover:bg-purple-50 whitespace-nowrap"
+                className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-xs font-semibold text-orange-600 hover:bg-orange-50 whitespace-nowrap transition-colors"
               >
-                <Scale className="h-5 w-5" />
+                <Scale className="h-4 w-4" />
                 Compare Scenarios
               </Link>
               <Link
                 href={`/dashboard/datasets/${dataset.id}/scenarios/new`}
-                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700 whitespace-nowrap"
+                className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-700 whitespace-nowrap transition-colors"
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
                 New Detailed Scenario
               </Link>
             </div>
@@ -114,17 +114,17 @@ export default async function ScenariosPage({
           />
         </>
       ) : (
-        <div className="rounded-lg border bg-yellow-50 p-8 text-center">
-          <GitCompare className="mx-auto h-12 w-12 text-yellow-600" />
-          <p className="mt-4 font-medium text-yellow-900">
+        <div className="rounded-lg border border-stone-200 bg-yellow-50 p-5 text-center">
+          <GitCompare className="mx-auto h-5 w-5 text-yellow-600" />
+          <p className="mt-3 text-xs font-medium text-yellow-900">
             No data available for scenarios
           </p>
-          <p className="mt-1 text-sm text-yellow-700">
+          <p className="mt-1 text-[10px] text-yellow-700">
             Add employees first to run scenario analyses
           </p>
           <Link
             href={`/dashboard/datasets/${dataset.id}/employees`}
-            className="mt-4 inline-block rounded-lg bg-yellow-600 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-700"
+            className="mt-3 inline-block rounded-lg bg-yellow-600 px-4 py-2 text-xs font-medium text-white hover:bg-yellow-700 transition-colors"
           >
             Go to Employees
           </Link>

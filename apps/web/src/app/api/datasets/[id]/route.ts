@@ -34,14 +34,14 @@ export async function GET(
     });
 
     if (!dataset) {
-      return NextResponse.json({ error: 'Dataset not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
 
     return NextResponse.json({ dataset });
   } catch (error) {
     console.error('Error fetching dataset:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch dataset' },
+      { error: 'Failed to fetch company' },
       { status: 500 }
     );
   }
@@ -76,7 +76,7 @@ export async function PATCH(
     });
 
     if (!dataset) {
-      return NextResponse.json({ error: 'Dataset not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
 
     const body = await request.json();
@@ -85,7 +85,7 @@ export async function PATCH(
     // Validate required fields
     if (!name || name.trim() === '') {
       return NextResponse.json(
-        { error: 'Dataset name is required' },
+        { error: 'Company name is required' },
         { status: 400 }
       );
     }
@@ -142,7 +142,7 @@ export async function DELETE(
     });
 
     if (!dataset) {
-      return NextResponse.json({ error: 'Dataset not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
 
     await prisma.dataset.delete({
@@ -153,7 +153,7 @@ export async function DELETE(
   } catch (error) {
     console.error('Error deleting dataset:', error);
     return NextResponse.json(
-      { error: 'Failed to delete dataset' },
+      { error: 'Failed to delete company' },
       { status: 500 }
     );
   }

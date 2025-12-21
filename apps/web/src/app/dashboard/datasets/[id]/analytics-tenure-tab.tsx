@@ -108,17 +108,17 @@ export default function AnalyticsTenureTab({
   const icPercentage = (icCount / totalEmployees) * 100;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Warning if no manager relationships */}
       {!hasManagerRelationships && managementByLevel.length > 0 && (
-        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+        <div className="rounded-lg bg-orange-50 border border-stone-200 p-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5" />
             <div>
-              <p className="font-medium text-blue-900">
+              <p className="font-medium text-orange-900">
                 Limited span of control data
               </p>
-              <p className="mt-1 text-sm text-blue-700">
+              <p className="mt-1 text-xs text-orange-700">
                 We detected {managementByLevel.length} employees with management levels, but no manager relationships.
                 Add the "Manager ID" field to your dataset to see detailed span of control metrics for each manager.
               </p>
@@ -129,12 +129,12 @@ export default function AnalyticsTenureTab({
 
       {/* Warning if no managers detected at all */}
       {allManagers.length === 0 && (
-        <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-4">
+        <div className="rounded-lg bg-yellow-50 border border-stone-200 p-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
             <div>
               <p className="font-medium text-yellow-900">No managers detected in your dataset</p>
-              <p className="mt-1 text-sm text-yellow-700">
+              <p className="mt-1 text-xs text-yellow-700">
                 Add employee level data (Manager, Director, VP, C-Level) or manager relationships
                 to see span of control metrics.
               </p>
@@ -145,49 +145,49 @@ export default function AnalyticsTenureTab({
 
       {/* Span of Control Overview */}
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <Users className="h-8 w-8 text-blue-600" />
+            <Users className="h-5 w-5 text-orange-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {avgSpanOfControl.toFixed(1)}
           </p>
-          <p className="text-sm text-gray-600">Avg Span of Control</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Avg Span of Control</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             Industry benchmark: 5-8 direct reports
           </p>
         </div>
 
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <Users className="h-8 w-8 text-purple-600" />
+            <Users className="h-5 w-5 text-orange-500" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {allManagers.length}
           </p>
-          <p className="text-sm text-gray-600">Total Managers</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Total Managers</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             {totalEmployees > 0 ? ((allManagers.length / totalEmployees) * 100).toFixed(1) : '0.0'}% of workforce
           </p>
         </div>
 
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <TrendingUp className="h-8 w-8 text-green-600" />
+            <TrendingUp className="h-5 w-5 text-green-600" />
           </div>
-          <p className="mt-4 text-2xl font-bold text-gray-900">
+          <p className="mt-3 text-xl font-bold text-stone-900">
             {allManagers.length > 0 ? (totalEmployees / allManagers.length).toFixed(1) : '—'}
           </p>
-          <p className="text-sm text-gray-600">Employees per Manager</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-xs text-stone-600">Employees per Manager</p>
+          <p className="mt-1 text-[10px] text-stone-500">
             {allManagers.length > 0 ? 'Overall company ratio' : 'No managers found'}
           </p>
         </div>
       </div>
 
       {/* Seniority Level Distribution */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="text-sm font-semibold text-stone-900 mb-3">
           Seniority Level Distribution
         </h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -197,39 +197,39 @@ export default function AnalyticsTenureTab({
               return (levelOrder[a[0]] || 99) - (levelOrder[b[0]] || 99);
             })
             .map(([level, count]: [string, any]) => (
-              <div key={level} className="rounded-lg bg-gray-50 p-4">
+              <div key={level} className="rounded-lg bg-stone-50 p-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-700">
+                  <p className="text-xs font-medium text-stone-700">
                     {level === 'C_LEVEL' ? 'C-Level' : level}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-[10px] text-stone-500">
                     {((count / totalEmployees) * 100).toFixed(1)}%
                   </p>
                 </div>
-                <p className="mt-2 text-2xl font-bold text-gray-900">{count}</p>
-                <p className="text-xs text-gray-500">employees</p>
+                <p className="mt-2 text-xl font-bold text-stone-900">{count}</p>
+                <p className="text-[10px] text-stone-500">employees</p>
               </div>
             ))}
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="rounded-lg bg-blue-50 p-4">
-            <p className="text-sm text-blue-900 font-medium">Individual Contributors (IC)</p>
-            <p className="mt-2 text-2xl font-bold text-blue-900">{icPercentage.toFixed(1)}%</p>
-            <p className="text-xs text-blue-700">{icCount} employees</p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="rounded-lg bg-orange-50 p-4">
+            <p className="text-xs text-orange-900 font-medium">Individual Contributors (IC)</p>
+            <p className="mt-2 text-xl font-bold text-orange-900">{icPercentage.toFixed(1)}%</p>
+            <p className="text-[10px] text-orange-700">{icCount} employees</p>
           </div>
-          <div className="rounded-lg bg-purple-50 p-4">
-            <p className="text-sm text-purple-900 font-medium">Management (M/D/VP/C)</p>
-            <p className="mt-2 text-2xl font-bold text-purple-900">{managementPercentage.toFixed(1)}%</p>
-            <p className="text-xs text-purple-700">{managementCount} employees</p>
+          <div className="rounded-lg bg-orange-50 p-4">
+            <p className="text-xs text-orange-900 font-medium">Management (M/D/VP/C)</p>
+            <p className="mt-2 text-xl font-bold text-orange-900">{managementPercentage.toFixed(1)}%</p>
+            <p className="text-[10px] text-orange-700">{managementCount} employees</p>
           </div>
         </div>
       </div>
 
       {/* Span of Control by Management Level */}
       {spanOfControlData.length > 0 && (
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="rounded-lg border border-stone-200 bg-white p-4">
+          <h3 className="text-sm font-semibold text-stone-900 mb-3">
             Span of Control by Management Level
           </h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -237,38 +237,38 @@ export default function AnalyticsTenureTab({
               {
                 key: 'C_LEVEL',
                 label: 'C-Level',
-                bgClass: 'bg-purple-50',
-                borderClass: 'border-purple-200',
-                textClass: 'text-purple-900',
-                labelClass: 'text-purple-700',
-                indicatorClass: 'text-purple-600'
+                bgClass: 'bg-orange-50',
+                borderClass: 'border-stone-200',
+                textClass: 'text-orange-900',
+                labelClass: 'text-orange-700',
+                indicatorClass: 'text-orange-600'
               },
               {
                 key: 'VP',
                 label: 'VP',
-                bgClass: 'bg-blue-50',
-                borderClass: 'border-blue-200',
-                textClass: 'text-blue-900',
-                labelClass: 'text-blue-700',
-                indicatorClass: 'text-blue-600'
+                bgClass: 'bg-orange-50',
+                borderClass: 'border-stone-200',
+                textClass: 'text-orange-900',
+                labelClass: 'text-orange-700',
+                indicatorClass: 'text-orange-600'
               },
               {
                 key: 'DIRECTOR',
                 label: 'Director',
-                bgClass: 'bg-indigo-50',
-                borderClass: 'border-indigo-200',
-                textClass: 'text-indigo-900',
-                labelClass: 'text-indigo-700',
-                indicatorClass: 'text-indigo-600'
+                bgClass: 'bg-orange-50',
+                borderClass: 'border-stone-200',
+                textClass: 'text-orange-900',
+                labelClass: 'text-orange-700',
+                indicatorClass: 'text-orange-600'
               },
               {
                 key: 'MANAGER',
                 label: 'Manager',
-                bgClass: 'bg-cyan-50',
-                borderClass: 'border-cyan-200',
-                textClass: 'text-cyan-900',
-                labelClass: 'text-cyan-700',
-                indicatorClass: 'text-cyan-600'
+                bgClass: 'bg-orange-50',
+                borderClass: 'border-stone-200',
+                textClass: 'text-orange-900',
+                labelClass: 'text-orange-700',
+                indicatorClass: 'text-orange-600'
               },
             ].map(({ key, label, bgClass, borderClass, textClass, labelClass, indicatorClass }) => {
               const count = spanByLevel[key as keyof typeof spanByLevel].length;
@@ -279,20 +279,20 @@ export default function AnalyticsTenureTab({
               return (
                 <div key={key} className={`rounded-lg ${bgClass} border ${borderClass} p-4`}>
                   <div className="flex items-center justify-between mb-2">
-                    <p className={`text-sm font-medium ${textClass}`}>{label}</p>
-                    <p className={`text-xs ${labelClass}`}>{count} {count === 1 ? 'person' : 'people'}</p>
+                    <p className={`text-xs font-medium ${textClass}`}>{label}</p>
+                    <p className={`text-[10px] ${labelClass}`}>{count} {count === 1 ? 'person' : 'people'}</p>
                   </div>
-                  <p className={`text-3xl font-bold ${textClass}`}>{avg.toFixed(1)}</p>
-                  <p className={`text-xs ${labelClass} mt-1`}>avg direct reports</p>
+                  <p className={`text-xl font-bold ${textClass}`}>{avg.toFixed(1)}</p>
+                  <p className={`text-[10px] ${labelClass} mt-1`}>avg direct reports</p>
                   <div className="mt-2">
                     {avg < 3 && (
-                      <p className={`text-xs ${indicatorClass}`}>⚠️ Low span</p>
+                      <p className={`text-[10px] ${indicatorClass}`}>Low span</p>
                     )}
                     {avg >= 5 && avg <= 8 && (
-                      <p className={`text-xs ${indicatorClass}`}>✓ Healthy range</p>
+                      <p className={`text-[10px] ${indicatorClass}`}>Healthy range</p>
                     )}
                     {avg > 10 && (
-                      <p className={`text-xs ${indicatorClass}`}>⚠️ High span</p>
+                      <p className={`text-[10px] ${indicatorClass}`}>High span</p>
                     )}
                   </div>
                 </div>
@@ -301,8 +301,8 @@ export default function AnalyticsTenureTab({
           </div>
 
           {managersWithoutReports.length > 0 && (
-            <div className="mt-4 rounded-lg bg-gray-50 p-4">
-              <p className="text-sm text-gray-700">
+            <div className="mt-3 rounded-lg bg-stone-50 p-4">
+              <p className="text-xs text-stone-700">
                 <strong>{managersWithoutReports.length}</strong> employees with management titles have no direct reports tracked.
                 {!hasManagerRelationships && ' Add manager relationships to see their span of control.'}
               </p>
@@ -312,15 +312,15 @@ export default function AnalyticsTenureTab({
       )}
 
       {/* Span of Control Details */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <h3 className="text-sm font-semibold text-stone-900 mb-3">
           Span of Control by Manager
         </h3>
         {spanOfControlData.length === 0 ? (
           <div className="text-center py-8">
-            <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-2 text-sm text-gray-600">No manager data available</p>
-            <p className="text-xs text-gray-500">Add manager relationships to see span of control details</p>
+            <Users className="mx-auto h-12 w-12 text-stone-400" />
+            <p className="mt-2 text-xs text-stone-600">No manager data available</p>
+            <p className="text-[10px] text-stone-500">Add manager relationships to see span of control details</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -331,30 +331,30 @@ export default function AnalyticsTenureTab({
                 key={mgr.managerId}
                 className={`flex items-center justify-between rounded-lg p-4 ${
                   mgr.directReportsCount < 5
-                    ? 'bg-yellow-50 border border-yellow-200'
+                    ? 'bg-yellow-50 border border-stone-200'
                     : mgr.directReportsCount > 10
-                    ? 'bg-orange-50 border border-orange-200'
-                    : 'bg-gray-50'
+                    ? 'bg-orange-50 border border-stone-200'
+                    : 'bg-stone-50'
                 }`}
               >
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">{mgr.managerName || 'Unnamed Manager'}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-medium text-stone-900">{mgr.managerName || 'Unnamed Manager'}</p>
+                  <p className="text-xs text-stone-600">
                     {mgr.department} · {mgr.role || 'No role'} · {mgr.level || 'No level'}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   {mgr.directReportsCount < 5 && (
-                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
                   )}
                   {mgr.directReportsCount > 10 && (
-                    <AlertTriangle className="h-5 w-5 text-orange-600" />
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
                   )}
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-xl font-bold text-stone-900">
                       {mgr.directReportsCount}
                     </p>
-                    <p className="text-xs text-gray-500">direct reports</p>
+                    <p className="text-[10px] text-stone-500">direct reports</p>
                   </div>
                 </div>
               </div>
@@ -363,22 +363,22 @@ export default function AnalyticsTenureTab({
         )}
 
         {spanOfControlData.length > 0 && lowSpanManagers.length > 0 && (
-          <div className="mt-6 rounded-lg bg-yellow-50 p-4">
+          <div className="mt-4 rounded-lg bg-yellow-50 p-4">
             <p className="font-medium text-yellow-900">
-              ⚠️ {lowSpanManagers.length} manager{lowSpanManagers.length > 1 ? 's' : ''} with low span of control (&lt; 5 reports)
+              {lowSpanManagers.length} manager{lowSpanManagers.length > 1 ? 's' : ''} with low span of control (&lt; 5 reports)
             </p>
-            <p className="mt-1 text-sm text-yellow-700">
+            <p className="mt-1 text-xs text-yellow-700">
               Consider consolidating teams or redistributing direct reports for better efficiency.
             </p>
           </div>
         )}
 
         {spanOfControlData.length > 0 && highSpanManagers.length > 0 && (
-          <div className="mt-4 rounded-lg bg-orange-50 p-4">
+          <div className="mt-3 rounded-lg bg-orange-50 p-4">
             <p className="font-medium text-orange-900">
-              ⚠️ {highSpanManagers.length} manager{highSpanManagers.length > 1 ? 's' : ''} with high span of control (&gt; 10 reports)
+              {highSpanManagers.length} manager{highSpanManagers.length > 1 ? 's' : ''} with high span of control (&gt; 10 reports)
             </p>
-            <p className="mt-1 text-sm text-orange-700">
+            <p className="mt-1 text-xs text-orange-700">
               Consider adding middle management or splitting teams to reduce management burden.
             </p>
           </div>
@@ -391,11 +391,11 @@ export default function AnalyticsTenureTab({
       )}
 
       {/* AI-Powered Insights */}
-      <div className="rounded-lg border bg-blue-50 p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-2">
-          💡 Team Structure Insights
+      <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
+        <h3 className="text-sm font-semibold text-orange-900 mb-1.5">
+          Team Structure Insights
         </h3>
-        <ul className="space-y-2 text-sm text-blue-800">
+        <ul className="space-y-2 text-xs text-orange-800">
           {avgSpanOfControl < 5 && (
             <li>• Your average span of control is below industry standard. Consider consolidating management layers.</li>
           )}

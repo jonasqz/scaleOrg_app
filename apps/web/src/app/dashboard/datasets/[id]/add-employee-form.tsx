@@ -36,9 +36,9 @@ export default function AddEmployeeForm({ datasetId, currency, allEmployees = []
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+        className="inline-flex items-center gap-2 rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
       >
-        <Plus className="h-5 w-5" />
+        <Plus className="h-3.5 w-3.5" />
         Add Employee
       </button>
 

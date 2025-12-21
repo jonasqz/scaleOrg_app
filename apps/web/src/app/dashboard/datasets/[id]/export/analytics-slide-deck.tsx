@@ -8,6 +8,7 @@ import {
   InsightCallout,
 } from './slide-template';
 import { TrendingUp, TrendingDown, Users, DollarSign } from 'lucide-react';
+import { ExportConfiguration } from '@/lib/export-types';
 
 interface AnalyticsSlideDeckProps {
   dataset: any;
@@ -18,6 +19,7 @@ interface AnalyticsSlideDeckProps {
     benchmarkedEmployees: number;
     averageMarketPosition: number;
   };
+  config?: ExportConfiguration | null;
 }
 
 export function AnalyticsSlideDeck({
@@ -25,8 +27,24 @@ export function AnalyticsSlideDeck({
   employees,
   metrics,
   benchmarkSummary,
+  config = null,
 }: AnalyticsSlideDeckProps) {
+  // Check which slides are enabled
+  const isEnabled = (sectionId: string) => {
+    if (!config) return true; // Show all if no config
+    return config.sections.some(s => s.id === sectionId && s.enabled);
+  };
+
   const totalSlides = 7;
+
+  // Safety check - if no metrics or no employees, don't render data slides
+  if (!metrics || !employees || employees.length === 0) {
+    console.error('AnalyticsSlideDeck: Missing data', {
+      hasMetrics: !!metrics,
+      employeeCount: employees?.length || 0,
+    });
+    return null;
+  }
 
   // Calculate key metrics
   const totalHeadcount = employees.length;
@@ -48,18 +66,19 @@ export function AnalyticsSlideDeck({
 
   return (
     <div className="space-y-0">
-      {/* Slide 1: Cover */}
+      {/* Slide 1: Cover - Always shown */}
       <CoverSlide
-        companyName={dataset.companyName || 'Company'}
-        datasetName={dataset.name}
+        companyName={config?.branding?.companyName || dataset.companyName || 'Company'}
+        datasetName={config?.settings?.title || dataset.name}
       />
 
       {/* Slide 2: Executive Summary */}
-      <SlideTemplate
-        title="Executive Summary"
-        slideNumber={2}
-        totalSlides={totalSlides}
-      >
+      {isEnabled('executive_summary') && (
+        <SlideTemplate
+          title="Executive Summary"
+          slideNumber={2}
+          totalSlides={totalSlides}
+        >
         <div className="space-y-6">
           <p className="text-lg text-gray-700">
             Comprehensive workforce analysis covering {totalHeadcount} employees
@@ -114,13 +133,15 @@ export function AnalyticsSlideDeck({
           )}
         </div>
       </SlideTemplate>
+      )}
 
       {/* Slide 3: Organizational Overview */}
-      <SlideTemplate
-        title="Organizational Overview"
-        slideNumber={3}
-        totalSlides={totalSlides}
-      >
+      {isEnabled('org_structure') && (
+        <SlideTemplate
+          title="Organizational Overview"
+          slideNumber={3}
+          totalSlides={totalSlides}
+        >
         <div className="space-y-8">
           <div>
             <h3 className="mb-4 text-xl font-semibold text-gray-900">
@@ -185,13 +206,15 @@ export function AnalyticsSlideDeck({
           </div>
         </div>
       </SlideTemplate>
+      )}
 
       {/* Slide 4: Compensation Analysis */}
-      <SlideTemplate
-        title="Compensation Analysis"
-        slideNumber={4}
-        totalSlides={totalSlides}
-      >
+      {isEnabled('compensation_analysis') && (
+        <SlideTemplate
+          title="Compensation Analysis"
+          slideNumber={4}
+          totalSlides={totalSlides}
+        >
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-6">
             <MetricCard
@@ -259,9 +282,10 @@ export function AnalyticsSlideDeck({
           </div>
         </div>
       </SlideTemplate>
+      )}
 
       {/* Slide 5: Market Benchmarking */}
-      {benchmarkSummary && (
+      {isEnabled('market_benchmarking') && benchmarkSummary && (
         <SlideTemplate
           title="Market Benchmarking"
           slideNumber={5}
@@ -319,11 +343,12 @@ export function AnalyticsSlideDeck({
       )}
 
       {/* Slide 6: Team Dynamics */}
-      <SlideTemplate
-        title="Team Dynamics & Structure"
-        slideNumber={6}
-        totalSlides={totalSlides}
-      >
+      {isEnabled('team_dynamics') && (
+        <SlideTemplate
+          title="Team Dynamics & Structure"
+          slideNumber={6}
+          totalSlides={totalSlides}
+        >
         <div className="space-y-8">
           <div className="grid grid-cols-3 gap-6">
             <MetricCard
@@ -386,13 +411,15 @@ export function AnalyticsSlideDeck({
           </div>
         </div>
       </SlideTemplate>
+      )}
 
       {/* Slide 7: Recommendations */}
-      <SlideTemplate
-        title="Strategic Recommendations"
-        slideNumber={7}
-        totalSlides={totalSlides}
-      >
+      {isEnabled('recommendations') && (
+        <SlideTemplate
+          title="Strategic Recommendations"
+          slideNumber={7}
+          totalSlides={totalSlides}
+        >
         <div className="space-y-6">
           <p className="text-gray-700">
             Based on comprehensive workforce analysis, we recommend the following
@@ -484,6 +511,7 @@ export function AnalyticsSlideDeck({
           </div>
         </div>
       </SlideTemplate>
+      )}
     </div>
   );
 }

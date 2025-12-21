@@ -68,63 +68,63 @@ export default function ScenarioDetailsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-lg bg-white shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-lg bg-white">
         {/* Header */}
-        <div className="sticky top-0 z-10 border-b bg-white px-6 py-4">
+        <div className="sticky top-0 z-10 border-b border-stone-200 bg-white px-4 py-3">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">{scenario.name}</h2>
+              <h2 className="text-sm font-semibold text-stone-900">{scenario.name}</h2>
               <div className="mt-2 flex items-center gap-3">
-                <span className="rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-700">
+                <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700">
                   {getTypeLabel(scenario.type)}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-xs text-stone-500">
                   Created: {formatDate(scenario.createdAt)}
                 </span>
               </div>
               {scenario.description && (
-                <p className="mt-2 text-sm text-gray-600">{scenario.description}</p>
+                <p className="mt-2 text-xs text-stone-600">{scenario.description}</p>
               )}
             </div>
             <button
               onClick={onClose}
-              className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="rounded-md p-2 text-stone-400 transition-colors hover:bg-orange-50 hover:text-orange-600"
             >
-              <X className="h-6 w-6" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="space-y-6 p-6">
+        <div className="space-y-6 p-4">
           {/* Comparison Grid */}
           {baseline && scenarioMetrics && delta && (
             <div className="grid gap-4 md:grid-cols-3">
               {/* Baseline */}
-              <div className="rounded-lg border bg-gray-50 p-4">
-                <p className="mb-3 text-sm font-semibold text-gray-600">Current (Baseline)</p>
+              <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                <p className="mb-3 text-xs font-semibold text-stone-600">Current (Baseline)</p>
                 <div className="space-y-2">
                   <div>
-                    <p className="text-xs text-gray-500">Total FTE</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Total FTE</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {baseline.totalFTE.toFixed(1)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Total Cost</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Total Cost</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {currency} {(baseline.totalCost / 1000000).toFixed(2)}M
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Cost per FTE</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Cost per FTE</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {currency} {(baseline.costPerFTE / 1000).toFixed(0)}k
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Employees</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Employees</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {baseline.employeeCount}
                     </p>
                   </div>
@@ -132,30 +132,30 @@ export default function ScenarioDetailsModal({
               </div>
 
               {/* Scenario */}
-              <div className="rounded-lg border bg-purple-50 p-4">
-                <p className="mb-3 text-sm font-semibold text-purple-600">Scenario</p>
+              <div className="rounded-lg border border-stone-200 bg-orange-50 p-4">
+                <p className="mb-3 text-xs font-semibold text-orange-600">Scenario</p>
                 <div className="space-y-2">
                   <div>
-                    <p className="text-xs text-gray-500">Total FTE</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Total FTE</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {scenarioMetrics.totalFTE.toFixed(1)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Total Cost</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Total Cost</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {currency} {(scenarioMetrics.totalCost / 1000000).toFixed(2)}M
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Cost per FTE</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Cost per FTE</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {currency} {(scenarioMetrics.costPerFTE / 1000).toFixed(0)}k
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Employees</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] text-stone-500">Employees</p>
+                    <p className="text-sm font-bold text-stone-900">
                       {scenarioMetrics.employeeCount}
                     </p>
                   </div>
@@ -163,25 +163,25 @@ export default function ScenarioDetailsModal({
               </div>
 
               {/* Delta */}
-              <div className="rounded-lg border bg-green-50 p-4">
-                <p className="mb-3 text-sm font-semibold text-green-600">Impact</p>
+              <div className="rounded-lg border border-stone-200 bg-green-50 p-4">
+                <p className="mb-3 text-xs font-semibold text-green-600">Impact</p>
                 <div className="space-y-2">
                   <div>
-                    <p className="text-xs text-gray-500">FTE Change</p>
-                    <p className={`text-lg font-bold ${delta.fteChange >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                    <p className="text-[10px] text-stone-500">FTE Change</p>
+                    <p className={`text-sm font-bold ${delta.fteChange >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                       {delta.fteChange > 0 && '+'}{delta.fteChange.toFixed(1)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Cost Savings</p>
-                    <p className={`text-lg font-bold ${delta.costSavings >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                    <p className="text-[10px] text-stone-500">Cost Savings</p>
+                    <p className={`text-sm font-bold ${delta.costSavings >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                       {delta.costSavings > 0 && '+'}
                       {currency} {(delta.costSavings / 1000000).toFixed(2)}M
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Cost Change</p>
-                    <p className={`text-lg font-bold ${delta.costSavingsPct >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                    <p className="text-[10px] text-stone-500">Cost Change</p>
+                    <p className={`text-sm font-bold ${delta.costSavingsPct >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                       {delta.costSavingsPct > 0 && '+'}
                       {delta.costSavingsPct.toFixed(1)}%
                     </p>
@@ -202,10 +202,10 @@ export default function ScenarioDetailsModal({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 border-t bg-white px-6 py-4">
+        <div className="sticky bottom-0 border-t border-stone-200 bg-white px-4 py-3">
           <button
             onClick={onClose}
-            className="w-full rounded-lg bg-purple-600 px-4 py-3 font-medium text-white hover:bg-purple-700"
+            className="w-full rounded-lg bg-orange-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-orange-700"
           >
             Close
           </button>

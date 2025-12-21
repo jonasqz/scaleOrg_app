@@ -11,18 +11,21 @@ datasource db {
 
 // User model (minimal - most data managed by Clerk)
 model User {
-  id           String    @id @default(uuid())
-  clerkId      String    @unique @map("clerk_id")
-  email        String
-  companyName  String?   @map("company_name")
-  industry     String?
-  companySize  String?   @map("company_size")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id                   String    @id @default(uuid())
+  clerkId              String    @unique @map("clerk_id")
+  email                String
+  companyName          String?   @map("company_name")
+  industry             String?
+  companySize          String?   @map("company_size")
+  onboardingCompleted  Boolean   @default(false) @map("onboarding_completed")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  datasets     Dataset[]
+  // Relations
+  datasets          Dataset[]
 
   @@index([clerkId])
+  @@index([email])
   @@map("users")
 }
 
@@ -30,6 +33,7 @@ model User {
 model Dataset {
   id              String    @id @default(uuid())
   userId          String    @map("user_id")
+  organizationId  String?   @map("organization_id")  // Clerk organization ID
 
   // Metadata
   name            String
@@ -51,6 +55,7 @@ model Dataset {
   currentCashBalance Decimal? @map("current_cash_balance") @db.Decimal(15, 2)  // Cash in bank for runway calculations
   fiscalYearStart   DateTime? @map("fiscal_year_start")
   currency          String    @default("EUR")
+  isDemo            Boolean   @default(false) @map("is_demo")  // Demo data flag
 
   // Timestamps
   createdAt       DateTime  @default(now()) @map("created_at")
@@ -67,8 +72,10 @@ model Dataset {
   monthlyEmployerCosts    MonthlyEmployerCost[]
   monthlyPlannedCompensation MonthlyPlannedCompensation[]
   monthlyRevenue          MonthlyRevenue[]
+  compensationScenarios   CompensationScenario[]
 
   @@index([userId])
+  @@index([organizationId])
   @@index([status])
   @@index([createdAt(sort: Desc)])
   @@map("datasets")
@@ -95,6 +102,11 @@ model DatasetSettings {
   industry    String?                                  // "SaaS", "Fintech", "Climate Tech", etc.
   region      String?                                  // "DACH", "EU", "US", "Global", etc.
   growthStage String?  @map("growth_stage")           // "Seed", "Series A", "Series B+", "Growth", "Public"
+
+  // KPI preferences - which KPIs to show in dashboard
+  // Array of KPI IDs, e.g., ["revenue_per_employee", "eng_pct_employees", ...]
+  // If null, shows default KPIs
+  selectedKPIs String[] @default([]) @map("selected_kpis")
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -149,6 +161,7 @@ model Employee {
   directReports              Employee[] @relation("EmployeeManager")
   monthlyEmployerCosts       MonthlyEmployerCost[]
   monthlyPlannedCompensation MonthlyPlannedCompensation[]
+  compensationTargets        EmployeeCompensationTarget[]
 
   @@index([datasetId])
   @@index([datasetId, department])
@@ -806,6 +819,78 @@ model MonthlyRevenue {
   @@index([datasetId, period])
   @@index([source])
   @@map("monthly_revenue")
+}
+
+// Compensation Scenario - for IS/SHOULD/FORECAST planning
+model CompensationScenario {
+  id          String   @id @default(uuid())
+  datasetId   String   @map("dataset_id")
+
+  name        String                              // "Baseline", "Planned", "Q1 Raises", etc.
+  description String?
+
+  isBaseline  Boolean  @default(false) @map("is_baseline")  // Only one baseline per dataset
+  isActive    Boolean  @default(true) @map("is_active")
+
+  status      CompensationScenarioStatus @default(DRAFT)
+  approvedBy  String?  @map("approved_by")
+  approvedAt  DateTime? @map("approved_at")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  dataset     Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  targets     EmployeeCompensationTarget[]
+
+  @@index([datasetId])
+  @@index([isBaseline])
+  @@index([status])
+  @@map("compensation_scenarios")
+}
+
+enum CompensationScenarioStatus {
+  DRAFT
+  APPROVED
+  ARCHIVED
+}
+
+// Employee Compensation Target - stores SHOULD values
+model EmployeeCompensationTarget {
+  id           String   @id @default(uuid())
+  employeeId   String   @map("employee_id")
+  scenarioId   String?  @map("scenario_id")  // NULL for default/baseline
+
+  // SHOULD value
+  targetAnnualComp  Decimal  @map("target_annual_comp") @db.Decimal(12, 2)
+
+  // How was this target calculated
+  calculationMethod String  @map("calculation_method")  // "benchmark", "manual", "formula"
+  benchmarkSource   String? @map("benchmark_source")    // Which benchmark was used
+
+  // Manual override
+  isManualOverride  Boolean @default(false) @map("is_manual_override")
+  overrideReason    String? @map("override_reason")
+
+  // Explanation data (JSON)
+  // Structure: { marketBenchmark: 150000, locationAdjustment: 1.1, performanceFactor: 1.0, ... }
+  explanation  Json?  // Breakdown showing how target was calculated
+
+  // Target timeline
+  targetDate   DateTime? @map("target_date")  // When should employee reach this comp
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  scenario     CompensationScenario? @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, scenarioId])
+  @@index([employeeId])
+  @@index([scenarioId])
+  @@index([calculationMethod])
+  @@map("employee_compensation_targets")
 }
 
 // Audit logs

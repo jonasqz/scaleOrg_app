@@ -36,9 +36,9 @@ export default async function CashFlowPage({
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Cash Flow & Runway</h1>
-        <p className="mt-2 text-gray-600">
+      <div className="pb-4 border-b border-stone-200">
+        <h1 className="text-xl font-semibold tracking-tight text-stone-900">Cash Flow & Runway</h1>
+        <p className="mt-1 text-xs text-stone-500">
           Track revenue, monitor burn rate, and forecast your cash runway
         </p>
       </div>

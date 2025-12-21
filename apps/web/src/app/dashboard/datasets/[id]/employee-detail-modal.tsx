@@ -254,18 +254,18 @@ export default function EmployeeDetailModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl">
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-stone-200 bg-white px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                <User className="h-6 w-6 text-blue-600" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                <User className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-sm font-semibold text-stone-900">
                   {isAddMode
                     ? 'Add New Employee'
                     : currentEmployee.employeeName || 'Unnamed Employee'}
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs text-stone-500">
                   {isAddMode
                     ? 'Fill in employee details'
                     : currentEmployee.role || currentEmployee.department}
@@ -274,53 +274,53 @@ export default function EmployeeDetailModal({
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-stone-400 hover:text-stone-600 transition-colors"
             >
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-4">
             {/* Quick Stats - Only show in view mode */}
             {!isAddMode && (
               <div className="mb-6 grid gap-4 md:grid-cols-4">
-                <div className="rounded-lg bg-gray-50 p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <DollarSign className="h-4 w-4" />
+                <div className="rounded-lg bg-stone-50 p-4">
+                  <div className="flex items-center gap-2 text-xs text-stone-500">
+                    <DollarSign className="h-3.5 w-3.5" />
                     <span>Total Compensation</span>
                   </div>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                  <p className="mt-1 text-sm font-semibold text-stone-900">
                     {currency} {currentEmployee.totalCompensation.toLocaleString()}
                   </p>
                 </div>
 
-                <div className="rounded-lg bg-gray-50 p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Briefcase className="h-4 w-4" />
+                <div className="rounded-lg bg-stone-50 p-4">
+                  <div className="flex items-center gap-2 text-xs text-stone-500">
+                    <Briefcase className="h-3.5 w-3.5" />
                     <span>Department</span>
                   </div>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                  <p className="mt-1 text-sm font-semibold text-stone-900">
                     {currentEmployee.department}
                   </p>
                 </div>
 
-                <div className="rounded-lg bg-gray-50 p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="h-4 w-4" />
+                <div className="rounded-lg bg-stone-50 p-4">
+                  <div className="flex items-center gap-2 text-xs text-stone-500">
+                    <Calendar className="h-3.5 w-3.5" />
                     <span>Tenure</span>
                   </div>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                  <p className="mt-1 text-sm font-semibold text-stone-900">
                     {calculateTenure() || 'N/A'}
                   </p>
                 </div>
 
-                <div className="rounded-lg bg-gray-50 p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <User className="h-4 w-4" />
+                <div className="rounded-lg bg-stone-50 p-4">
+                  <div className="flex items-center gap-2 text-xs text-stone-500">
+                    <User className="h-3.5 w-3.5" />
                     <span>Employment Type</span>
                   </div>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                  <p className="mt-1 text-sm font-semibold text-stone-900">
                     {currentEmployee.employmentType}
                   </p>
                 </div>
@@ -331,12 +331,12 @@ export default function EmployeeDetailModal({
             <div className="space-y-6">
               {/* Personal Information */}
               <div>
-                <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                <h3 className="mb-4 text-sm font-semibold text-stone-900">
                   Personal Information
                 </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Full Name
                     </label>
                     {isEditing ? (
@@ -346,18 +346,18 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, employeeName: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       />
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.employeeName || 'N/A'}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      <Mail className="inline h-4 w-4 mr-1" />
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
+                      <Mail className="inline h-3.5 w-3.5 mr-1" />
                       Email
                     </label>
                     {isEditing ? (
@@ -367,17 +367,17 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, email: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       />
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.email || 'N/A'}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Start Date (Hire Date)
                     </label>
                     {isEditing ? (
@@ -387,10 +387,10 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, startDate: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       />
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.startDate
                           ? new Date(currentEmployee.startDate).toLocaleDateString()
                           : 'N/A'}
@@ -399,7 +399,7 @@ export default function EmployeeDetailModal({
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Location
                     </label>
                     {isEditing ? (
@@ -423,7 +423,7 @@ export default function EmployeeDetailModal({
                               }
                             }}
                             placeholder="Enter new location (e.g., San Francisco, CA)"
-                            className="flex-1 rounded-lg border border-blue-500 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="flex-1 rounded-lg border border-orange-500 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             autoFocus
                           />
                           <button
@@ -431,7 +431,7 @@ export default function EmployeeDetailModal({
                             onClick={() => {
                               setShowNewLocation(false);
                             }}
-                            className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 hover:bg-blue-100"
+                            className="rounded-lg border border-orange-300 bg-orange-50 px-3 py-2 text-sm text-orange-700 hover:bg-orange-100"
                           >
                             Done
                           </button>
@@ -447,7 +447,7 @@ export default function EmployeeDetailModal({
                                 setFormData({ ...formData, location: e.target.value });
                               }
                             }}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                           >
                             <option value="">Select location...</option>
                             {existingLocations.map((loc) => (
@@ -460,21 +460,21 @@ export default function EmployeeDetailModal({
                                 {formData.location}
                               </option>
                             )}
-                            <option value="__create_new__" className="font-medium text-blue-600">
+                            <option value="__create_new__" className="font-medium text-orange-600">
                               + Create new location
                             </option>
                           </select>
                         </div>
                       )
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.location || 'N/A'}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Gender
                     </label>
                     {isEditing ? (
@@ -483,7 +483,7 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, gender: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       >
                         <option value="">Prefer not to say</option>
                         <option value="MALE">Male</option>
@@ -491,14 +491,14 @@ export default function EmployeeDetailModal({
                         <option value="DIVERSE">Diverse</option>
                       </select>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.gender === 'MALE' ? 'Male' :
                          currentEmployee.gender === 'FEMALE' ? 'Female' :
                          currentEmployee.gender === 'DIVERSE' ? 'Diverse' :
                          'Prefer not to say'}
                       </p>
                     )}
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-[10px] text-stone-500">
                       Optional: Used for pay gap analysis and diversity reporting
                     </p>
                   </div>
@@ -507,12 +507,12 @@ export default function EmployeeDetailModal({
 
               {/* Employment Details */}
               <div>
-                <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                <h3 className="mb-4 text-sm font-semibold text-stone-900">
                   Employment Details
                 </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Department
                     </label>
                     {isEditing ? (
@@ -536,7 +536,7 @@ export default function EmployeeDetailModal({
                               }
                             }}
                             placeholder="Enter new department"
-                            className="flex-1 rounded-lg border border-blue-500 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="flex-1 rounded-lg border border-orange-500 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             autoFocus
                           />
                           <button
@@ -544,7 +544,7 @@ export default function EmployeeDetailModal({
                             onClick={() => {
                               setShowNewDepartment(false);
                             }}
-                            className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 hover:bg-blue-100"
+                            className="rounded-lg border border-orange-300 bg-orange-50 px-3 py-2 text-sm text-orange-700 hover:bg-orange-100"
                           >
                             Done
                           </button>
@@ -560,7 +560,7 @@ export default function EmployeeDetailModal({
                                 setFormData({ ...formData, department: e.target.value });
                               }
                             }}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                           >
                             {existingDepartments.length === 0 && (
                               <>
@@ -586,21 +586,21 @@ export default function EmployeeDetailModal({
                                 {formData.department}
                               </option>
                             )}
-                            <option value="__create_new__" className="font-medium text-blue-600">
+                            <option value="__create_new__" className="font-medium text-orange-600">
                               + Create new department
                             </option>
                           </select>
                         </div>
                       )
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.department}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Role / Title
                     </label>
                     {isEditing ? (
@@ -610,18 +610,18 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, role: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                         placeholder="Senior Software Engineer"
                       />
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.role || 'N/A'}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Level
                     </label>
                     {isEditing ? (
@@ -630,7 +630,7 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, level: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       >
                         <option value="">Select level...</option>
                         <option value="IC">IC (Individual Contributor)</option>
@@ -640,14 +640,14 @@ export default function EmployeeDetailModal({
                         <option value="C_LEVEL">C-Level</option>
                       </select>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.level || 'N/A'}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Employment Type
                     </label>
                     {isEditing ? (
@@ -656,7 +656,7 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, employmentType: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       >
                         <option value="FTE">FTE (Full-time)</option>
                         <option value="CONTRACTOR">Contractor</option>
@@ -664,14 +664,14 @@ export default function EmployeeDetailModal({
                         <option value="INTERN">Intern</option>
                       </select>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.employmentType}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       FTE Factor
                     </label>
                     {isEditing ? (
@@ -684,17 +684,17 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, fteFactor: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       />
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.fteFactor}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Cost Center
                     </label>
                     {isEditing ? (
@@ -704,19 +704,19 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, costCenter: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                         placeholder="CC-1001"
                       />
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.costCenter || 'N/A'}
                       </p>
                     )}
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      <User className="inline h-4 w-4 mr-1" />
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
+                      <User className="inline h-3.5 w-3.5 mr-1" />
                       Reports To (Manager)
                     </label>
                     {isEditing ? (
@@ -725,7 +725,7 @@ export default function EmployeeDetailModal({
                         onChange={(e) =>
                           setFormData({ ...formData, managerId: e.target.value })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                       >
                         <option value="">No manager / Reports to CEO</option>
                         {allEmployees
@@ -748,7 +748,7 @@ export default function EmployeeDetailModal({
                           ))}
                       </select>
                     ) : (
-                      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                      <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                         {currentEmployee.managerId
                           ? (() => {
                               const manager = allEmployees.find(e => e.id === currentEmployee.managerId);
@@ -759,7 +759,7 @@ export default function EmployeeDetailModal({
                           : 'No manager set'}
                       </p>
                     )}
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-[10px] text-stone-500">
                       Optional: Select who this employee reports to. Used for span of control calculations.
                     </p>
                   </div>
@@ -769,7 +769,7 @@ export default function EmployeeDetailModal({
               {/* Compensation */}
               <div>
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-sm font-semibold text-stone-900">
                     Compensation Breakdown
                   </h3>
                   {isEditing && (
@@ -800,7 +800,7 @@ export default function EmployeeDetailModal({
                   )}
                 </div>
                 {isEditing && (
-                  <p className="mb-4 text-sm text-gray-600">
+                  <p className="mb-4 text-xs text-stone-600">
                     {compensationInputMode === 'monthly'
                       ? 'Enter monthly values. They will be converted to annual (×12) when saved.'
                       : 'Enter annual values. All compensation is stored annually.'}
@@ -808,7 +808,7 @@ export default function EmployeeDetailModal({
                 )}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Total {isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'} Compensation
                     </label>
                     {isEditing ? (
@@ -822,10 +822,10 @@ export default function EmployeeDetailModal({
                               totalCompensation: e.target.value,
                             })
                           }
-                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                         />
                         {formData.totalCompensation && parseFloat(formData.totalCompensation) > 0 && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-[10px] text-stone-500">
                             {compensationInputMode === 'monthly'
                               ? `≈ ${currency} ${(parseFloat(formData.totalCompensation) * 12).toLocaleString()} annually`
                               : `≈ ${currency} ${(parseFloat(formData.totalCompensation) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
@@ -834,10 +834,10 @@ export default function EmployeeDetailModal({
                       </>
                     ) : (
                       <>
-                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                        <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                           {currency} {currentEmployee.totalCompensation.toLocaleString()} / year
                         </p>
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-[10px] text-stone-500">
                           {currency} {(currentEmployee.totalCompensation / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
                         </p>
                       </>
@@ -845,7 +845,7 @@ export default function EmployeeDetailModal({
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Base Salary ({isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'})
                     </label>
                     {isEditing ? (
@@ -856,11 +856,11 @@ export default function EmployeeDetailModal({
                           onChange={(e) =>
                             setFormData({ ...formData, baseSalary: e.target.value })
                           }
-                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                           placeholder="Optional"
                         />
                         {formData.baseSalary && parseFloat(formData.baseSalary) > 0 && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-[10px] text-stone-500">
                             {compensationInputMode === 'monthly'
                               ? `≈ ${currency} ${(parseFloat(formData.baseSalary) * 12).toLocaleString()} annually`
                               : `≈ ${currency} ${(parseFloat(formData.baseSalary) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
@@ -869,13 +869,13 @@ export default function EmployeeDetailModal({
                       </>
                     ) : (
                       <>
-                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                        <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                           {currentEmployee.annualSalary
                             ? `${currency} ${currentEmployee.annualSalary.toLocaleString()} / year`
                             : 'N/A'}
                         </p>
                         {currentEmployee.annualSalary && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-[10px] text-stone-500">
                             {currency} {(currentEmployee.annualSalary / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
                           </p>
                         )}
@@ -884,7 +884,7 @@ export default function EmployeeDetailModal({
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Bonus ({isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'})
                     </label>
                     {isEditing ? (
@@ -895,11 +895,11 @@ export default function EmployeeDetailModal({
                           onChange={(e) =>
                             setFormData({ ...formData, bonus: e.target.value })
                           }
-                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                           placeholder="Optional"
                         />
                         {formData.bonus && parseFloat(formData.bonus) > 0 && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-[10px] text-stone-500">
                             {compensationInputMode === 'monthly'
                               ? `≈ ${currency} ${(parseFloat(formData.bonus) * 12).toLocaleString()} annually`
                               : `≈ ${currency} ${(parseFloat(formData.bonus) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
@@ -908,13 +908,13 @@ export default function EmployeeDetailModal({
                       </>
                     ) : (
                       <>
-                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                        <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                           {currentEmployee.bonus
                             ? `${currency} ${currentEmployee.bonus.toLocaleString()} / year`
                             : 'N/A'}
                         </p>
                         {currentEmployee.bonus && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-[10px] text-stone-500">
                             {currency} {(currentEmployee.bonus / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
                           </p>
                         )}
@@ -923,7 +923,7 @@ export default function EmployeeDetailModal({
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-xs font-medium text-stone-700">
                       Equity Value ({isEditing && compensationInputMode === 'monthly' ? 'Monthly' : 'Annual'})
                     </label>
                     {isEditing ? (
@@ -934,11 +934,11 @@ export default function EmployeeDetailModal({
                           onChange={(e) =>
                             setFormData({ ...formData, equityValue: e.target.value })
                           }
-                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-full rounded-md border border-stone-300 px-4 py-2 text-xs focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                           placeholder="Optional"
                         />
                         {formData.equityValue && parseFloat(formData.equityValue) > 0 && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-[10px] text-stone-500">
                             {compensationInputMode === 'monthly'
                               ? `≈ ${currency} ${(parseFloat(formData.equityValue) * 12).toLocaleString()} annually`
                               : `≈ ${currency} ${(parseFloat(formData.equityValue) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} monthly`}
@@ -947,13 +947,13 @@ export default function EmployeeDetailModal({
                       </>
                     ) : (
                       <>
-                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900">
+                        <p className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-xs text-stone-900">
                           {currentEmployee.equityValue
                             ? `${currency} ${currentEmployee.equityValue.toLocaleString()} / year`
                             : 'N/A'}
                         </p>
                         {currentEmployee.equityValue && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-[10px] text-stone-500">
                             {currency} {(currentEmployee.equityValue / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} / month
                           </p>
                         )}
@@ -966,14 +966,14 @@ export default function EmployeeDetailModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="sticky bottom-0 flex items-center justify-between border-t bg-white px-6 py-4">
+          <div className="sticky bottom-0 flex items-center justify-between border-t border-stone-200 bg-white px-5 py-4">
             {!isAddMode && (
               <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-xs text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3.5 w-3.5" />
                 Delete Employee
               </button>
             )}
@@ -992,16 +992,16 @@ export default function EmployeeDetailModal({
                       }
                     }}
                     disabled={loading}
-                    className="rounded-lg border px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg border border-stone-200 px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                   >
-                    <Save className="h-4 w-4" />
+                    <Save className="h-3.5 w-3.5" />
                     {loading
                       ? isAddMode
                         ? 'Adding...'
@@ -1014,7 +1014,7 @@ export default function EmployeeDetailModal({
               ) : (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white hover:bg-blue-700"
+                  className="rounded-lg bg-orange-600 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-700 transition-colors"
                 >
                   Edit Employee
                 </button>

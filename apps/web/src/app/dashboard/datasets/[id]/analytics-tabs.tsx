@@ -31,7 +31,7 @@ export default function AnalyticsTabs({
 
   const tabs = [
     { id: 'general' as AnalyticsTabId, label: 'General Overview', icon: BarChart3 },
-    { id: 'benchmarking' as AnalyticsTabId, label: 'Benchmarking', icon: Scale },
+    { id: 'benchmarking' as AnalyticsTabId, label: 'Bands', icon: Scale },
     { id: 'tenure' as AnalyticsTabId, label: 'Team & Span of Control', icon: Users },
     { id: 'pay-gap' as AnalyticsTabId, label: 'Pay Gap Analysis', icon: TrendingDown },
     { id: 'recommendations' as AnalyticsTabId, label: 'Recommendations', icon: Lightbulb },
@@ -39,12 +39,12 @@ export default function AnalyticsTabs({
 
   if (!metrics || employees.length < 3) {
     return (
-      <div className="rounded-lg border bg-yellow-50 p-8 text-center">
-        <BarChart3 className="mx-auto h-12 w-12 text-yellow-600" />
-        <p className="mt-4 font-medium text-yellow-900">
+      <div className="rounded-lg border-2 border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
+        <BarChart3 className="mx-auto h-10 w-10 text-yellow-600" />
+        <p className="mt-3 text-sm font-medium text-yellow-900">
           Need more data for analytics
         </p>
-        <p className="mt-1 text-sm text-yellow-700">
+        <p className="mt-1 text-xs text-yellow-700">
           Add at least 3 employees to see analytics and insights
         </p>
       </div>
@@ -54,21 +54,21 @@ export default function AnalyticsTabs({
   return (
     <div className="space-y-6">
       {/* Sub-Tab Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+      <div className="border-b border-stone-200">
+        <nav className="-mb-px flex space-x-6">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 border-b-2 px-1 py-3 text-xs font-medium transition-colors ${
                   activeTab === tab.id
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    ? 'border-orange-500 text-orange-600'
+                    : 'border-transparent text-stone-500 hover:border-stone-300 hover:text-stone-700'
                 }`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-3.5 w-3.5" />
                 {tab.label}
               </button>
             );

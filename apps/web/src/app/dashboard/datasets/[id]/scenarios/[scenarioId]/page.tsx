@@ -60,28 +60,28 @@ export default async function ScenarioDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <header className="border-b bg-white">
+      <header className="border-b border-stone-200 bg-white">
         <div className="container mx-auto px-4 py-4">
           <Link
             href={`/dashboard/datasets/${params.id}`}
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-3.5 w-3.5" />
             Back to Dataset
           </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
+      <main className="container mx-auto px-4 py-5">
+        <div className="pb-4 border-b border-stone-200">
+          <h1 className="text-xl font-semibold tracking-tight text-stone-900">
             {scenario.name}
           </h1>
           {scenario.description && (
-            <p className="mt-2 text-gray-600">{scenario.description}</p>
+            <p className="mt-1 text-xs text-stone-500">{scenario.description}</p>
           )}
         </div>
 

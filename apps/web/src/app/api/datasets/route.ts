@@ -2,10 +2,10 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@scleorg/database';
 
-// GET /api/datasets - List all datasets for current user
+// GET /api/datasets - List all datasets for current organization/user
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const { userId, orgId } = await auth();
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -26,8 +26,11 @@ export async function GET() {
       });
     }
 
+    // Filter by organization context or personal workspace
     const datasets = await prisma.dataset.findMany({
-      where: { userId: user.id },
+      where: orgId
+        ? { organizationId: orgId }
+        : { userId: user.id, organizationId: null },
       orderBy: { createdAt: 'desc' },
       include: {
         _count: {
@@ -43,16 +46,16 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching datasets:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch datasets' },
+      { error: 'Failed to fetch companies' },
       { status: 500 }
     );
   }
 }
 
-// POST /api/datasets - Create new dataset
+// POST /api/datasets - Create new company
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
+    const { userId, orgId } = await auth();
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -74,21 +77,45 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, description, companyName, totalRevenue, currency } = body;
+    const {
+      name,
+      description,
+      companyName,
+      totalRevenue,
+      currentCashBalance,
+      currency,
+      fileName,
+      fileUrl,
+      fileType,
+      status,
+      benchmarking, // { industry, region, growthStage }
+    } = body;
 
     const dataset = await prisma.dataset.create({
       data: {
         userId: user.id,
+        organizationId: orgId, // Set organization context from Clerk
         name,
         description,
         companyName,
         totalRevenue,
+        currentCashBalance,
         currency: currency || 'EUR',
-        fileName: 'Manual Entry',
-        fileUrl: '',
-        fileType: 'manual',
-        status: 'READY',
+        fileName: fileName || 'Manual Entry',
+        fileUrl: fileUrl || '',
+        fileType: fileType || 'manual',
+        status: status || 'READY',
         processedAt: new Date(),
+        // Create DatasetSettings if benchmarking data provided
+        ...(benchmarking && {
+          settings: {
+            create: {
+              industry: benchmarking.industry,
+              region: benchmarking.region,
+              growthStage: benchmarking.growthStage,
+            },
+          },
+        }),
       },
     });
 
@@ -96,7 +123,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating dataset:', error);
     return NextResponse.json(
-      { error: 'Failed to create dataset' },
+      { error: 'Failed to create company' },
       { status: 500 }
     );
   }

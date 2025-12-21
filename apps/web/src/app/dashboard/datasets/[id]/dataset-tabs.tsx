@@ -52,7 +52,7 @@ export default function DatasetTabs({
   currency,
   employees,
   metrics,
-  datasetName = 'Workforce Dataset',
+  datasetName = 'Company',
 }: DatasetTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [benchmarkData, setBenchmarkData] = useState<any>(null);

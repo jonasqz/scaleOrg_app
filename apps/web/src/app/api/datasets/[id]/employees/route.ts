@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@scleorg/database';
+import { verifyDatasetAccess } from '@/lib/access-control';
 import { syncPlannedCompensation, validateEmployeeData } from '@/lib/sync-planned-compensation';
 
 // POST /api/datasets/:id/employees - Add employee
@@ -23,13 +24,8 @@ export async function POST(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Verify dataset ownership
-    const dataset = await prisma.dataset.findFirst({
-      where: {
-        id: params.id,
-        userId: user.id,
-      },
-    });
+    // Verify dataset access (organization or personal)
+    const dataset = await verifyDatasetAccess(params.id);
 
     if (!dataset) {
       return NextResponse.json({ error: 'Dataset not found' }, { status: 404 });
